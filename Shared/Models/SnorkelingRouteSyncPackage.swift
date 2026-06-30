@@ -21,6 +21,7 @@ struct SnorkelingRouteSyncPackageBody: Codable, Hashable, Sendable {
     var routePlan: SnorkelingRoutePlan
     var profile: SnorkelingCompanionProfile?
     var maxDistanceLimitMeters: Double?
+    var planningMetadata: SnorkelingRoutePlanningMetadata?
     var capabilities: SnorkelingRouteSyncCapabilities
 }
 

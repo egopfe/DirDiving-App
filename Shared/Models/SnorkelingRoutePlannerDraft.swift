@@ -13,6 +13,7 @@ struct SnorkelingRoutePlannerPoint: Identifiable, Codable, Hashable, Sendable {
     var latitude: Double
     var longitude: Double
     var routeOrder: Int
+    var notes: String?
 
     init(
         id: UUID = UUID(),
@@ -20,7 +21,8 @@ struct SnorkelingRoutePlannerPoint: Identifiable, Codable, Hashable, Sendable {
         role: SnorkelingRoutePointRole,
         latitude: Double,
         longitude: Double,
-        routeOrder: Int = 0
+        routeOrder: Int = 0,
+        notes: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -28,6 +30,7 @@ struct SnorkelingRoutePlannerPoint: Identifiable, Codable, Hashable, Sendable {
         self.latitude = latitude
         self.longitude = longitude
         self.routeOrder = routeOrder
+        self.notes = notes
     }
 }
 
@@ -39,6 +42,10 @@ struct SnorkelingRoutePlannerDraft: Identifiable, Codable, Hashable, Sendable {
     var exitPoint: SnorkelingRoutePlannerPoint?
     var waypoints: [SnorkelingRoutePlannerPoint]
     var maxDistanceLimitMeters: Double?
+    var routeType: SnorkelingRouteType?
+    var returnAlertPolicy: SnorkelingReturnAlertPolicy?
+    var routeProfileKind: SnorkelingRouteProfileKind?
+    var checklist: SnorkelingPreSnorkelingChecklist?
     var updatedAt: Date
 
     init(
@@ -49,6 +56,10 @@ struct SnorkelingRoutePlannerDraft: Identifiable, Codable, Hashable, Sendable {
         exitPoint: SnorkelingRoutePlannerPoint? = nil,
         waypoints: [SnorkelingRoutePlannerPoint] = [],
         maxDistanceLimitMeters: Double? = nil,
+        routeType: SnorkelingRouteType? = nil,
+        returnAlertPolicy: SnorkelingReturnAlertPolicy? = nil,
+        routeProfileKind: SnorkelingRouteProfileKind? = nil,
+        checklist: SnorkelingPreSnorkelingChecklist? = nil,
         updatedAt: Date = Date()
     ) {
         self.id = id
@@ -58,7 +69,27 @@ struct SnorkelingRoutePlannerDraft: Identifiable, Codable, Hashable, Sendable {
         self.exitPoint = exitPoint
         self.waypoints = waypoints
         self.maxDistanceLimitMeters = maxDistanceLimitMeters
+        self.routeType = routeType
+        self.returnAlertPolicy = returnAlertPolicy
+        self.routeProfileKind = routeProfileKind
+        self.checklist = checklist
         self.updatedAt = updatedAt
+    }
+
+    var resolvedRouteType: SnorkelingRouteType {
+        routeType ?? .differentExit
+    }
+
+    var resolvedReturnAlertPolicy: SnorkelingReturnAlertPolicy {
+        returnAlertPolicy ?? .halfPlannedTime
+    }
+
+    var resolvedChecklist: SnorkelingPreSnorkelingChecklist {
+        checklist ?? .default
+    }
+
+    var routingPoints: [SnorkelingRoutePlannerPoint] {
+        orderedPoints
     }
 
     var orderedPoints: [SnorkelingRoutePlannerPoint] {
@@ -79,7 +110,13 @@ struct SnorkelingRoutePlannerDraft: Identifiable, Codable, Hashable, Sendable {
                 return copy
             }
         points.append(contentsOf: sortedWaypoints)
-        if let exitPoint {
+        if resolvedRouteType == .roundTrip, let entryPoint, exitPoint == nil {
+            var returnLeg = entryPoint
+            returnLeg.role = .exit
+            returnLeg.routeOrder = points.count
+            returnLeg.name = returnLeg.name.isEmpty ? "snorkeling.route.exit" : returnLeg.name
+            points.append(returnLeg)
+        } else if let exitPoint {
             var exit = exitPoint
             exit.role = .exit
             exit.routeOrder = points.count

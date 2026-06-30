@@ -41,6 +41,7 @@ struct IOSSnorkelingSessionDetailView: View {
                     dipsSection
                     photosSection
                     markersSection
+                    runtimeSummarySection
                     equipmentSection
                     buddySection
                 }
@@ -309,6 +310,66 @@ struct IOSSnorkelingSessionDetailView: View {
                         Text(markerTimeText(for: marker))
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(DIRTheme.muted)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var runtimeSummarySection: some View {
+        if let summary = session.runtimeSummary {
+            DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.runtime_summary"), icon: "waveform.path.ecg", accent: DIRTheme.cyan) {
+                VStack(alignment: .leading, spacing: 8) {
+                    if let band = summary.gpsQualityBand {
+                        detailRow(
+                            DIRIOSLocalizer.string("snorkeling.logbook.gps_quality"),
+                            DIRIOSLocalizer.string(band.localizationKey)
+                        )
+                    }
+                    detailRow(
+                        DIRIOSLocalizer.string("snorkeling.logbook.track_points"),
+                        "\(summary.trackPointCount)"
+                    )
+                    if let average = summary.averageAccuracyMeters {
+                        detailRow(
+                            DIRIOSLocalizer.string("snorkeling.logbook.average_accuracy"),
+                            String(format: "±%.0f m", average)
+                        )
+                    }
+                    detailRow(
+                        DIRIOSLocalizer.string("snorkeling.logbook.gaps"),
+                        "\(summary.gapsDetected)"
+                    )
+                    if let completion = summary.routeCompletedPercentage {
+                        detailRow(
+                            DIRIOSLocalizer.string("snorkeling.logbook.route_completion"),
+                            String(format: "%.0f%%", completion)
+                        )
+                    }
+                    if summary.returnAlertTriggered {
+                        detailRow(
+                            DIRIOSLocalizer.string("snorkeling.logbook.return_alert"),
+                            "✓"
+                        )
+                    }
+                    if summary.offRouteEventCount > 0 {
+                        detailRow(
+                            DIRIOSLocalizer.string("snorkeling.logbook.off_route_events"),
+                            "\(summary.offRouteEventCount)"
+                        )
+                    }
+                    if let maxOff = summary.maxOffRouteDistanceMeters {
+                        detailRow(
+                            DIRIOSLocalizer.string("snorkeling.logbook.max_off_route"),
+                            String(format: "%.0f m", maxOff)
+                        )
+                    }
+                    if summary.timeOffRouteSeconds > 0 {
+                        detailRow(
+                            DIRIOSLocalizer.string("snorkeling.logbook.time_off_route"),
+                            Formatters.time(summary.timeOffRouteSeconds)
+                        )
                     }
                 }
             }

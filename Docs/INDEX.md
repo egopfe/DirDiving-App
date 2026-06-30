@@ -5,6 +5,23 @@
 
 ---
 
+## Aggiornamento indice 2026-06-17 — Snorkeling iOS + Watch P1/P2/P3 (uncommitted)
+
+Route safety check, profile-based duration, route type, checklist, return alert policy, Watch runtime (GPS bands, route progress, off-route, 50% return alert), logbook runtime summary, export, tests, docs, QA templates.
+
+| Campo | Valore |
+|-------|--------|
+| **Roadmap** | [`SNORKELING_IOS_WATCH_ROADMAP_P1_P2_P3.md`](SNORKELING_IOS_WATCH_ROADMAP_P1_P2_P3.md) |
+| **Architecture** | [`SNORKELING_IOS_WATCH_ARCHITECTURE.md`](SNORKELING_IOS_WATCH_ARCHITECTURE.md) |
+| **Route safety** | [`SNORKELING_ROUTE_SAFETY_CHECK.md`](SNORKELING_ROUTE_SAFETY_CHECK.md) |
+| **Watch return** | [`SNORKELING_WATCH_RETURN_TO_ENTRY.md`](SNORKELING_WATCH_RETURN_TO_ENTRY.md) |
+| **GPS policy** | [`SNORKELING_GPS_QUALITY_POLICY.md`](SNORKELING_GPS_QUALITY_POLICY.md) |
+| **Report** | [`SNORKELING_IOS_WATCH_P1_P2_P3_IMPLEMENTATION_REPORT_CURRENT.md`](SNORKELING_IOS_WATCH_P1_P2_P3_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **QA** | `Docs/QA_EVIDENCE/SNORKELING_IOS_ROUTE_*` · `SNORKELING_WATCH_*` · `SNORKELING_LOGBOOK_GPS_QUALITY` |
+| **Verdict** | **INTERNAL_READY** · **PHYSICAL_QA_PENDING** |
+
+---
+
 ## Aggiornamento indice 2026-06-17 — iOS Snorkeling map UX improvements @ `7a88e9c`
 
 Center-on-location button, reset map with confirmation, section reorder (Map → Route points → Profiles) in iOS Route Planner.

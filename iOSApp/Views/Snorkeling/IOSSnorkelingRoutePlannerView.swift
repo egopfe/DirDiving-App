@@ -17,6 +17,8 @@ struct IOSSnorkelingRoutePlannerView: View {
     @State private var mapNotice: String?
     @State private var pendingCenterOnLocation = false
     @State private var isResetMapConfirmationPresented = false
+    @State private var isShareSheetPresented = false
+    @State private var shareText = ""
 
     private enum MapSelectionMode: String, CaseIterable, Identifiable {
         case entry, waypoint, exit
@@ -33,10 +35,16 @@ struct IOSSnorkelingRoutePlannerView: View {
 
                     mapSection
                     waypointList
+                    routeSafetySection
+                    returnToEntrySection
                     profilesSection
+                    routeTypeSection
+                    routeProfileKindSection
+                    returnAlertSection
+                    checklistSection
                     estimatesCard
-                    validationSection
                     transferSection
+                    exportSection
                     actionButtons
                 }
                 .padding(.horizontal, 18)
@@ -55,6 +63,21 @@ struct IOSSnorkelingRoutePlannerView: View {
             pendingCenterOnLocation = false
             mapNotice = nil
         }
+        .sheet(isPresented: $isShareSheetPresented) {
+            ShareSheetView(activityItems: [shareText])
+        }
+    }
+
+    private var selectedProfile: SnorkelingCompanionProfile? {
+        plannerStore.draft.profileID.flatMap { profileStore.profile(id: $0) }
+    }
+
+    private var validation: SnorkelingRouteValidationResult {
+        plannerStore.validationResult(profile: selectedProfile)
+    }
+
+    private var canSendToWatch: Bool {
+        validation.allowsWatchTransfer
     }
 
     private var mapSection: some View {
@@ -244,7 +267,7 @@ struct IOSSnorkelingRoutePlannerView: View {
                 HStack {
                     Text(DIRIOSLocalizer.string("snorkeling.ios.planner.duration"))
                     Spacer()
-                    Text(IOSSnorkelingRoutePresentation.durationText(seconds: plannerStore.estimatedDurationSeconds))
+                    Text(IOSSnorkelingRoutePresentation.durationText(seconds: plannerStore.estimatedDurationSeconds(profile: selectedProfile)))
                         .font(.headline.monospacedDigit())
                 }
                 if let limit = plannerStore.draft.maxDistanceLimitMeters, limit > 0 {
@@ -265,16 +288,144 @@ struct IOSSnorkelingRoutePlannerView: View {
         }
     }
 
-    @ViewBuilder
-    private var validationSection: some View {
-        if !plannerStore.validationIssues.isEmpty {
-            DIRCard(DIRIOSLocalizer.string("snorkeling.ios.planner.validation"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.orange) {
-                ForEach(plannerStore.validationIssues, id: \.self) { issue in
+    private var routeSafetySection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.route_safety.title"), icon: "checkmark.shield.fill", accent: safetyAccent) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(DIRIOSLocalizer.string(validation.localizationKey))
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(safetyAccent)
+                ForEach(validation.issues, id: \.self) { issue in
                     Text(DIRIOSLocalizer.string(IOSSnorkelingRoutePresentation.validationText(for: issue)))
                         .font(.caption)
                         .foregroundStyle(DIRTheme.orange)
                 }
+                ForEach(validation.warnings, id: \.self) { warning in
+                    Text(DIRIOSLocalizer.string(IOSSnorkelingRoutePresentation.warningText(for: warning)))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.orange)
+                }
             }
+        }
+    }
+
+    private var safetyAccent: Color {
+        switch validation.status {
+        case .ready: return DIRTheme.green
+        case .warning: return DIRTheme.orange
+        case .incomplete, .blocked: return DIRTheme.red
+        }
+    }
+
+    private var returnToEntrySection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.route.return_to_entry"), icon: "location.north.line.fill", accent: DIRTheme.cyan) {
+            let preview = plannerStore.returnToEntryPreview(
+                currentLatitude: locationPermission.currentCoordinate?.latitude,
+                currentLongitude: locationPermission.currentCoordinate?.longitude
+            )
+            VStack(alignment: .leading, spacing: 8) {
+                Text(DIRIOSLocalizer.string("snorkeling.route.gps_orientation_aid"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+                if preview.isAvailable, let distance = preview.distanceMeters {
+                    HStack {
+                        Text(DIRIOSLocalizer.string("snorkeling.route.return_to_entry"))
+                        Spacer()
+                        Text(IOSSnorkelingRoutePresentation.distanceText(meters: distance))
+                            .font(.headline.monospacedDigit())
+                    }
+                    if let bearing = preview.bearingDegrees {
+                        HStack {
+                            Text(DIRIOSLocalizer.string("snorkeling.route.bearing"))
+                            Spacer()
+                            Text(String(format: "%.0f°", bearing))
+                                .font(.headline.monospacedDigit())
+                        }
+                    }
+                } else {
+                    Text(DIRIOSLocalizer.string("snorkeling.route.return_unavailable"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                }
+            }
+            .foregroundStyle(.white)
+        }
+    }
+
+    private var routeTypeSection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.route.type.title"), icon: "arrow.triangle.turn.up.right.diamond.fill", accent: DIRTheme.cyan) {
+            Picker(DIRIOSLocalizer.string("snorkeling.route.type.title"), selection: Binding(
+                get: { plannerStore.draft.resolvedRouteType },
+                set: { plannerStore.setRouteType($0) }
+            )) {
+                Text(DIRIOSLocalizer.string("snorkeling.route.type.round_trip")).tag(SnorkelingRouteType.roundTrip)
+                Text(DIRIOSLocalizer.string("snorkeling.route.type.different_exit")).tag(SnorkelingRouteType.differentExit)
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+
+    private var routeProfileKindSection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.route.profile_kind.title"), icon: "figure.open.water.swim", accent: DIRTheme.cyan) {
+            Picker(DIRIOSLocalizer.string("snorkeling.route.profile_kind.title"), selection: Binding(
+                get: { plannerStore.draft.routeProfileKind },
+                set: { plannerStore.setRouteProfileKind($0) }
+            )) {
+                Text(DIRIOSLocalizer.string("snorkeling.ios.planner.profile_none")).tag(SnorkelingRouteProfileKind?.none)
+                ForEach(SnorkelingRouteProfileKind.allCases) { kind in
+                    Text(DIRIOSLocalizer.string(kind.localizationKey)).tag(Optional(kind))
+                }
+            }
+        }
+    }
+
+    private var returnAlertSection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.alert.return.title"), icon: "bell.badge.fill", accent: DIRTheme.cyan) {
+            Picker(DIRIOSLocalizer.string("snorkeling.alert.return.title"), selection: Binding(
+                get: { plannerStore.draft.resolvedReturnAlertPolicy },
+                set: { plannerStore.setReturnAlertPolicy($0) }
+            )) {
+                Text(DIRIOSLocalizer.string("snorkeling.alert.return.off")).tag(SnorkelingReturnAlertPolicy.off)
+                Text(DIRIOSLocalizer.string("snorkeling.alert.return.time_50")).tag(SnorkelingReturnAlertPolicy.halfPlannedTime)
+                Text(DIRIOSLocalizer.string("snorkeling.alert.return.distance_50")).tag(SnorkelingReturnAlertPolicy.halfPlannedDistance)
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+
+    private var checklistSection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.checklist.title"), icon: "checklist", accent: DIRTheme.cyan) {
+            VStack(alignment: .leading, spacing: 8) {
+                checklistToggle("snorkeling.checklist.weather", keyPath: \.weatherChecked)
+                checklistToggle("snorkeling.checklist.current", keyPath: \.currentAssessed)
+                checklistToggle("snorkeling.checklist.exit", keyPath: \.exitConfirmed)
+                checklistToggle("snorkeling.checklist.buddy", keyPath: \.buddyPresent)
+                checklistToggle("snorkeling.checklist.buoy", keyPath: \.surfaceMarkerBuoy)
+                checklistToggle("snorkeling.checklist.watch_battery", keyPath: \.watchCharged)
+            }
+        }
+    }
+
+    private func checklistToggle(
+        _ key: String,
+        keyPath: WritableKeyPath<SnorkelingPreSnorkelingChecklist, Bool>
+    ) -> some View {
+        Toggle(DIRIOSLocalizer.string(key), isOn: Binding(
+            get: { plannerStore.draft.resolvedChecklist[keyPath: keyPath] },
+            set: { plannerStore.setChecklistValue(keyPath, value: $0) }
+        ))
+        .toggleStyle(.switch)
+        .tint(DIRTheme.cyan)
+    }
+
+    private var exportSection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.export.share_plan"), icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
+            Button(action: sharePlan) {
+                Label(DIRIOSLocalizer.string("snorkeling.export.share_plan"), systemImage: "square.and.arrow.up")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+            }
+            .buttonStyle(.plain)
+            .disabled(!canSendToWatch)
         }
     }
 
@@ -301,7 +452,7 @@ struct IOSSnorkelingRoutePlannerView: View {
                     .background(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).fill(DIRTheme.cyan))
             }
             .buttonStyle(.plain)
-            .disabled(!plannerStore.validationIssues.isEmpty)
+            .disabled(!canSendToWatch)
 
             Button(action: savePlan) {
                 Text(DIRIOSLocalizer.string("snorkeling.ios.planner.save_plan"))
@@ -312,7 +463,7 @@ struct IOSSnorkelingRoutePlannerView: View {
                     .background(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan, lineWidth: 1))
             }
             .buttonStyle(.plain)
-            .disabled(!plannerStore.validationIssues.isEmpty)
+            .disabled(!canSendToWatch)
         }
     }
 
@@ -439,7 +590,7 @@ struct IOSSnorkelingRoutePlannerView: View {
 
     private func sendToWatch() {
         let session = WCSession.default
-        let profile = plannerStore.draft.profileID.flatMap { profileStore.profile(id: $0) }
+        let profile = selectedProfile
         let sent = transferService.send(
             draft: plannerStore.draft,
             profile: profile,
@@ -457,9 +608,18 @@ struct IOSSnorkelingRoutePlannerView: View {
     }
 
     private func savePlan() {
-        if plannerStore.saveCurrentPlan() {
+        if plannerStore.saveCurrentPlan(profile: selectedProfile) {
             transferMessage = DIRIOSLocalizer.string("snorkeling.ios.planner.saved")
         }
+    }
+
+    private func sharePlan() {
+        shareText = SnorkelingRoutePlanExportFormatter.shareText(
+            draft: plannerStore.draft,
+            profile: selectedProfile,
+            validation: validation
+        )
+        isShareSheetPresented = true
     }
 
     private var transferStatusIcon: String {

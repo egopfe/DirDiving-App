@@ -80,7 +80,7 @@ enum SnorkelingRoutePackageBuilder {
         now: Date = Date()
     ) throws -> SnorkelingRouteSyncPackage {
         let routePlan = draft.asRoutePlan()
-        guard SnorkelingRoutePlanValidator.isValid(routePlan) else {
+        guard SnorkelingRouteValidator.validate(draft: draft, profile: profile).allowsWatchTransfer else {
             throw SnorkelingRouteSyncValidationError.invalidRoute
         }
         let body = SnorkelingRouteSyncPackageBody(
@@ -92,6 +92,7 @@ enum SnorkelingRoutePackageBuilder {
             routePlan: routePlan,
             profile: profile,
             maxDistanceLimitMeters: draft.maxDistanceLimitMeters,
+            planningMetadata: SnorkelingRoutePlanningMetadata.make(from: draft, profile: profile),
             capabilities: .current
         )
         return try SnorkelingRouteSyncCodec.seal(body)
