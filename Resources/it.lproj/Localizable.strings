@@ -1524,3 +1524,13 @@
 "snorkeling.watch.off_route" = "Fuori rotta";
 "snorkeling.watch.off_route_paused" = "GPS debole — avviso rotta sospeso";
 "snorkeling.watch.route_progress" = "Rotta";
+
+"apnea.watch.sensors_ok" = "Sensori OK";
+"apnea.watch.depth_weak" = "Profondità debole";
+"apnea.watch.hr_unavailable" = "FC non disponibile";
+"apnea.watch.recovery_target_reached" = "Recupero target raggiunto";
+"apnea.watch.layout.hold" = "APNEA";
+"apnea.watch.layout.depth" = "PROF";
+"apnea.watch.layout.time" = "TEMPO";
+"apnea.summary.reps" = "Ripetizioni";
+"apnea.summary.max_depth" = "Profondità max";

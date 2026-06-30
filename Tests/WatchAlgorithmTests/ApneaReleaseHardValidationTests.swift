@@ -143,7 +143,12 @@ final class ApneaReleaseHardValidationTests: XCTestCase {
             averageDiveDurationSeconds: 0,
             sessionWarnings: [],
             dataQualityDegraded: sensorDegraded,
-            activeOverlay: nil
+            activeOverlay: nil,
+            runtimeLayout: .freeTrainingCompact,
+            sensorQualityLabels: [],
+            maxRepetitions: nil,
+            averageRecoverySeconds: 0,
+            dataQualityLevel: .good
         )
     }
 
