@@ -22,7 +22,7 @@ final class SnorkelingRouteProfileTests: XCTestCase {
     }
 
     func testPlanningMetadataUsesProfileKindWhenNoCompanionProfile() {
-        var draft = SnorkelingRoutePlannerDraft(name: "Meta", routeProfileKind: .coastalExploration, routeType: .roundTrip)
+        var draft = SnorkelingRoutePlannerDraft(name: "Meta", routeType: .roundTrip, routeProfileKind: .coastalExploration)
         draft.entryPoint = SnorkelingRoutePlannerPoint(name: "Entry", role: .entry, latitude: 44.40, longitude: 8.94)
         draft.waypoints = [
             SnorkelingRoutePlannerPoint(name: "WP", role: .waypoint, latitude: 44.401, longitude: 8.941, routeOrder: 0),

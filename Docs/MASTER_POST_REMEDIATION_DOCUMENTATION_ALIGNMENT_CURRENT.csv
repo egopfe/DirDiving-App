@@ -9,5 +9,5 @@ CONS-007,runtime depth capability authority,MASTER_DEPTH_CAPABILITY_POST_REMEDIA
 CONS-008,independent TTS/schedule oracle,MASTER_WATCH_FULL_COMPUTER_ORACLE_INDEPENDENCE_MATRIX,Independent oracle path,FIXED_SOFTWARE,PARTIAL,PENDING_EXTERNAL,Note partial altitude/oracle external validation,P2,
 CONS-019,Water auto-open FC depth gate,MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT,DepthCapabilityPolicy in automatic step,FIXED_SOFTWARE,TRUE,PENDING,Feature matrix row missing,P1,
 CONS-046,validate_commands_for_cursor_integrity.sh drift,INDEX orchestrator V1.3 block,Script expects old filenames,OPEN,PARTIAL,n/a,Update script to V2.2/V2.3/V1.2 paths,P1,Documented in INDEX; script not fixed
-CONS-047,stale upstream audit outputs,MASTER_CONSOLIDATED_AUDIT plan,01–06 outputs predating Snorkeling wave,PARTIAL,PARTIAL,PENDING,Re-run upstream audits @ 451f8fb or update baseline notes,P1,
+CONS-047,stale upstream audit outputs,MASTER_CONSOLIDATED_AUDIT plan,01–06 rerun @ 451f8fb,PASS,PASS,COMPLETE,Closed 2026-06-30,P2,Audits current; surfaced CONS-049
 CONS-048,Snorkeling physical QA pending,SNORKELING_* docs; INDEX Snorkeling blocks,INTERNAL_READY · PHYSICAL_QA_PENDING,TRUE,TRUE,PENDING,None if labels kept,P3,Snorkeling docs aligned

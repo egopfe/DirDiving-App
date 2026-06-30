@@ -1,6 +1,8 @@
 Rank,Consolidated_Finding_ID,Severity,Priority,Recommended_Batch,Recommended_Command,Dependency_Level,Safety_Critical,Release_Blocker,Quick_Win,High_Regression_Risk,Needs_Physical_QA,Needs_External_Validation,Reason_For_Rank,Acceptance_Gate,Notes
-1,CONS-010,P1,P1,Batch-8,Physical Watch Ultra matrix,0,Yes,Yes,No,No,Yes,No,0% physical depth QA — top external TF blocker,Signed wet depth log,MWFC-P2-001
-2,CONS-042,P1,P1,Batch-8,Shallow wet QA gate,0,Yes,Yes,No,No,Yes,Yes,Shallow/full depth separation field,Signed shallow wet,Software gating PASS @ 5d757cc
+1,CONS-049,P1,P1,Batch-0,iOS Snorkeling test compile fix,0,No,Yes,Yes,Low,No,No,iOS Algorithm Tests BUILD FAILED blocks CI regression,xcodebuild iOS Algorithm Tests SUCCEEDED,New @ 451f8fb — IOS-P1-001
+2,CONS-046,P1,P1,Script-fix,Update validate_commands_for_cursor_integrity.sh,0,No,Yes,Yes,Low,No,No,Automated command integrity gate FAIL,Script PASS @ HEAD,Script drift only — bodies aligned
+3,CONS-048,P1,P1,Batch-8,Snorkeling 12 QA templates,1,Yes,Yes,No,No,Yes,No,12 open-water templates block Snorkeling external TF,12/12 signed folders,Software PASS @ dbe5d8b
+4,CONS-010,P1,P1,Batch-8,Physical Watch Ultra matrix,1,Yes,Yes,No,No,Yes,No,0% physical depth QA — top external TF blocker,Signed wet depth log,MWFC-P2-001
 3,CONS-021,P1,P1,Batch-8,WAO physical QA,0,No,Yes,No,No,Yes,No,SOFTWARE_READY — physical pending,Signed WAO artifacts,WAO-G-008
 4,CONS-022,P1,P1,Batch-8,Underwater HW QA,0,No,Yes,No,No,Yes,No,Crown/Action Button physical,Signed HW artifacts,MASB-HW-01..03
 5,CONS-011,P1,P1,Batch-8,Paired device QA campaign,0,No,Yes,No,No,Yes,No,Validates sync fixes @ 5d757cc,Signed paired pack,CONS-003..005 closed

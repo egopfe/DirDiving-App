@@ -545,6 +545,7 @@ targets:
       - iOSApp/Services/IOSSnorkelingBuddySafetyStore.swift
       - iOSApp/Services/IOSSnorkelingSessionPhotoStore.swift
       - iOSApp/Services/IOSSnorkelingSessionExportService.swift
+      - iOSApp/Services/SnorkelingRoutePlanExportFormatter.swift
       - iOSApp/Services/SnorkelingRouteSyncAckSigner.swift
       - iOSApp/Services/ApneaSyncAckSigner.swift
       - iOSApp/Services/ApneaSessionSyncCodec.swift
