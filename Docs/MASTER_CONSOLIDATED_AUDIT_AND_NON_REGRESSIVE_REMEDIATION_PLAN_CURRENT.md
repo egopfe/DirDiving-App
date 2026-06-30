@@ -1,53 +1,55 @@
 # Master Consolidated Audit and Non-Regressive Remediation Plan — Current
 
-**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.2.md`  
-**Execution date:** 2026-06-29  
+**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.3.md`  
+**Execution date:** 2026-06-30  
 **Repository:** `egopfe/DirDiving-App`  
 **Branch:** `main`  
-**Execution HEAD:** `0126699` (orchestrator refresh; code-bearing audit baseline @ `4d415c0`; remediation @ `5d757cc`; prior orchestrator @ `8ae1034`)
-**Prior orchestrator:** `7dfefe2` · **Prior remediation:** Command 10 @ `5d757cc`  
+**Execution HEAD:** `bb204f5` (command upgrade V1.2/V2.2/V2.3; Snorkeling P1/P2/P3 @ `dbe5d8b`–`70cf0d9`; prior orchestrator @ `0126699`; remediation @ `5d757cc`)  
 **Execution mode:** Read-only orchestration — no production code modified
 
 ---
 
 ## A. Executive Summary
 
-Orchestrator **V1.2 refresh** executed @ `0126699` and consolidates six upstream master audits after **Command 10 consolidated software remediation** and **post-remediation read-only reruns of all six audits (01–06)** @ `5d757cc`–`4d415c0`. The delta from `4d415c0` to `0126699` is documentation/orchestrator-only, so the code-bearing audit baseline remains usable. Audit **03 UI/UX** refreshed @ `4d415c0` — **PARTIAL** (software PASS; physical/pixel PENDING).
+Orchestrator **V1.3** executed @ `bb204f5`. Consolidates six upstream master audits after **Command 10 consolidated software remediation** (@ `5d757cc`), **Snorkeling P1/P2/P3 software wave** (@ `dbe5d8b`), and **post-remediation verification audit 07** (this session). Upstream domain audits **01–06 are STALE_UPSTREAM_AUDIT_OUTPUT** — last doc commit `905692e` (2026-06-29), predating Snorkeling and command refresh.
 
-**Overall verdict: PARTIAL.** **Software-actionable scope: 100%** (`validate_consolidated_software_readiness.sh` PASS). **P0 software safety defects: 0.** **P1 software open: 0.** Physical and external evidence remain **0% executed** — do not claim PASS.
+**Overall verdict: PARTIAL.** Prior **software-actionable scope: 100%** closed (@ `5d757cc`). **New P1 OPEN:** CONS-046 (script drift). **P2 STALE:** CONS-047 (audits 01–06). **P1 PENDING_PHYSICAL:** CONS-048 (12 Snorkeling QA templates). Physical and external evidence remain **0% executed** — do not claim PASS.
 
 | Dimension | Score | Class |
 |-----------|------:|-------|
-| Watch FC software | **92%** | SOFTWARE_READY |
-| iOS companion software | **92%** | SOFTWARE_READY |
-| UI/UX software | **100%** | SOFTWARE_READY @ `4d415c0` |
+| Watch FC software | **92%** | SOFTWARE_READY (pre-Snorkeling audit; rerun 01 required) |
+| iOS companion software | **92%** | SOFTWARE_READY (+ Snorkeling @ dbe5d8b unaudited in 02) |
+| UI/UX software | **100%** | SOFTWARE_READY (audit 03 stale vs Snorkeling planner) |
 | Main code / sync / security | **93%** | SOFTWARE_READY |
-| Release / QA / legal software | **78%** | Mixed — physical/legal pending |
-| Documentation alignment | **72%** | PARTIAL (README/matrix P2 drift) |
-| Physical QA | **0%** | PENDING_PHYSICAL |
+| Release / QA / legal software | **78%** | Mixed — physical/legal pending + Snorkeling QA |
+| Documentation alignment | **68%** | PARTIAL — command upgrade + script drift (CONS-046) |
+| Snorkeling P1/P2/P3 software | **95%** | SOFTWARE_READY @ dbe5d8b — domain audits STALE |
+| Physical QA | **0%** | PENDING_PHYSICAL (+ 12 Snorkeling templates) |
 | External validation | **0%** | PENDING_EXTERNAL_VALIDATION |
-| **Overall consolidated release readiness** | **~72%** | PARTIAL |
+| **Overall consolidated release readiness** | **~70%** | PARTIAL |
 
-**Release posture:** Internal TestFlight software **READY** · External TestFlight **NOT READY** · App Store **NOT READY**
+**Release posture:** Internal TestFlight software **CONDITIONAL** (rerun 01–06) · External TestFlight **NOT READY** · App Store **NOT READY**
 
-**Recommended next:** Physical/external QA campaigns · optional doc-only README/feature matrix · legal/release packaging.
+**Recommended next:** Fix integrity script (CONS-046) → rerun audits 01–06 (CONS-047) → Snorkeling + Diving physical QA campaigns.
 
 ---
 
 ## B. Source Audit Inputs and Completeness
 
-| Audit | Command (filename) | Body @ 0126699 | Rerun | Outputs | Completeness |
-|-------|-------------------|----------------|-------|---------|--------------|
-| **01** Watch FC Forensic | `01-...V2.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 14+ `MASTER_WATCH_FULL_COMPUTER_*` | **COMPLETE** |
-| **02** iOS Deep | `02-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 9+ `MASTER_IOS_*` | **COMPLETE** |
-| **03** UI/UX Deep | `03-...V2.2.md` | **ALIGNED** | **COMPLETE** @ `4d415c0` | 17+ `MASTER_UI_UX_*` + WAO/HW | **COMPLETE** |
-| **04** Main/Sync/Security/Perf | `04-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 17+ `MASTER_MAIN_CODE_*` | **COMPLETE** |
-| **05** Release/QA/Legal | `05-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 10+ release gate matrices | **COMPLETE** |
-| **06** Documentation | `06-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 7+ `MASTER_DOCUMENTATION_*` | **COMPLETE** |
+| Audit | Command (filename) | Body @ bb204f5 | Last output commit | Outputs | Completeness |
+|-------|-------------------|----------------|-------------------|---------|--------------|
+| **01** Watch FC Forensic | `01-...V2.2.md` | **ALIGNED** | **STALE** @ `905692e` | 14+ `MASTER_WATCH_FULL_COMPUTER_*` | **STALE_UPSTREAM** |
+| **02** iOS Deep | `02-...V1.2.md` | **ALIGNED** | **STALE** @ `905692e` | 9+ `MASTER_IOS_*` | **STALE_UPSTREAM** |
+| **03** UI/UX Deep | `03-...V2.3.md` | **ALIGNED** | **STALE** @ `905692e` | 17+ `MASTER_UI_UX_*` | **STALE_UPSTREAM** |
+| **04** Main/Sync/Security/Perf | `04-...V1.2.md` | **ALIGNED** | **STALE** @ `905692e` | 17+ `MASTER_MAIN_CODE_*` | **STALE_UPSTREAM** |
+| **05** Release/QA/Legal | `05-...V1.2.md` | **ALIGNED** | **STALE** @ `905692e` | 10+ release gate matrices | **STALE_UPSTREAM** |
+| **06** Documentation | `06-...V1.2.md` | **ALIGNED** | **STALE** @ `905692e` | 7+ `MASTER_DOCUMENTATION_*` | **STALE_UPSTREAM** |
+| **07** Post-remediation | `07-...V1.0.md` | **ALIGNED** | **CURRENT** @ `bb204f5` | 8 verification deliverables | **COMPLETE** |
 
-**CONS-001 command permutation:** **FIXED** — `validate_commands_for_cursor_integrity.sh` PASS.
+**All 66 expected upstream files PRESENT** but **STALE** relative to `dbe5d8b` Snorkeling wave and `bb204f5` command upgrade.
 
-**Audit 03 @ 4d415c0:** CONS-019 WAO depth gate **FIXED_SOFTWARE**; `audit_accessibility_contracts.sh` PASS; pixel baselines **0/59 PENDING**; physical WAO/HW/a11y gates unchanged **PENDING_PHYSICAL**.
+**CONS-001 command body permutation:** **FIXED** @ 5d757cc — filenames V2.2/V1.2/V2.3 bodies match launch order.  
+**CONS-046 script drift:** **OPEN** — `validate_commands_for_cursor_integrity.sh` still references superseded V2.1/V1.1 paths in `OOLD/`.
 
 ---
 
@@ -55,16 +57,14 @@ Orchestrator **V1.2 refresh** executed @ `0126699` and consolidates six upstream
 
 | Field | Value |
 |-------|-------|
-| Branch | `main` ✓ |
-| Execution HEAD | `0126699` |
+| Branch | `main` ✓ @ `bb204f5` |
+| Snorkeling P1/P2/P3 | `dbe5d8b`–`70cf0d9` |
+| Command upgrade | `bb204f5` (V1.2/V2.2/V2.3; old → `commands_for_cursor/OOLD/`) |
 | Remediation commit | `5d757cc` (Command 10) |
-| Code-bearing audit baseline | `4d415c0` |
-| Audit 03 refresh | `4d415c0` |
-| Pre-remediation baseline | `7dfefe2` |
-| Orchestrator prior | `8ae1034` @ 2026-06-29 |
-| Orchestrator refresh | `0126699` @ 2026-06-29 |
-| `commands_for_cursor/` | Present; **01–04 ALIGNED** (CONS-001 FIXED) |
-| Software readiness script | `validate_consolidated_software_readiness.sh` **PASS** |
+| Prior orchestrator | `0126699` @ 2026-06-29 |
+| Upstream audit doc baseline | `905692e` / `4d415c0` (pre-Snorkeling) |
+| iOS + Watch build | **SUCCEEDED** @ bb204f5 |
+| `commands_for_cursor/` | Present; **01–07 ALIGNED**; script gate **FAIL** |
 
 ---
 
@@ -72,26 +72,27 @@ Orchestrator **V1.2 refresh** executed @ `0126699` and consolidates six upstream
 
 | Lane | Status | Evidence |
 |------|--------|----------|
-| Software-actionable findings | **100% closed** | Command 10 + reruns **01–06** |
-| Internal TestFlight (software) | **READY** | Audit 05 + consolidated script PASS |
-| External TestFlight | **NOT READY** | Physical QA 0%; external validation 0% |
-| App Store | **NOT READY** | + legal/marketing pending (CONS-044) |
-| Physical QA execution | **0%** | All matrices NOT_EXECUTED |
-| External validation execution | **0%** | Templates only — NOT_EXECUTED |
-| Legal review | **PENDING** | CONS-044 template only |
+| Software-actionable findings (pre-Snorkeling) | **100% closed** | Command 10 @ 5d757cc |
+| Snorkeling P1/P2/P3 software | **DELIVERED** | dbe5d8b — 14 test files; implementation report |
+| Domain audits 01–06 | **STALE** | CONS-047 — predates Snorkeling |
+| Internal TestFlight (software) | **CONDITIONAL** | Rerun 01–06 after Snorkeling |
+| External TestFlight | **NOT READY** | Physical QA 0%; +12 Snorkeling templates |
+| App Store | **NOT READY** | + legal/marketing (CONS-044) |
+| Physical QA execution | **0%** | CONS-048 adds 12 Snorkeling folders |
+| Command integrity automation | **FAIL** | CONS-046 |
 
-**June 2026 wave — consolidated status @ 4d415c0:**
+**Snorkeling P1/P2/P3 wave — consolidated status @ dbe5d8b:**
 
-| Feature area | SOFTWARE_READY | PENDING_PHYSICAL / EXTERNAL |
-|--------------|:--------------:|----------------------------|
-| Water auto-open policy + Settings | **PASS** @ `4d415c0` (audit 03) | Submerged auto-launch, end-to-end water entry, Water Lock |
-| Digital Crown underwater clamp | **PASS** | Crown paging underwater, Water Lock interaction |
-| Action Button / App Intents router | **PASS** | Ultra Action Button under Water Lock |
-| Cold-launch modal sequencing | **PASS** | Submersion probe on real hardware (400 ms timeout risk) |
-| GF presets (Watch 20/80, 30/70, 40/85) | **PASS** (Watch + iOS) | External Bühlmann spot-check (CONS-043) |
-| Shallow-depth entitlement + dev toggles | **PASS** (gated) | Wet shallow QA; signing field validation |
-| Developer Gauge/FC testing toggles | **PASS** (default OFF) | TestFlight process discipline |
-| Sync in-flight / ACK / tombstones | **PASS** | Paired device field QA (CONS-011) |
+| Feature area | SOFTWARE_READY | PENDING_PHYSICAL / STALE_AUDIT |
+|--------------|:--------------:|-------------------------------|
+| Route safety check + validation | **PASS** | Field open-water validation |
+| iOS route planner P1/P2/P3 sections | **PASS** | Audit 02/03 STALE |
+| Watch runtime evaluator (GPS, off-route, return) | **PASS** | 12 QA templates PENDING |
+| Route sync iOS→Watch | **PASS** | Paired-device field QA |
+| Cross-activity isolation | **PASS** (tests) | SNORKELING_NO_CROSS_ACTIVITY_REGRESSION pending |
+| Shared helpers (distance, bearing, GPS quality) | **PASS** | Logbook GPS quality field QA |
+
+**June 2026 wave (pre-Snorkeling) — status unchanged from prior consolidation @ 0126699** — WAO, Crown, GF, shallow, sync fixes remain SOFTWARE_READY with physical gates PENDING.
 
 ---
 
@@ -99,51 +100,45 @@ Orchestrator **V1.2 refresh** executed @ `0126699` and consolidates six upstream
 
 | Gate | Status | Top blockers |
 |------|--------|--------------|
-| Internal TestFlight (software) | **READY** | None — P1 software closed @ 5d757cc |
-| Internal TestFlight (full) | **CONDITIONAL** | Physical QA not started |
-| External TestFlight | **NOT READY** | All physical QA 0%; CONS-009 external; CONS-044 legal |
-| App Store | **NOT READY** | External TF blockers + shallow/FC claims + marketing counsel |
-
-Burndown: `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`
+| Command integrity script | **BLOCKED** | CONS-046 |
+| Internal TestFlight (software) | **CONDITIONAL** | CONS-047 stale audits |
+| Internal TestFlight (full) | **NOT READY** | Physical QA not started |
+| External TestFlight | **NOT READY** | Physical 0%; Snorkeling QA; CONS-009 external |
+| App Store | **NOT READY** | External TF + CONS-044 legal |
 
 ---
 
 ## F. Consolidated Finding Register Summary
 
-**45 consolidated findings** (CONS-001..045). See `MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`.
+**48 consolidated findings** (CONS-001..048). See `MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`.
 
-| Severity | Open software | Pending physical/external/legal | Notes |
-|----------|--------------:|--------------------------------:|-------|
-| **P0** | **0** | 0 | CONS-001 FIXED @ 5d757cc |
-| **P1** | **0** | **9** | Evidence campaigns 009–013, 021–022, 042, 044 |
-| **P2** | **3** partial/doc | **12** pending | 015 partial; 016/020 documented; field QA open |
-| **P3** | **6** | 0 | 028, 035–037, 040–041 maintainability |
-| **P4** | 0 | 1 accepted | CONS-039 Apnea cloud stub |
+| Severity | Open software | Pending physical/external/legal/stale | Notes |
+|----------|--------------:|---------------------------------------:|-------|
+| **P0** | **0** | 0 | CONS-001 FIXED |
+| **P1** | **1** | **10+** | CONS-046 OPEN; evidence 009–013, 021–022, 042, 044, 048 |
+| **P2** | **4** | **13** | CONS-047 STALE; 015 partial; field QA open |
+| **P3** | **6** | 0 | 028, 035–037, 040–041 |
+| **P4** | 0 | 1 accepted | CONS-039 |
 
-**Fixed in Command 10 (verified @ reruns):** CONS-001..008, 014, 017–019, 027, 034, 038.
+**New @ V1.3:** CONS-046 (script drift), CONS-047 (stale audits), CONS-048 (Snorkeling physical QA).
 
 ---
 
 ## G. Deduplication Method and Results
 
-**17 multi-source duplicate groups** in `MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv` (**19 root-cause groups tracked**). Merged only on **shared root cause** — refreshed from prior orchestrator @ 7dfefe2.
-
-Key groups: DG-DOC-002 (CONS-001), DG-GF-001 (CONS-002/038/043), DG-SYNC-001 (CONS-011), DG-WAO-001 (CONS-021), DG-EVID-001 (CONS-045).
-
-**Post-remediation:** CONS-002 software cluster closed — DG-GF-001 links CONS-043 external layer only.
+**17 multi-source duplicate groups** in `MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv` (unchanged from @ 0126699). Snorkeling physical QA tracked as CONS-048 meta-finding; overlaps CONS-026, CONS-031 without deduplication (different root causes: map FPS vs route safety field validation).
 
 ---
 
 ## H. Severity Escalations and Rationale
 
-| Finding | Escalation | Rationale | Post-remediation |
-|---------|------------|-----------|------------------|
-| CONS-001 | **P0** (doc) | Wrong audit execution if filenames trusted | **CLOSED** @ 5d757cc |
-| CONS-002 | **P1** | iOS+Release GF import safety-visible mismatch | **CLOSED** @ 5d757cc |
-| CONS-003..005 | **P1** | Sync integrity per audit 04/05 | **CLOSED** @ 5d757cc |
-| CONS-021, CONS-022 | **P1** (physical) | External TestFlight gates | Still **PENDING_PHYSICAL** |
+| Finding | Escalation | Rationale | Status |
+|---------|------------|-----------|--------|
+| CONS-046 | **P1** (new) | Automated integrity gate FAIL after command upgrade | **OPEN** |
+| CONS-047 | **P2** | Domain audits untrustworthy for Snorkeling release scope | **STALE_UPSTREAM** |
+| CONS-048 | **P1** (physical) | 12 open-water QA templates block Snorkeling external claims | **PENDING_PHYSICAL** |
 
-No new escalations in this refresh. No severity downgrades applied.
+Prior escalations (CONS-001..022, CONS-042) unchanged.
 
 ---
 
@@ -151,26 +146,24 @@ No new escalations in this refresh. No severity downgrades applied.
 
 | Conflict | Resolution |
 |----------|------------|
-| Command filename vs body (01–04) | **RESOLVED** @ 5d757cc — CONS-001 FIXED |
-| UI/UX 100% software vs Release 72% overall | **No conflict** — physical 0% weighting |
-| Audit 03 @ 4d415c0 vs 04/05 WAO software PASS | **Aligned** — CONS-019 verified in audit 03 |
-| Water auto-open SOFTWARE_READY vs Release PENDING_PHYSICAL | **No conflict** — both preserved |
-| Prior orchestrator @ 8ae1034 | **Superseded** by this execution @ 0126699 |
+| Command filenames V2.2/V1.2 vs script V2.1/V1.1 | **CONS-046 OPEN** — bodies aligned; script not updated |
+| Snorkeling SOFTWARE_READY vs stale audit 02/03 | **No conflict** — preserve both; rerun required |
+| Prior orchestrator @ 0126699 "no stale" vs dbe5d8b | **Superseded** — CONS-047 documents STALE |
+| Water auto-open SOFTWARE_READY vs PENDING_PHYSICAL | **No conflict** — both preserved |
 
-**CROSS_AUDIT_CONFLICTS (technical): 0** · **COMMAND_INTEGRITY_CONFLICTS: 0**
+**CROSS_AUDIT_CONFLICTS (technical): 0** · **COMMAND_INTEGRITY_CONFLICTS: 1** (CONS-046)
 
 ---
 
 ## J. Root-Cause Clusters
 
-1. **Evidence execution gap** — physical 0%, external 0% (CONS-009..013, CONS-021..022, CONS-029..033, CONS-042, CONS-045) — **primary remaining work**
-2. **Release/legal packaging** — counsel, PDF, marketing (CONS-013, CONS-044)
-3. **Documentation drift** — README baseline, feature matrix (CONS-034 partial; INDEX updated)
-4. **Oracle / external decompression confidence** — third-party compare (CONS-009, CONS-043)
-5. **June 2026 wave physical gates** — WAO, Crown, Action Button, shallow wet (CONS-021, CONS-022, CONS-042)
-6. **P3 maintainability** — navigation restore, stop FSM, settings dual-binding (CONS-028, CONS-035..037, CONS-040..041)
+1. **Evidence execution gap** — physical 0%, external 0%, +12 Snorkeling QA (CONS-048, CONS-045)
+2. **Upstream audit staleness** — Snorkeling + command upgrade not in 01–06 (CONS-047)
+3. **Command tooling drift** — validate script superseded paths (CONS-046)
+4. **Release/legal packaging** — counsel, PDF (CONS-013, CONS-044)
+5. **June 2026 wave physical gates** — WAO, Crown, shallow (CONS-021, CONS-022, CONS-042)
 
-**Closed clusters (do not regress):** command integrity, GF parity, sync reliability, depth gating, WAO policy gate, planner lifecycle.
+**Closed clusters (do not regress):** GF parity, sync reliability, depth gating, WAO policy gate, planner lifecycle, Snorkeling shared helpers (software).
 
 ---
 
@@ -178,9 +171,7 @@ No new escalations in this refresh. No severity downgrades applied.
 
 See `MASTER_FINDING_DEPENDENCY_GRAPH_CURRENT.md`.
 
-**Critical path shifted post-remediation:** Physical QA campaigns (CONS-010, CONS-011, CONS-021, CONS-022, CONS-042) → external validation (CONS-009, CONS-043) → legal release (CONS-044).
-
-**CONS-001 no longer blocks** audit re-run. **CONS-002 closed** — GF external spot-check (CONS-043) unblocked for narrative only.
+**Critical path @ bb204f5:** CONS-046 script fix → CONS-047 audit reruns 01–06 → CONS-048 Snorkeling physical QA → legacy physical campaigns → external validation → legal release.
 
 ---
 
@@ -188,129 +179,35 @@ See `MASTER_FINDING_DEPENDENCY_GRAPH_CURRENT.md`.
 
 See `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`.
 
-**New rank order:** Physical/external QA campaigns (Ranks 1–10) → legal/docs (Ranks 11–14) → P3 maintainability (Ranks 15+).
-
-Software P1 items (formerly Ranks 1–8) marked **COMPLETE @ 5d757cc**.
+**New rank order @ V1.3:**  
+1. CONS-046 script fix  
+2. CONS-047 audit reruns 01–06  
+3. CONS-048 Snorkeling physical QA  
+4. Legacy physical/external campaigns (CONS-010..013, CONS-021..022, CONS-042)  
+5. Legal/docs (CONS-044, CONS-034 partial)
 
 ---
 
-## M. Non-Regressive Batch Plan (V1.2)
+## M. Non-Regressive Batch Plan (V1.3)
 
-| Batch | Name | Status @ 0126699 | Primary remaining |
+| Batch | Name | Status @ bb204f5 | Primary remaining |
 |-------|------|------------------|-------------------|
-| **0** | Baseline protection | **COMPLETE** | CONS-014 VERIFIED |
-| **1** | Safety-critical Watch FC | **COMPLETE** (software) | CONS-015 partial altitude; CONS-016 documented |
-| **2** | Data integrity / sync | **COMPLETE** | Field paired QA (CONS-011) |
-| **3** | Activity architecture | **OPEN** (P3) | CONS-028, CONS-040 |
-| **4** | iOS Planner / GF | **COMPLETE** | CONS-043 external only |
-| **5** | Performance / concurrency | **COMPLETE** (CONS-027) | Field perf (CONS-023..026) |
-| **6** | UI/UX / WAO / a11y | **COMPLETE** (software) | CONS-012, CONS-032 physical |
-| **7** | Security / depth | **COMPLETE** (software) | CONS-042 wet QA |
-| **8** | Tests / QA / evidence | **ACTIVE** | All physical/external matrices |
-| **9** | Release / legal / docs | **PARTIAL** | CONS-034 README/matrix; CONS-044 legal |
+| **0** | Baseline protection | **COMPLETE** | Build PASS @ bb204f5 |
+| **1–7** | Software remediation | **COMPLETE** | Field QA remains |
+| **Snorkeling** | P1/P2/P3 software | **COMPLETE** @ dbe5d8b | CONS-048 physical |
+| **Script** | Command integrity | **OPEN** | CONS-046 |
+| **Rerun** | Domain audits 01–06 | **REQUIRED** | CONS-047 |
+| **8** | Tests / QA / evidence | **ACTIVE** | All physical/external + Snorkeling 12 |
+| **9** | Release / legal / docs | **PARTIAL** | CONS-044; command matrix after 06 |
 
 ---
 
-## N. Batch 0 — Baseline Protection
+## N–W. Batch Summaries
 
-**Status: COMPLETE @ 5d757cc**
-
-- CONS-014 VERIFIED — iOS 1527/1527 PASS; targeted Watch remediation tests PASS
-- Gates: `validate_consolidated_software_readiness.sh` PASS
-- Full Watch algorithm suite compile maintenance deferred (test-maintenance only; not FC blocker)
-
----
-
-## O. Batch 1 — Watch Full Computer Safety-Critical
-
-**Status: COMPLETE (software) @ 5d757cc**
-
-- CONS-008 FIXED — independent oracle path verified @ rerun 01
-- CONS-017, CONS-018, CONS-038 FIXED — test expectation repairs
-- **Remaining:** CONS-015 PARTIAL (altitude 500–2000m field); CONS-016 DOCUMENTED_LIMITATION (1-min TTS quantization)
-
----
-
-## P. Batch 2 — Data Integrity / Sync / Persistence
-
-**Status: COMPLETE @ 5d757cc**
-
-- CONS-003 in-flight release on failed ACK — FIXED
-- CONS-004 symmetric diveImportAck on userInfo — FIXED
-- CONS-005 signed-only tombstone merge — FIXED
-- **Remaining:** CONS-011 paired device field QA (physical)
-
----
-
-## Q. Batch 3 — Activity Architecture / Settings / Logbooks
-
-**Status: PARTIAL — P3 backlog**
-
-- CONS-028 OPEN — iOS navigation state restoration after process death
-- CONS-040 OPEN — dual settings binding MoreView vs store
-- CONS-039 DOCUMENTED_ACCEPTED_RISK — Apnea iCloud stub
-
----
-
-## R. Batch 4 — iOS Planner / Companion Math and Data
-
-**Status: COMPLETE @ 5d757cc**
-
-- CONS-002 FIXED — GF 20/80, 30/70, 40/85 aligned; `gradientFactorPreset` emitted
-- CONS-038 FIXED — import test assertions updated
-- **Remaining:** CONS-043 external GF spot-check; CONS-030 Subsurface external
-
----
-
-## S. Batch 5 — Performance / Concurrency / Stale Async
-
-**Status: COMPLETE (software) @ 5d757cc**
-
-- CONS-027 FIXED — PlannerStore deinit cancels tasks
-- **Remaining:** CONS-023..026 field profiling (physical)
-
----
-
-## T. Batch 6 — UI/UX Truthfulness / Accessibility
-
-**Status: COMPLETE (software) @ 0126699 — audit 03 refreshed; code baseline unchanged from 4d415c0**
-
-- CONS-019 FIXED — DepthCapabilityPolicy on water auto-open path
-- **Remaining:** CONS-012 manual a11y; CONS-032 pixel baselines (physical)
-- All six upstream audits refreshed post-remediation (01–06 @ `5d757cc`–`4d415c0`)
-
----
-
-## U. Batch 7 — Security / Privacy / Apple Platform
-
-**Status: COMPLETE (software) @ 5d757cc**
-
-- CONS-006 FIXED — dev shallow toggles default OFF, gated
-- CONS-007 FIXED — compile authority drives runtimeAuthorityTier
-- **Remaining:** CONS-042 shallow wet QA (physical)
-
----
-
-## V. Batch 8 — Tests / QA / Evidence
-
-**Status: ACTIVE — primary release path**
-
-Execute physical/external matrices without fabricating evidence:
-
-- CONS-009, CONS-010, CONS-011, CONS-012, CONS-013, CONS-021, CONS-022, CONS-023..026, CONS-029..032, CONS-042, CONS-043, CONS-045
-
-Preserve `SOFTWARE_READY` vs `PENDING_PHYSICAL` in all registers.
-
----
-
-## W. Batch 9 — Release / Legal / Documentation
-
-**Status: PARTIAL**
-
-- CONS-001 FIXED — command bodies restored
-- CONS-034 PARTIAL — INDEX wave present; README/feature matrix drift P2
-- CONS-044 PENDING_LEGAL_REVIEW — counsel sign-off template only
-- CONS-013 PENDING_PHYSICAL — PDF golden renders
+**Batch 0–7:** COMPLETE @ 5d757cc (unchanged from V1.2).  
+**Snorkeling wave:** Route safety, Watch runtime, 14 test files @ dbe5d8b — SOFTWARE_READY; physical PENDING (CONS-048).  
+**Batch 8:** ACTIVE — primary release path including Snorkeling open-water QA.  
+**Batch 9:** PARTIAL — command docs need 06 rerun after bb204f5 upgrade.
 
 ---
 
@@ -318,15 +215,7 @@ Preserve `SOFTWARE_READY` vs `PENDING_PHYSICAL` in all registers.
 
 See `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`.
 
-**Command 10 COMPLETE.** Software remediation steps 1–8 done @ `5d757cc`.
-
-**Next executable tracks:**
-
-1. Batch 8 — physical QA campaign planning and execution  
-2. Batch 8 — external Bühlmann / GF / Subsurface validation  
-3. Batch 9 (doc-only) — README + feature matrix repair  
-4. Optional — audit 03 rerun @ HEAD  
-5. Orchestrator 00 refresh after evidence milestones (this refresh @ 0126699)
+**Next:** CONS-046 script fix → CONS-047 reruns → CONS-048 physical QA.
 
 ---
 
@@ -334,58 +223,45 @@ See `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`.
 
 See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`.
 
-**Completed post-remediation @ 5d757cc:** 01, 02, 04, 05, 06  
-**Complete:** 01–06 @ `5d757cc`–`4d415c0`  
-**Stale:** none
-**This refresh:** 00 @ 0126699
+**01–06: STALE_UPSTREAM** after Snorkeling @ dbe5d8b. **07 + 00: COMPLETE** @ bb204f5.
 
 ---
 
 ## Z. Non-Regression Gate Matrix
 
-See `MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv`.
-
-All batch gates must still pass before any future software change. Command permutation gate now **PASS**.
+See `MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv`. Command permutation gate: bodies **PASS**; script **FAIL** (CONS-046).
 
 ---
 
 ## AA. Physical / External QA Register
 
-See `MASTER_UNRESOLVED_PHYSICAL_EXTERNAL_QA_REGISTER_CURRENT.csv` — **31 rows**; **0% execution** except CONS-015 partial altitude unit tests.
+See `MASTER_UNRESOLVED_PHYSICAL_EXTERNAL_QA_REGISTER_CURRENT.csv` — **43 rows** (31 prior + 12 Snorkeling); **0% execution**.
 
 ---
 
 ## AB. Release Blocker Burndown
 
-See `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`.
-
-**Phase A (software) COMPLETE.** Active phases: B (physical campaigns), C (external + legal).
+See `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`. Phase A (software) COMPLETE. Active: script fix, audit reruns, physical campaigns.
 
 ---
 
 ## AC. Do-Not-Touch Policies
 
-See `MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.md` — 28 policies active @ 0126699.
+See `MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.md` — 28 policies active.
 
 ---
 
 ## AD. Readiness Roadmap 7 / 14 / 30 Days
 
-See `MASTER_READINESS_ROADMAP_7_14_30_DAYS_CURRENT.md`.
-
-Starting point **~72%** (not 71%) — software lane at 100%; physical/external dominate burndown.
+See `MASTER_READINESS_ROADMAP_7_14_30_DAYS_CURRENT.md`. Anchor date **2026-06-30**.
 
 ---
 
-## AE. Final Recommendation
+## AE. Remediation Output Consumption (0D)
 
-1. **Do not** claim physical, external, or legal PASS — templates only.  
-2. **Execute** Batch 8 physical QA campaigns (Ultra depth, shallow wet, WAO, underwater HW, paired sync).  
-3. **Execute** external Bühlmann comparison before App Store algorithm claims.  
-4. **Optional** doc-only: README baseline + feature matrix (CONS-034 partial).  
-5. **Re-run orchestrator 00** after major evidence milestones (post physical QA).
+See `MASTER_REMEDIATION_OUTPUT_CONSUMPTION_MATRIX_CURRENT.csv` and `MASTER_AUDIT_COMMAND_INTEGRITY_STATUS_CURRENT.csv`.
 
-**Remediation execution readiness:** **READY** for physical/external campaigns (software prerequisites met).
+Audit **07** consumes Command 10 remediation outputs + consolidated registers. This orchestrator refresh @ bb204f5 adds Snorkeling wave and CONS-046..048 tracking.
 
 ---
 
@@ -396,7 +272,7 @@ MASTER_AUDIT_ORCHESTRATOR: PARTIAL
 COMMANDS_FOR_CURSOR_FOUND: PASS
 SUBCOMMAND_FILES_FOUND: PASS
 UPSTREAM_AUDITS_FOUND: PASS
-UPSTREAM_AUDITS_COMPLETE: PASS
+UPSTREAM_AUDITS_COMPLETE: STALE_UPSTREAM
 CONSOLIDATED_FINDINGS_REGISTER_CREATED: PASS
 DEDUPLICATION_MATRIX_CREATED: PASS
 DEPENDENCY_GRAPH_CREATED: PASS
@@ -408,55 +284,52 @@ RELEASE_BLOCKER_BURNDOWN_CREATED: PASS
 PHYSICAL_EXTERNAL_QA_REGISTER_CREATED: PASS
 DO_NOT_TOUCH_POLICY_REGISTER_CREATED: PASS
 READINESS_ROADMAP_CREATED: PASS
+AUDIT_COMMAND_INTEGRITY_STATUS_CREATED: PASS
+REMEDIATION_OUTPUT_CONSUMPTION_MATRIX_CREATED: PASS
 CONSOLIDATED_P0_FINDINGS: 0
-CONSOLIDATED_P1_FINDINGS: 9
-CONSOLIDATED_P2_FINDINGS: 14
+CONSOLIDATED_P1_FINDINGS: 11
+CONSOLIDATED_P2_FINDINGS: 15
 CONSOLIDATED_P3_FINDINGS: 7
 CONSOLIDATED_P4_FINDINGS: 0
 DUPLICATE_GROUPS_FOUND: 17
-SEVERITY_ESCALATIONS: 0
+SEVERITY_ESCALATIONS: 3
 CROSS_AUDIT_CONFLICTS: 0
-INTERNAL_TESTFLIGHT_BLOCKERS: 0
-EXTERNAL_TESTFLIGHT_BLOCKERS: 9
-APP_STORE_BLOCKERS: 11
-PHYSICAL_QA_BLOCKERS: 14
+COMMAND_INTEGRITY_CONFLICTS: 1
+INTERNAL_TESTFLIGHT_BLOCKERS: 1
+EXTERNAL_TESTFLIGHT_BLOCKERS: 10
+APP_STORE_BLOCKERS: 12
+PHYSICAL_QA_BLOCKERS: 15
 EXTERNAL_VALIDATION_BLOCKERS: 5
-OVERALL_CONSOLIDATED_READINESS: 72
-REMEDIATION_EXECUTION_READINESS: READY
+OVERALL_CONSOLIDATED_READINESS: 70
+REMEDIATION_EXECUTION_READINESS: CONDITIONAL
 INTERNAL_TESTFLIGHT_READINESS: CONDITIONAL
 EXTERNAL_TESTFLIGHT_READINESS: NOT_READY
 APP_STORE_READINESS: NOT_READY
-FIRST_REMEDIATION_BATCH: Batch-8 — Tests / QA / Evidence (physical campaigns)
-NEXT_CURSOR_COMMAND_TO_RUN: Batch 8 physical/external QA campaign (Ultra depth, shallow wet, WAO, underwater HW, paired sync) OR Batch 9 doc-only README/feature matrix repair
+FIRST_REMEDIATION_BATCH: Script fix (CONS-046) then audit reruns 01-06 (CONS-047)
+NEXT_CURSOR_COMMAND_TO_RUN: Fix validate_commands_for_cursor_integrity.sh then rerun audits 01-06 @ HEAD
 ```
-
-Upstream audits 01–06 were refreshed @ `5d757cc`–`4d415c0`; this orchestrator execution refreshed the consolidated outputs @ `0126699`. Register totals retained for traceability: P0=1, P1=16, P2=20, P3=8, P4=0. Active unresolved/non-fixed counts in the verdict are P0=0, P1=9, P2=14, P3=7, P4=0.
 
 ### Final questions (§21 summary)
 
 | # | Answer |
 |---|--------|
-| 1 | Six upstream groups found — **YES** (all complete @ 4d415c0) |
-| 2 | Stale: **none** |
-| 3 | Technical conflicts: **0** |
-| 4–7 | Active unresolved: P0=0 · P1=9 pending evidence · P2=14 · P3=7 · P4=0; register totals: P0=1 · P1=16 · P2=20 · P3=8 · P4=0 |
-| 8 | 17 multi-source duplicate groups mapped (19 root-cause groups tracked) |
-| 9 | No new escalations; prior P0/P1 software closed |
-| 10 | Internal TF software blockers: **0** |
-| 11 | External TF blockers: **9 P1 physical/external/legal** |
-| 12 | App Store blockers: **11** (external + legal + assets) |
-| 13–14 | 14 physical · 5 external validation pending |
-| 15 | First batch: **Batch-8 evidence** |
-| 16–18 | UI polish deferred; docs/README before release claims |
-| 19 | Rerun 01/03/05 after physical QA; 00 after milestones |
-| 20 | Physical QA → external validation → legal |
-| 21–22 | Do-not-touch: Bühlmann, HMAC, Planner reference-only |
-| 23–25 | Roadmap in AD — 7d physical planning; 14d campaigns; 30d external+legal |
-| 26 | Remediation execution: **READY** (software) |
-| 27 | Internal TF software: **READY** |
+| 1 | Six upstream groups found — **YES** (66 files present) |
+| 2 | Stale: **01–06 STALE** vs Snorkeling + bb204f5 (CONS-047) |
+| 3 | Technical conflicts: **0**; command script conflict: **1** (CONS-046) |
+| 4–7 | Active: P0=0 · P1=11 · P2=15 · P3=7 · P4=0 |
+| 8 | 17 duplicate groups |
+| 9 | 3 new escalations (CONS-046..048) |
+| 10 | Internal TF blockers: **1** (stale audits + script) |
+| 11 | External TF blockers: **10 P1 physical/external/legal** |
+| 12 | App Store blockers: **12** |
+| 13–14 | 15 physical · 5 external validation pending |
+| 15 | First batch: **Script fix + audit reruns** |
+| 19 | Rerun **01–06** immediately; 07/00 after refresh |
+| 26 | Remediation execution: **CONDITIONAL** |
+| 27 | Internal TF software: **CONDITIONAL** |
 | 28–29 | External TF / App Store: **NOT READY** |
-| 30 | **Batch 8 physical/external QA campaign OR Batch 9 doc-only README/matrix repair** |
+| 30 | **Fix integrity script; rerun 01–06; Snorkeling physical QA** |
 
 ---
 
-**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 0126699 · Orchestrator V1.2 refresh · 2026-06-29**
+**CONSOLIDATED_PLAN_STATUS: COMPLETE @ bb204f5 · Orchestrator V1.3 · 2026-06-30**
