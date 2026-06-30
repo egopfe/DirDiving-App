@@ -1,7 +1,7 @@
 Finding_ID,Original_Severity,Original_Status,Title,Batch,Classification,Files_Changed,Tests_Added_Or_Updated,Scripts_Changed,Docs_Changed,New_Status,Software_Readiness_Impact,Physical_QA_Status,External_Validation_Status,Legal_Status,Acceptance_Evidence,Notes
 IOS-P1-001,P1,OPEN,iOS Algorithm Tests compile failure,A,FIXED_SOFTWARE,"Tests/iOSAlgorithmTests/Snorkeling*.swift;project.yml",Updated,validate_commands_for_cursor_integrity.sh,Remediation docs,FIXED_SOFTWARE,+10,PENDING_PHYSICAL,PENDING_EXTERNAL,N/A,1637 iOS tests 0 failures @ HEAD,Disambiguated empty array; export formatter in test target; profile init order
 CONS-049,P1,OPEN,Snorkeling test gate regression,A,FIXED_SOFTWARE,same as IOS-P1-001,Updated,,Remediation docs,FIXED_SOFTWARE,+10,PENDING_PHYSICAL,PENDING_EXTERNAL,N/A,xcodebuild iOS Algorithm Tests TEST SUCCEEDED,
-CONS-046,P1,OPEN,Command integrity script drift,B,FIXED_SOFTWARE,,,Scripts/validate_commands_for_cursor_integrity.sh,Remediation docs,FIXED_SOFTWARE,+5,N/A,N/A,N/A,Script PASS @ V2.2/V2.3/V1.2 paths,
+CONS-046,P1,OPEN,Command integrity script drift,B,FIXED_SOFTWARE,,,Scripts/validate_commands_for_cursor_integrity.sh,Remediation docs,FIXED_SOFTWARE,+5,N/A,N/A,N/A,Script PASS @ V1.5 paths,
 CONS-047,P2,VERIFIED,Stale upstream audits 01-06,E,DOCUMENTATION,,,,Remediation docs,VERIFIED,N/A,N/A,N/A,N/A,Prior audit rerun @ 451f8fb; remediation does not re-run 01-06,
 CONS-048,P1,PENDING_PHYSICAL,12 Snorkeling QA templates,D,PRESERVED_PENDING,,,,,PENDING_PHYSICAL_WITH_TEMPLATES,0,PENDING_PHYSICAL,N/A,N/A,No field evidence added,
 CONS-001..045,Mixed,CLOSED,Prior remediation wave,C,PRESERVED,,,,,PRESERVED_CLOSED,0,PENDING_PHYSICAL,PENDING_EXTERNAL,PENDING_LEGAL,validate_consolidated_software_readiness.sh PASS,No regression detected
