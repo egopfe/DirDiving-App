@@ -1,0 +1,8 @@
+Gate_ID,Toggle_or_Flag,Default,Visible_When,Production_Leak_Risk,Test_Coverage,Release_Gate,Verdict,Notes
+DEV-001,allowsShallowGaugeTesting,OFF,DeveloperSettings DEBUG/TestFlight,Medium if mis-shipped,DepthCapabilityTests,Internal TestFlight only,PASS software,Utils/DeveloperSettings.swift Watch-side
+DEV-002,allowsShallowDepthDivingTesting,OFF,DeveloperSettings shallow build,Medium — FC on ~6m hardware,DepthCapabilityTests,Internal QA labeling required,PASS software,CONS-006 FIXED — default OFF
+DEV-003,DeveloperSettingsView exposure,Gated,isDeveloperSectionVisible,Low if gate holds,DeveloperSensorSourceTests,App Store must hide,PASS,Not in production App Store path by policy
+DEV-004,Fake logbook toggles (Apnea/Snorkeling),OFF,Activity Settings not DeveloperSettings,Low — demo data only,IOSActivityDemoLogbookSettingsStoreTests,Disclosed DEMO banner,PASS,dirdiving.ios.*.fakeLogbook.enabled keys
+DEV-005,DiveLogStore.includeDemoLogbook,OFF,Diving Settings / MoreView,Low,Demo isolation tests,Separate from real sessions,PASS,Diving-only demo logbook
+DEV-006,Simulation sensor source,DEBUG only,DeveloperSettings,None,DeveloperSensorSourceTests,No production claim,PASS,iOS developer sensor selection only
+DEV-007,Shallow FC on App Store build,Blocked,DepthCapabilityPolicy + release gate,High if bypassed,ReleaseLegalClaimsRemediationTests,App Store NOT READY until gate,PASS policy,Physical shallow wet QA pending CONS-042

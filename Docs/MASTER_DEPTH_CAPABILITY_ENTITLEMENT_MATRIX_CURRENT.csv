@@ -1,0 +1,7 @@
+Tier_ID,Probe_or_Policy,Info_plist_Claim,Entitlement_File,Runtime_Behavior,Developer_Toggle,Test_Coverage,Verdict,Notes
+DEPTH-001,DepthCapabilityEntitlementProbe,Shallow vs full depth tier,Config/DIRDiving*.entitlements,Compile/plist tier resolution,None in iOS,DepthCapabilityTests,PASS software,CONS-007 FIXED — probe uses configured tier policy
+DEPTH-002,DepthCapabilityPolicy,FC runtime gate,entitlements + policy,supportsFullComputerRuntime check,DeveloperSettings shallow FC toggle,DepthCapabilityTests,PENDING physical,Utils/DepthCapabilityPolicy.swift @451f8fb,Shallow wet QA pending CONS-042
+DEPTH-003,DIRDiving.WithShallowDepth.entitlements,~6m scope,Config/DIRDiving.WithShallowDepth.entitlements,Shallow signing variant,allowsShallowDepthDivingTesting,DepthCapabilityTests,PASS software,PENDING physical,Intentional internal QA path CONS-006
+DEPTH-004,DIRDiving.WithWaterSubmersion.entitlements,Submersion API,Config/DIRDiving.WithWaterSubmersion.entitlements,Submersion probe availability,N/A,WatchSubmersionLaunchProbeTests,PASS,Watch-only submersion
+DEPTH-005,iOS depth authority,iOS planner reference only,iOSApp/App/Info.plist,N/A — no live FC on iOS,N/A,N/A,N/A,iOS does not claim live depth computer
+DEPTH-006,Signing manifest alignment,CI signing vs plist,project.yml + entitlements,Manifest test,None,DepthCapabilityTests signing manifest,PENDING CI,Shallow/full pairing must match in release pipeline

@@ -1,5 +1,5 @@
 Gate_ID,Scenario,Expected_Behavior,Automated_Test,Simulator_Evidence,Physical_Evidence,Water_Lock_Evidence,System_Listing_Evidence,Legal_Gate,Safety_Gate,Status,Software_Status,Physical_Status,Severity,Finding_ID,Evidence_Folder,Notes
-WAO-G-001,Default mode disabled,Water auto-open off until user enables,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,Policy default disabled @5d757cc
+WAO-G-001,Default mode disabled,Water auto-open off until user enables,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,Policy default disabled @ 451f8fb
 WAO-G-002,Preferred FC routes predive not live,FC destination → fullComputerPrediveConfiguration,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,yes,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,Does not auto-start runtime
 WAO-G-003,Does not start dive/session,beginWaterAutoLaunch routing only,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,yes,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
 WAO-G-004,Blocked during active session,No routing when dive active,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,yes,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,

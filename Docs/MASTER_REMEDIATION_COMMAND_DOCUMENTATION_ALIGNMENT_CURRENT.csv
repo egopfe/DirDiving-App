@@ -1,0 +1,7 @@
+Command_Reference,Expected_Type,Documented_In,Doc_Claim_Matches_Reality,File_On_Disk,INDEX_Linked,Remediation_Outputs_Exist,Status,Required_Action,Priority,Notes
+10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,remediation not audit,Docs/INDEX.md § Command 10; MASTER_CONSOLIDATED_AUDIT plan,Command 10 is software remediation not read-only audit,MISSING,YES,YES,PARTIAL,Restore command file to commands_for_cursor/ or archive banner with path,P1,COMMAND_10_DOCUMENTED_AS_REMEDIATION: FAIL — body missing
+MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md,plan doc,INDEX orchestrator block,Consolidates post-Command-10 state,PRESENT,YES,YES,PASS,None,P4,
+MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv,findings register,INDEX; orchestrator,CONS-001..048 tracked,PRESENT,YES,YES,PASS,Refresh upstream stale notes after audit reruns,P2,CONS-047
+MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md,remediation report,INDEX Command 10 block,Reports software fixes not physical closure,PRESENT,YES,YES,PASS,Clarify remediation ≠ App Store ready in header,P2,
+validate_consolidated_software_readiness.sh,gate script,Remediation plan,Software readiness gate,PRESENT,PARTIAL,YES,PASS,Document in RELEASE_CHECKLIST,P2,
+validate_commands_for_cursor_integrity.sh,integrity gate,Prior audit claimed PASS,Script stale vs V2.2/V2.3 filenames,PRESENT,PARTIAL,n/a,FAIL,Update script paths,P1,CONS-046

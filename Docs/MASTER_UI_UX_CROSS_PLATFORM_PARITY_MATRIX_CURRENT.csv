@@ -1,22 +1,20 @@
-ID,Feature,Platform_Classification,Parity_Type,Names_Aligned,Units_Aligned,Labels_Aligned,Error_States_Aligned,Status,Severity,Finding_ID,Notes
-PAR-001,Activity selection,Watch+iOS,shared,yes,yes,yes,yes,PASS,,,DIRActivitySelectionStore / CompanionActivityPreferenceStore
-PAR-002,Settings mode switch,iOS-only,iOS-only,yes,n/a,yes,n/a,PASS,,,Watch uses activity-gated sections not iOS switcher
-PAR-003,Live sensors/decompression,Watch-only,Watch-only,yes,n/a,partial,n/a,PASS,,,By design; iOS has planner not live Bühlmann
-PAR-004,Planner/analysis/export,iOS-only,iOS-only,yes,n/a,yes,n/a,PASS,,,Reference-only briefing cards to Watch
-PAR-005,FC altitude environment,iOS→Watch,synchronized,yes,yes,yes,yes,PASS,,,OrchestratedAltitudeEnvironmentTests @ 1f62235
-PAR-006,Apnea logbook browse,iOS browse / Watch save,intentionally asymmetric,yes,partial,partial,yes,PASS,,,Watch ApneaLogbookStore save-only
-PAR-007,Snorkeling maps/route planner,iOS-heavy,intentionally asymmetric,yes,partial,partial,yes,PARTIAL,P1,MUIUX-P1-001,Physical GPS/navigation QA PENDING
-PAR-008,Gauge TTV vs Full Computer TTS,Watch,intentionally distinct,yes,yes,yes,yes,PASS,,,Terminology and panels distinct
-PAR-009,Units and language,Watch+iOS,shared,yes,yes,partial,yes,PASS,,,EN/IT key parity; device layout PENDING
-PAR-010,Alarm/reminder naming,Watch+iOS,shared,yes,yes,partial,partial,PASS,,,
-PAR-011,Mission Mode status,Watch primary,reference-only on iOS,yes,n/a,partial,n/a,PASS,,,
-PAR-012,Accessibility labels,Watch+iOS,shared,yes,yes,partial,no,PARTIAL,P1,MUIUX-P1-003,Physical VoiceOver evidence PENDING
-PAR-013,Visual language,Watch neon / iOS cards,intentionally asymmetric,yes,yes,partial,yes,PARTIAL,P2,MUIUX-P2-002,Manual on-device fidelity PENDING
-PAR-014,Sync namespaces,Watch+iOS,synchronized,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-002,Paired round-trip QA PENDING
-PAR-015,CCR reference UX,iOS planner,iOS-only reference,yes,n/a,yes,n/a,PASS,,,No live-loop PPO2 claim
-PAR-UW-001,Underwater Crown paging,Watch-only,asymmetric,yes,Documented in user guide,PASS
-PAR-UW-002,Action Button primary action,Watch-only,asymmetric,yes,Ultra only,PASS
-PAR-WAO-001,Water auto-open,Watch-only,asymmetric,yes,n/a,yes,n/a,PASS,,,No iOS equivalent; truthful limitation copy
-PAR-FC-GF-001,GF presets Watch/iOS plan,Watch+iOS,synchronized,yes,yes,yes,partial,PASS,,CONS-002,Emit gradientFactorPreset @ 5d757cc; Watch 3-preset UI; external spot-check PENDING
-PAR-DEPTH-001,Shallow depth capability,Watch-only,asymmetric,yes,n/a,yes,n/a,PASS,,,iOS does not claim shallow entitlement equals full validation
-PAR-SET-001,Settings mode switch,iOS-only,asymmetric,yes,Watch uses activity sections,PASS
+Feature,Activity,Classification,Watch_Label,iOS_Label,Units_Parity,Mode_Parity,Sync_Parity,Intentional_Asymmetry,Documented,Pass,Finding_ID,Notes
+Activity selection,Global,shared,StartupFlowView,IOSCompanionActivitySelectionView,yes,yes,partial,no,yes,yes,,
+Settings mode switch,Global,iOS-only,n/a,IOSCompanionSettingsModeSwitcher,n/a,n/a,no,yes,yes,yes,,iOS configures; Watch in-app selection
+Diving Logbook,Diving,synchronized,DiveLogListView,LogbookView,yes,yes,yes,no,yes,yes,,
+Apnea Logbook,Apnea,synchronized,Apnea logbook route,IOSApneaSessionsListView,yes,yes,partial,no,yes,yes,,
+Snorkeling Logbook,Snorkeling,synchronized,Snorkeling session save,IOSSnorkelingSessionsListView,yes,yes,partial,no,yes,yes,,
+Gauge TTV,Diving,intentionally asymmetric,TTV on Watch,n/a (Planner TTS reference),yes,yes,n/a,yes,yes,yes,,Gauge≠Full Computer
+Full Computer TTS,Diving,intentionally asymmetric,TTS on Watch,Planner TTS reference,yes,yes,partial,yes,yes,yes,,
+GF presets,Diving,synchronized,FullComputerGradientFactorSettingsStore,DivePlanPackageBuilder,yes,yes,yes,no,yes,yes,,CONS-002 fixed
+Planner,Diving,iOS-only reference,n/a,PlannerView,yes,yes,partial,yes,yes,yes,,Not live Watch authority
+Briefing cards,Diving,reference-only,BriefingCardInventory,Planner briefing export,yes,yes,yes,yes,yes,yes,,
+CCR planning,Diving,reference-only,n/a,CCRPlannerView,yes,yes,n/a,yes,yes,yes,MUIUX-P2-002,Not controller
+Snorkeling route planner,Snorkeling,iOS-only planning,n/a,IOSSnorkelingRoutePlannerView,yes,yes,yes,yes,yes,yes,,Watch receives imported route
+Water auto-open,Diving,Watch-only,WatchWaterAutoOpenSettingsView,n/a,n/a,n/a,n/a,yes,yes,yes,MUIUX-P1-001,iOS must not claim WAO
+Crown underwater clamp,Diving,Watch-only,WatchUnderwaterPagePolicy,n/a,n/a,n/a,n/a,yes,yes,yes,MUIUX-P1-002,
+Action Button router,Diving,Watch-only,WatchUnderwaterActionRouter,n/a,n/a,n/a,n/a,yes,yes,yes,MUIUX-P1-002,
+Apnea Settings,Apnea,shared,WatchActivitySettingsSections,IOSApneaSettingsContent,yes,yes,partial,no,yes,yes,,
+Snorkeling Settings,Snorkeling,shared,WatchActivitySettingsSections,IOSSnorkelingSettingsContent,yes,yes,partial,no,yes,yes,,
+Mission Mode,Diving,Watch-only,MissionModeIndicator,n/a,yes,n/a,n/a,yes,yes,yes,,
+Manual accessibility QA,Global,pending,n/a,n/a,n/a,n/a,n/a,yes,yes,partial,MUIUX-P1-003,Contracts PASS software

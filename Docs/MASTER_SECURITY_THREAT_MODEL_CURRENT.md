@@ -1,8 +1,8 @@
 # DIR DIVING — Master Security Threat Model (Current)
 
-**Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.1  
-**Date:** 2026-06-28  
-**Branch:** `main` @ `5d757cc`  
+**Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.2  
+**Date:** 2026-06-30  
+**Branch:** `main` @ `451f8fb`  
 **Pass type:** Post-remediation audit rerun  
 **Scope:** Watch + iOS MAIN targets (Diving, Apnea, Snorkeling)
 

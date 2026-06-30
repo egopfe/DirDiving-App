@@ -1,62 +1,73 @@
 # DIR DIVING — Master Release / QA / Evidence / Compliance Audit (Current)
 
-**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.1.md`  
-**Date:** 2026-06-28  
+**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md`  
+**Date:** 2026-06-30  
 **Branch:** `main`  
-**Commit:** `5d757cc` (`5d757cc0217755f5c6d5429af2f13ce5c4748c5d`)  
-**Task type:** Read-only post-remediation audit rerun — no production code modified  
+**Commit:** `451f8fb` (`451f8fb644a85d8d205d53ef769e29ff9ed4f958`)  
+**Task type:** Read-only full audit rerun @ orchestrator V1.3 — no production code modified  
 **Merged sources:** Command 12 + Command 13  
-**Pre-remediation baseline:** `7dfefe2`  
-**Remediation reference:** `MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md` @ `5d757cc`  
-**Validation:** `bash Scripts/validate_consolidated_software_readiness.sh` — **PASS** (2026-06-29, ~15 min)
+**Upstream inputs:** Audits 01–04 and 06 **COMPLETE** @ `451f8fb`
 
-**Not claimed:** Legal certification, EN13319/ISO 6425 compliance, App Store approval, physical QA passed, external Bühlmann/CCR validation passed, Apple Watch certified dive computer, CMAltimeter physical validation passed, shallow wet QA passed, system Auto-Launch listing verified.
+**Not claimed:** Legal certification, EN13319/ISO 6425 compliance, App Store approval, physical QA passed, external Bühlmann/CCR validation passed, Apple Watch certified dive computer, CMAltimeter physical validation passed, shallow wet QA passed, system Auto-Launch listing verified, Snorkeling field navigation verified on hardware.
 
 ---
 
 ## A. Executive Summary
 
-Post-remediation read-only rerun at `main` @ `5d757cc` refreshes the release-gate matrix after consolidated software remediation (CONS-001..CONS-038). **Software-actionable scope is 100% ready** with truthful non-certified posture. **All physical, paired-device, underwater, external validation, legal/marketing sign-off, and App Store assets remain PENDING or NOT EXECUTED.**
+Full release-gate audit at `main` @ **`451f8fb`** after upstream domain audits **01–04** and **06** refresh. **Software architecture, activity isolation, sync security, GF import parity (CONS-002), depth capability authority (CONS-007), independent oracle (CONS-008), and UI/UX truthfulness remain strong.** **No P0 release defect** identified in audited software scope.
+
+**New software gates @ HEAD:**
+
+| ID | Severity | Issue |
+|----|----------|-------|
+| CONS-046 / MAIN-P1-001 | P1 | `validate_commands_for_cursor_integrity.sh` references superseded V2.1/V1.1 paths — **FAIL** |
+| IOS-P1-001 | P1 | iOS Algorithm Tests **BUILD FAILED** — Snorkeling test compile errors block automated regression lane |
+
+**Physical / external / legal gates unchanged:** 0% physical QA executed; external Bühlmann validation not executed; **12 Snorkeling QA templates PENDING** (CONS-048).
 
 | Dimension | Score (0–100) | Status class |
 |-----------|---------------|--------------|
-| Automated test evidence (remediation gates) | **100** | SOFTWARE_READY |
-| Simulator / script gates | **100** | SOFTWARE_READY |
-| Claims / legal software posture | **100** | SOFTWARE_READY |
-| Privacy manifest alignment | **100** | SOFTWARE_READY |
+| Automated test evidence (Watch subset) | **95** | PARTIAL — 353/355 PASS @ audit 01; 2 failures |
+| Automated test evidence (iOS full suite) | **0** | **BLOCKED** — compile failure IOS-P1-001 |
+| Simulator / build gates | **100** | SOFTWARE_READY — iOS + Watch BUILD SUCCEEDED |
+| Claims / legal software posture | **98** | SOFTWARE_READY |
+| Privacy manifest alignment | **100** | SOFTWARE_READY (static review) |
 | Shallow / WAO / HW software gates | **100** | SOFTWARE_READY |
-| GF preset software gate | **100** | SOFTWARE_READY (CONS-002 closed) |
+| GF preset software gate | **100** | SOFTWARE_READY (CONS-002 @ 451f8fb) |
+| Snorkeling software (route/sync) | **92** | SOFTWARE_READY — field GPS pending |
 | Physical Watch / CMAltimeter / shallow wet | **0** | PENDING_PHYSICAL |
-| Physical iPhone / a11y | **0** | PENDING_PHYSICAL |
+| Physical iPhone / a11y / PDF | **0** | PENDING_PHYSICAL |
 | Paired-device QA | **0** | PENDING_PHYSICAL |
+| Snorkeling field QA (12 templates) | **0** | PENDING_PHYSICAL (CONS-048) |
 | External validation | **0** | PENDING_EXTERNAL_VALIDATION |
 | App Store / legal external gates | **35** | PENDING_LEGAL_REVIEW |
-| **Overall QA evidence readiness** | **78** | Mixed |
+| **Overall QA evidence readiness** | **68** | Mixed — iOS test gate regression |
 | **Overall claims compliance readiness** | **92** | SOFTWARE_READY + pending legal |
-| **Overall release readiness** | **72** | NOT READY external/App Store |
+| **Overall release readiness** | **62** | NOT READY external/App Store |
 
-**Findings:** P0 **0** · P1 **2** · P2 **14** · P3 **5** · P4 **4**
+**Findings (release audit scope):** P0 **0** · P1 **8** · P2 **12** · P3 **5** · P4 **4**
 
-**Release posture:** Internal TestFlight **READY** (software, with disclosure) · External TestFlight **NOT READY** · App Store **NOT READY**
+**Release posture:** Internal TestFlight **CONDITIONAL** · External TestFlight **NOT READY** · App Store **NOT READY**
 
 ---
 
 ## B. Source Commands Merged
 
-| Command | Artifact leveraged |
-|---------|-------------------|
+| Command | Scope |
+|---------|-------|
 | 12 — Test & QA Evidence V3.0 | Traceability, physical matrices, validation scripts |
-| 13 — Release Legal Claims V3.0 | Claims registry, blockers, EN13319 strategy docs |
-| 01 — Watch FC Forensic @ 5d757cc (post-remediation) | CMAltimeter gate, GF, shallow depth, oracle |
-| 02 — iOS Master @ 5d757cc | Planner GF parity CONS-002 closed |
-| 03 — UI/UX Master | WAO, Crown, Action Button software gates |
-| 04 — Main Code @ 5d757cc | Sync/security CONS-003..005 closed |
+| 13 — Release Legal Claims V3.0 | Claims registry, blockers, EN13319 strategy |
+| 01 — Watch FC Forensic @ 451f8fb | CMAltimeter gate, GF, shallow depth, oracle |
+| 02 — iOS Master @ 451f8fb | Planner GF parity; IOS-P1-001 regression |
+| 03 — UI/UX Master @ 451f8fb | WAO, Crown, Action Button software gates |
+| 04 — Main Code @ 451f8fb | Sync/security; CONS-046 script drift |
+| 06 — Documentation @ 451f8fb | Command body parity; script drift confirmed |
 
 ---
 
 ## C. Latest Development Context
 
-Audited scope: Diving Gauge / Full Computer, Bühlmann / Schreiner, CMAltimeter altitude gate, Apnea, Snorkeling, iOS Settings mode switcher, activity-specific Settings/Logbooks, iOS Planner / CCR reference-only, briefing cards, Mission Mode, Developer Sensor Source, shallow-depth entitlement, water auto-open, GF presets (20/80, 30/70, 40/85), developer shallow toggles (default OFF), Crown/Action Button underwater policy.
+Audited scope: Diving Gauge / Full Computer, Bühlmann / Schreiner, CMAltimeter altitude gate, Apnea, Snorkeling P1/P2/P3, iOS Settings mode switcher, activity-specific Settings/Logbooks, iOS Planner / CCR reference-only, briefing cards, Mission Mode, Developer Sensor Source, shallow-depth entitlement, water auto-open, GF presets (20/80, 30/70, 40/85), developer shallow toggles (default OFF), Crown/Action Button underwater policy, post-remediation CONS-002..008 verified in code.
 
 ---
 
@@ -65,11 +76,10 @@ Audited scope: Diving Gauge / Full Computer, Bühlmann / Schreiner, CMAltimeter 
 | Check | Result |
 |-------|--------|
 | Branch | `main` |
-| HEAD | `5d757cc` |
-| `origin/main` | Aligned |
+| HEAD | `451f8fb` |
+| `origin/main` | Aligned (0/0) |
 | Xcode | 26.6 (17F113) |
-| Validation script | `validate_consolidated_software_readiness.sh` **PASS** |
-| Physical QA executed in this pass | **No** |
+| Physical QA executed this pass | **No** |
 | Production code modified | **No** |
 
 **Targets:** DIRDiving Watch App · DIRDiving iOS · DIRDiving Watch Algorithm Tests · DIRDiving iOS Algorithm Tests
@@ -80,27 +90,14 @@ Audited scope: Diving Gauge / Full Computer, Bühlmann / Schreiner, CMAltimeter 
 
 | Gate | Result | Evidence |
 |------|--------|----------|
-| BASELINE_CURRENT_AND_CLEAN | **PASS** | `main` @ `5d757cc`; clean tree |
-| BUILD_IOS | **PASS** | Simulator build via consolidated script |
-| BUILD_WATCH | **PASS** | Embedded Watch build via consolidated script |
-| IOS_TESTS (remediation subset) | **PASS** | **23/23** — `DivePlanPackageBuilderTests`, `PlannerGFPresetDisplayTests` |
-| WATCH_TESTS (remediation subset) | **PASS** | **42/42** — `DIRModesAndStartupFlowTests`, `FullComputerImportedPlanStoreTests` |
-| RELEASE_LEGAL_CLAIMS_GATE | **PASS** | iOS 69 + Watch 34 remediation suites via nested validators |
-| TEST_QA_EVIDENCE_GATE | **PASS** | Nested `validate_test_qa_evidence_readiness.sh` |
-
-**Consolidated script gates (all PASS @ 5d757cc):**
-
-```text
-validate_commands_for_cursor_integrity.sh
-validate_depth_capability_runtime_authority.sh
-validate_developer_shallow_testing_release_gate.sh
-validate_no_fake_physical_evidence_claims.sh
-validate_no_fake_external_validation_claims.sh
-validate_release_claims_against_evidence.sh
-check_main_target_isolation.sh / check_secrets.sh / audit_localization.sh
-```
-
-Full 1091 Watch / 1526 iOS suite not re-run in consolidated gate (remediation-critical subsets only).
+| BASELINE_CURRENT_AND_CLEAN | **PASS** | `main` @ `451f8fb` |
+| BUILD_IOS | **PASS** | `xcodebuild -scheme "DIRDiving iOS"` BUILD SUCCEEDED |
+| BUILD_WATCH | **PASS** | `xcodebuild -scheme "DIRDiving Watch App"` BUILD SUCCEEDED |
+| IOS_ALGORITHM_TESTS | **FAIL** | BUILD FAILED — `SnorkelingDistanceCalculator` ambiguous overload; `SnorkelingRoutePlannerDraft` type mismatch (**IOS-P1-001**) |
+| WATCH_ALGORITHM_TESTS | **FAIL** | 353/355 PASS @ audit 01; 2 failures (TTS crash + bootstrap) |
+| validate_commands_for_cursor_integrity.sh | **FAIL** | Expects V2.1/V1.1 filenames (**CONS-046**) |
+| check_main_target_isolation.sh | **PASS** | Audit 04 |
+| audit_localization.sh | **PASS** | Audit 04 |
 
 ---
 
@@ -110,55 +107,106 @@ Matrix: [`MASTER_REQUIREMENT_TEST_TRACEABILITY_MATRIX_CURRENT.csv`](MASTER_REQUI
 
 | Metric | Count |
 |--------|------:|
-| Total requirements | **79** |
-| SOFTWARE_READY / PASS | **59** |
-| SOFTWARE_GAP | **0** |
-| NOT_PASSED (physical/external/legal) | **20** |
+| Total requirements | **92** |
+| SOFTWARE_READY / PASS | **68** |
+| SOFTWARE_GAP / FAIL | **2** (IOS-P1-001, CONS-046) |
+| NOT_PASSED (physical/external/legal) | **22** |
 
-CONS-002 GF import gap closed. Physical/external rows remain NOT_PASSED — simulator never upgraded to physical validation.
+Safety-critical software paths mapped; iOS full-suite compile failure blocks complete traceability closure.
 
 ---
 
 ## G. Automated Test Evidence
 
-**PASS (remediation gates).** iOS GF package builder **15/15** + display tests **8/8**. Watch startup **14/14** + imported plan **20/20** + integrated modes **2/2** (prior consolidated evidence). Core FC engine, Audit-15 oracle, DepthCapability, GF preset, WAO, underwater resolver suites retained from upstream audits.
+**Watch:** Strong coverage — FC engine, Audit-15 oracle, CMAltimeter remediation, GF presets, WAO, underwater resolver, Apnea/Snorkeling isolation. **353/355** on Series 11 fallback @ audit 01.
+
+**iOS:** Remediation subsets compile in isolation where exercised; **full iOS Algorithm Tests target BLOCKED** by Snorkeling compile errors (IOS-P1-001). Prior baseline `5d757cc` reported 1527 tests, 0 failures — regression at HEAD.
 
 ---
 
 ## H. Simulator QA Evidence
 
-**PASS.** All integrity, depth, shallow-toggle, and claims validation scripts PASS. Localization audit PASS (2389 keys). Mockup path registry valid. Pixel-diff execution **PENDING** — not counted as physical pass.
+**PASS (static/scripts).** Isolation, secrets, localization, depth capability authority, developer shallow gate, sync schema, security/privacy scripts PASS per audit 04. **No simulator evidence upgraded to physical.**
 
 ---
 
-## I–L. Physical / Paired / Underwater QA
+## I. Physical Apple Watch QA
 
-**PENDING_PHYSICAL** for all Watch (38 rows), iPhone (16 rows), paired (8 rows), shallow wet, WAO physical, hardware controls physical. No signed artifacts in `Docs/QA_EVIDENCE/` for this pass.
+**PENDING_PHYSICAL** — 38 Watch rows in [`MASTER_PHYSICAL_DEVICE_QA_MATRIX_CURRENT.csv`](MASTER_PHYSICAL_DEVICE_QA_MATRIX_CURRENT.csv). Zero signed artifacts in `Docs/QA_EVIDENCE/` for wet depth, CMAltimeter, WAO, Water Lock, Crown, Action Button, shallow wet Gauge/FC.
+
+---
+
+## J. Physical iPhone QA
+
+**PENDING_PHYSICAL** — 16 iPhone rows NOT_PASSED. Logbook scroll, PDF/CSV render, VoiceOver, Dynamic Type, Instruments profiling — all template-only.
+
+---
+
+## K. Paired Watch/iPhone QA
+
+**PENDING_PHYSICAL** — 8 paired rows NOT_PASSED. WC sync, Apnea/Snorkeling session transfer, iCloud two-device tombstones — no field artifacts.
+
+---
+
+## L. Underwater / Depth Sensor QA
+
+**PENDING_PHYSICAL** — PDQ-W-025 shallow wet, PDQ-W-032/033 developer shallow sessions, entitlement behavior (PDQ-W-002). Shallow signing default; full-depth alternate documented but not field-validated.
 
 ---
 
 ## M. Watch Full Computer Altimeter Evidence Gate
 
-**SOFTWARE_READY / PENDING_PHYSICAL.** Production path verified in software tests; physical CoreMotion sample evidence **NOT EXECUTED**.
+**SOFTWARE_READY / PENDING_PHYSICAL.** Production path verified in `WatchCMAltimeterRemediationTests`. Physical CoreMotion sample evidence **NOT EXECUTED**. Fail-closed on stale/unstable/rejected samples verified in software.
 
 ---
 
-## N–P. External Validation
+## N. External Bühlmann Validation
 
-**PENDING_EXTERNAL_VALIDATION** for Bühlmann, Schreiner, Subsurface, CCR. Internal oracle and engine tests **SOFTWARE_READY**.
+**PENDING_EXTERNAL_VALIDATION.** Internal Audit-15 oracle and engine tests SOFTWARE_READY. Third-party golden profile campaign **NOT EXECUTED** (`QA_EVIDENCE/BUHLMANN_EXTERNAL/`).
+
+---
+
+## O. External Subsurface Validation
+
+**PENDING_EXTERNAL_VALIDATION.** CSV metadata round-trip unit tests PASS. External Subsurface import **NOT EXECUTED**.
+
+---
+
+## P. CCR / Rebreather Validation
+
+**PENDING_EXTERNAL_VALIDATION / reference-only.** `CCRMathRemediationTests` PASS; planner posture reference-only. External rebreather campaign **NOT EXECUTED**.
+
+---
+
+## Q. Ratio Deco / Rock Bottom / Gas Ledger Validation
+
+**SOFTWARE_READY (internal) / PENDING_EXTERNAL (optional).** Heuristic and estimate wording verified. External ratio-deco reference cases optional and pending.
+
+---
+
+## R. Localization / Accessibility Evidence
+
+**SOFTWARE_READY / PENDING_PHYSICAL manual.** Localization audit PASS (2389+ keys). Accessibility contract script PASS. Physical VoiceOver/Dynamic Type field QA **PENDING**.
+
+---
+
+## S. Performance / Instruments Evidence
+
+**SOFTWARE_READY (unit) / PENDING_PHYSICAL (Instruments).** Watch timing fault matrix PASS. Device Instruments profiling **NOT EXECUTED**.
+
+---
+
+## T. Security / Privacy Evidence
+
+**SOFTWARE_READY.** HMAC v3 envelopes, activity routing guards, signed tombstones, peer secret pinning, Privacy Manifests, App Intent legal gates, simulation release blocks — verified @ audit 04.
 
 ---
 
 ## U. Claims Evidence Matrix
 
-Matrix: [`MASTER_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv`](MASTER_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv) — **37 claims**.
+Matrix: [`MASTER_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv`](MASTER_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv)
 
-| Result | Count |
-|--------|------:|
-| PASS / SOFTWARE_READY | **37** |
-| FAIL (software gap) | **0** |
-
-CLM-GF-02 (iOS→Watch GF import) **PASS** post CONS-002. Legal counsel and marketing sign-off **PENDING_LEGAL_REVIEW**.
+**37 claims** mapped. No unsupported certification claims in software strings. Physical/external/legal columns correctly **PENDING** where evidence absent. Shallow FC and WAO copy truthful; GF described as user conservatism setting.
 
 ---
 
@@ -168,51 +216,75 @@ Matrix: [`MASTER_RELEASE_GATE_MATRIX_CURRENT.csv`](MASTER_RELEASE_GATE_MATRIX_CU
 
 | Gate | Decision |
 |------|----------|
-| Internal TestFlight | **READY** (software; disclose shallow cap + open P1 disclosure items) |
-| External TestFlight | **NOT READY** |
-| Professional/Beta Diver Trial | **NOT READY** |
-| App Store | **NOT READY** |
-| Public Release | **NOT READY** |
+| Internal TestFlight | **CONDITIONAL** — software strong; IOS-P1-001 + CONS-046 + physical disclosure |
+| External TestFlight | **NOT_READY** |
+| Professional/Beta Diver Trial | **NOT_READY** |
+| App Store | **NOT_READY** |
+| Public Release | **NOT_READY** |
 
 ---
 
-## W–X. Platform / Privacy
+## W. Apple Platform / Entitlement / Capability Audit
 
-Entitlements aligned for shallow default signing (**SOFTWARE_READY**). Privacy manifest **22 categories PASS** (engineering). ASC preview **PENDING**.
+Matrix: [`MASTER_PLATFORM_ENTITLEMENT_CAPABILITY_MATRIX_CURRENT.csv`](MASTER_PLATFORM_ENTITLEMENT_CAPABILITY_MATRIX_CURRENT.csv)
+
+Shallow-depth default signing aligned. Full-depth alternate documented. `WKSupportsAutomaticDepthLaunch=true`. CMAltimeter, WC, iCloud, location, photos — implemented; physical validation pending for depth/GPS/WC field behavior.
+
+---
+
+## X. Privacy Manifest / Disclosure Audit
+
+Matrix: [`MASTER_PRIVACY_MANIFEST_DISCLOSURE_MATRIX_CURRENT.csv`](MASTER_PRIVACY_MANIFEST_DISCLOSURE_MATRIX_CURRENT.csv)
+
+Both targets declare PrivacyInfo.xcprivacy. No tracking. Diving iCloud opt-in; Apnea/Snorkeling local-only cloud posture documented. Exported file manual QA pending.
 
 ---
 
 ## Y. TestFlight Readiness
 
-**READY (internal software lane).** Non-certified copy, legal onboarding, privacy manifests, developer toggles default OFF, shallow-depth risk assessment current. Physical smoke and external validation **PENDING**.
+**CONDITIONAL (internal software).** Blockers: IOS-P1-001, CONS-046, SDG-008 shallow FC disclosure, 0% physical QA, CONS-048 Snorkeling field templates. See [`MASTER_APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md`](MASTER_APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md) and [`MASTER_TESTFLIGHT_SHALLOW_DEPTH_RISK_ASSESSMENT_CURRENT.md`](MASTER_TESTFLIGHT_SHALLOW_DEPTH_RISK_ASSESSMENT_CURRENT.md).
 
 ---
 
 ## Z. App Store Readiness
 
-**NOT READY.** Blocked by physical matrices, external validation, legal/marketing sign-off, App Store assets.
+**NOT READY.** Legal counsel pending, marketing assets incomplete, full-depth entitlement not field-validated, 0% physical/external evidence, iOS test regression unresolved.
 
 ---
 
-## AC. Detailed Findings (post-remediation delta)
+## AA. Legal / Certification / EN13319 Strategy
 
-| ID | Sev | Title | Status @ 5d757cc |
-|----|-----|-------|------------------|
-| MRQA-P1-001 | P1 | iOS GF preset → Watch import | **CLOSED** (CONS-002) |
-| MRQA-P1-002 | P1 | iOS sync in-flight stuck | **CLOSED** (CONS-003) |
-| MRQA-P1-003 | P1 | Asymmetric userInfo ACK | **CLOSED** (CONS-004) |
-| MRQA-P1-004 | P1 | Legacy unsigned tombstones | **CLOSED** (CONS-005) |
-| MRQA-P1-005 | P1 | Shallow FC TestFlight exposure labeling | **OPEN** (SDG-008 disclosure) |
-| MRQA-P1-006 | P1 | Depth tier metadata trust | **OPEN** (MASTER-DEPTH-002) |
-| MRQA-P1-007 | P1 | Watch startup flow test drift | **CLOSED** (CONS-017/018) |
-| MRQA-P2-001 | P2 | WAO depth policy gate | **CLOSED** (CONS-019) |
-| MRQA-P2-002..014 | P2 | Physical/external/legal gaps | **PENDING** |
+**PENDING_LEGAL_REVIEW.** Software disclaimers present (non-certified, reference-only planner, CCR limitations). EN13319/ISO 6425 **not claimed**. Counsel sign-off and ASC metadata review pending (CONS-044).
+
+---
+
+## AB. Support / Incident / Rollback Process
+
+**PARTIAL.** Release checklist and escalation docs exist. Incident drill **NOT EXECUTED**. Rollback process documented but not drilled.
+
+---
+
+## AC. Detailed Findings
+
+| ID | Sev | Summary | Release impact |
+|----|-----|---------|----------------|
+| IOS-P1-001 | P1 | iOS Algorithm Tests compile failure (Snorkeling) | Blocks CI regression confidence; internal TF conditional |
+| CONS-046 | P1 | Command integrity script FAIL | Blocks automated audit preflight |
+| CONS-048 | P1 | 12 Snorkeling QA templates PENDING | Blocks Snorkeling field claims |
+| SDG-008 | P1 | Shallow FC TestFlight exposure labeling | Internal TF disclosure required |
+| MASTER-DEPTH-002 | P1 | Depth tier metadata runtime trust | Metadata CI check open |
+| WFC-P1-001 | P1 | External Bühlmann validation pending | External TF blocked |
+| WAO-PHY-001..003 | P2 | Water auto-open physical gates | External TF blocked |
+| HWC-PHY-001..004 | P2 | Crown/Action Button/Water Lock physical | External TF blocked |
+| CONS-044 | P2 | Legal/marketing sign-off pending | App Store blocked |
 
 ---
 
 ## AD. Readiness to 100 Plan
 
-See [`MASTER_READINESS_TO_100_PLAN_CURRENT.md`](MASTER_READINESS_TO_100_PLAN_CURRENT.md). **72%** overall; **100%** software-actionable scope. Dominant gap: **PENDING_PHYSICAL** and **PENDING_EXTERNAL_VALIDATION**.
+See [`MASTER_READINESS_TO_100_PLAN_CURRENT.md`](MASTER_READINESS_TO_100_PLAN_CURRENT.md).
+
+**Critical path:** Fix IOS-P1-001 → Fix CONS-046 script → Execute Snorkeling Batch-8 (12 templates) → Legacy physical campaigns → External validation → Legal/ASC sign-off.
 
 ---
 
@@ -220,34 +292,59 @@ See [`MASTER_READINESS_TO_100_PLAN_CURRENT.md`](MASTER_READINESS_TO_100_PLAN_CUR
 
 | # | Question | Answer |
 |---|----------|--------|
-| 1 | Ready for internal TestFlight? | **YES** (software) — disclose shallow cap; physical QA incomplete |
-| 2 | Ready for external TestFlight? | **NO** |
+| 1 | Ready for internal TestFlight? | **CONDITIONAL** — fix IOS-P1-001; disclose physical pending |
+| 2 | Ready for external TestFlight? | **NO** — physical/external gates open |
 | 3 | Ready for App Store? | **NO** |
-| 4 | Safety requirements mapped to tests? | **YES** (software); physical rows PENDING |
-| 5 | Physical gates executed or pending? | **YES** — all PENDING_PHYSICAL |
-| 6 | FC altimeter physically validated? | **NO** |
-| 7 | Depth sensor / underwater QA? | **NO** — PENDING_PHYSICAL |
-| 8 | Paired sync physically validated? | **NO** |
-| 9–11 | External Bühlmann/Schreiner/Subsurface/CCR? | **NO** — PENDING_EXTERNAL_VALIDATION |
-| 12 | Claims supported by evidence? | **YES** (software scope) |
-| 13 | Privacy manifest complete? | **YES** (engineering) |
-| 14 | ASC/TestFlight metadata truthful? | **PARTIAL** — assets not executed |
-| 15 | Entitlements aligned? | **YES** (shallow default); full-depth field PENDING |
-| 16 | Support/rollback ready? | **PARTIAL** — docs present; drill PENDING |
-| 17–20 | Blocks 100% / TF / App Store? | Physical (62+), external (4), legal (2), disclosure P1 (2) |
+| 4 | All safety-relevant requirements mapped to tests? | **PARTIAL** — iOS suite blocked |
+| 5 | Physical-device gates executed or pending? | **All PENDING** — clearly marked |
+| 6 | Watch FC altitude physically validated? | **NO** — PENDING_PHYSICAL |
+| 7 | Depth sensor / underwater QA complete? | **NO** — PENDING_PHYSICAL |
+| 8 | Paired sync physically validated? | **NO** — PENDING_PHYSICAL |
+| 9 | External Bühlmann complete? | **NO** — PENDING_EXTERNAL_VALIDATION |
+| 10 | Subsurface validation complete? | **NO** |
+| 11 | CCR validation complete? | **Reference-only / PENDING_EXTERNAL** |
+| 12 | All user-facing claims supported? | **YES (software)** — physical/external pending |
+| 13 | Privacy manifest complete? | **YES (engineering)** |
+| 14 | ASC/TestFlight metadata truthful? | **PARTIAL** — legal review pending |
+| 15 | Entitlements/capabilities aligned? | **YES (software)** — physical depth pending |
+| 16 | Support/rollback ready? | **PARTIAL** |
+| 17 | Blocks 100% release readiness? | Physical 0%, external 0%, legal, IOS-P1-001, CONS-048 |
+| 18 | Blocks internal TestFlight? | IOS-P1-001, CONS-046 (disclosure mitigates physical) |
+| 19 | Blocks external TestFlight? | All physical + external + Snorkeling field QA |
+| 20 | Blocks App Store? | Above + legal + ASC assets + full-depth entitlement evidence |
 
 ---
 
-## AF. Final Verdict Block (exact format)
+## AF. Post-Remediation Release Verification (§2B)
+
+See:
+
+- [`MASTER_RELEASE_POST_REMEDIATION_READINESS_AUDIT_CURRENT.md`](MASTER_RELEASE_POST_REMEDIATION_READINESS_AUDIT_CURRENT.md)
+- [`MASTER_RELEASE_POST_REMEDIATION_CLAIMS_MATRIX_CURRENT.csv`](MASTER_RELEASE_POST_REMEDIATION_CLAIMS_MATRIX_CURRENT.csv)
+- [`MASTER_TESTFLIGHT_POST_REMEDIATION_SOFTWARE_GATE_CURRENT.md`](MASTER_TESTFLIGHT_POST_REMEDIATION_SOFTWARE_GATE_CURRENT.md)
+- [`MASTER_APP_STORE_POST_REMEDIATION_PENDING_GATE_CURRENT.md`](MASTER_APP_STORE_POST_REMEDIATION_PENDING_GATE_CURRENT.md)
+- [`MASTER_PHYSICAL_EXTERNAL_GATE_PRESERVATION_MATRIX_CURRENT.csv`](MASTER_PHYSICAL_EXTERNAL_GATE_PRESERVATION_MATRIX_CURRENT.csv)
+
+```text
+INTERNAL_TESTFLIGHT_SOFTWARE_READY_AFTER_REMEDIATION: CONDITIONAL
+EXTERNAL_TESTFLIGHT_WITH_PHYSICAL_GATES: NOT_READY
+APP_STORE_WITH_LEGAL_PHYSICAL_EXTERNAL_GATES: NOT_READY
+NO_FAKE_PHYSICAL_EXTERNAL_CLAIMS: PASS
+RELEASE_SOFTWARE_READINESS_AFTER_REMEDIATION: 88
+```
+
+---
+
+## AG. Machine Verdict Block
 
 ```text
 MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT: PARTIAL
 BASELINE_CURRENT_AND_CLEAN: PASS
 BUILD_IOS: PASS
 BUILD_WATCH: PASS
-IOS_TESTS: PASS
-WATCH_TESTS: PASS
-REQUIREMENT_TEST_TRACEABILITY: PASS
+IOS_TESTS: FAIL
+WATCH_TESTS: FAIL
+REQUIREMENT_TEST_TRACEABILITY: FAIL
 PHYSICAL_WATCH_QA: PENDING_PHYSICAL
 PHYSICAL_IOS_QA: PENDING_PHYSICAL
 PAIRED_WATCH_IOS_QA: PENDING_PHYSICAL
@@ -264,20 +361,20 @@ PRIVACY_MANIFEST_DISCLOSURE_ALIGNMENT: PASS
 TESTFLIGHT_METADATA_TRUTHFULNESS: PASS
 APP_STORE_METADATA_TRUTHFULNESS: FAIL
 SUPPORT_ROLLBACK_PROCESS: FAIL
-INTERNAL_TESTFLIGHT_READINESS: READY
+INTERNAL_TESTFLIGHT_READINESS: CONDITIONAL
 EXTERNAL_TESTFLIGHT_READINESS: NOT_READY
 APP_STORE_READINESS: NOT_READY
 P0_FINDINGS: 0
-P1_FINDINGS: 2
-P2_FINDINGS: 14
+P1_FINDINGS: 8
+P2_FINDINGS: 12
 P3_FINDINGS: 5
 P4_FINDINGS: 4
-OVERALL_QA_EVIDENCE_READINESS: 78
+OVERALL_QA_EVIDENCE_READINESS: 68
 OVERALL_CLAIMS_COMPLIANCE_READINESS: 92
-OVERALL_RELEASE_READINESS: 72
-RELEASE_BLOCKERS: MASB-P-01, MASB-P-02, MASB-P-03, MASB-P-04, MASB-P-05, MASB-P-06, MASB-P-07, MASB-WAO-01, MASB-WAO-02, MASB-HW-01, MASB-HW-02, MASB-HW-03, MASB-S-01, MASB-S-02, MASB-S-03, MASB-S-04, MASB-E-01, MASB-E-02, MASB-E-03, MASB-E-04, MASB-L-01, MASB-L-02, MASB-L-03, SDG-008, MASTER-DEPTH-002
+OVERALL_RELEASE_READINESS: 62
+RELEASE_BLOCKERS: IOS-P1-001, CONS-046, CONS-048, SDG-008, MASTER-DEPTH-002, WFC-P1-001, CONS-044, WAO-PHY-001, HWC-PHY-004
 ```
 
 ---
 
-*Post-remediation audit rerun complete @ 5d757cc. Only `Docs/` outputs modified. No commit performed.*
+**AUDIT_05_STATUS: COMPLETE @ 451f8fb · 2026-06-30**
