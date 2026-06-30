@@ -46,3 +46,10 @@ DG-PHY-002,CONS-031,05-Release,MASB-P-05,Snorkeling physical gate,Yes,Yes,No,Yes
 DG-ALT-001,CONS-015,01-Watch,MWFC-P2-002,Altitude oracle replay,Yes,Yes,Yes,Yes,MERGE,None,Altitude evidence partial,
 DG-EVID-001,CONS-045,04-Main,MASTER-DCA-018,Physical QA aggregate,Yes,Yes,Yes,No,MERGE,None,Meta evidence execution gap,
 DG-EVID-001,CONS-045,05-Release,MASB-P-01,Physical matrix not run,Partial,Yes,No,No,LINK_NOT_MERGE,None,Rolls up multiple physical findings,
+DG-DOC-003,CONS-046,06-Docs,DOC-P1-005,Script filename drift,Yes,Yes,Yes,No,MERGE,Escalated P1,Same integrity gate cluster as CONS-001 repair,OPEN @ 451f8fb
+DG-AUDIT-001,CONS-047,00-Orchestrator,CONS-047,Stale upstream audits,Yes,Yes,Yes,No,MERGE,None,Meta audit freshness — VERIFIED @ 451f8fb,CLOSED
+DG-PHY-003,CONS-048,02-iOS,SNK-P1-P2-P3,Snorkeling 12 QA templates,Yes,Yes,No,Yes,MERGE,Escalated P1,Snorkeling physical meta-finding,0% executed
+DG-PHY-003,CONS-048,03-UI/UX,SNK physical,Route safety field QA,Yes,Yes,No,Yes,MERGE,None,Same Snorkeling campaign,
+DG-PHY-003,CONS-048,05-Release,CONS-048,Snorkeling release gate,Yes,Yes,No,Yes,MERGE,None,Release reflects 12 templates,
+DG-TEST-001,CONS-049,02-iOS,IOS-P1-001,Snorkeling test compile,Yes,Yes,Yes,No,MERGE,Escalated P1,Test infra regression @ 451f8fb,Production builds PASS
+DG-TEST-001,CONS-049,04-Main,MAIN-P2-001,iOS test gate blocked,Partial,Yes,Yes,No,LINK_NOT_MERGE,None,Same compile failure symptom,

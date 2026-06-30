@@ -5,7 +5,8 @@ enum SnorkelingDurationEstimator {
         draft: SnorkelingRoutePlannerDraft,
         profile: SnorkelingCompanionProfile?
     ) -> Double {
-        if let profileSpeed = profile?.estimatedSpeedMetersPerMinute, profileSpeed > 0 {
+        if let profileSpeed = profile?.estimatedSpeedMetersPerMinute {
+            guard profileSpeed > 0 else { return 0 }
             return profileSpeed
         }
         if let kind = draft.routeProfileKind {

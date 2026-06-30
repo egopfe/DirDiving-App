@@ -1,11 +1,11 @@
 Command_Number,Expected_Filename,Expected_Body_Title,File_Exists,Launch_Order_Match,Body_Aligned,Script_Referenced,Integrity_Result,Notes
-00,00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.3.md,Super Orchestrator,yes,yes,yes,no,PASS,V1.3 @ bb204f5
+00,00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.3.md,Super Orchestrator,yes,yes,yes,no,PASS,V1.3 @ 451f8fb
 01,01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.2.md,Watch Full Computer Forensic,yes,yes,yes,yes — wrong path V2.1,FAIL,Body OK; script expects OOLD V2.1 (CONS-046)
-02,02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.2.md,iOS Full Deep,yes,yes,yes,yes — wrong path V1.1,FAIL,Body OK; script drift
-03,03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md,UI/UX Full Deep,yes,yes,yes,yes — wrong path V2.2,FAIL,Body V2.3; script expects V2.2
-04,04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.2.md,Main Code Sync Security Performance,yes,yes,yes,yes — wrong path V1.1,FAIL,Body V1.2; script drift
-05,05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md,Release QA Evidence Compliance,yes,yes,yes,yes — wrong path V1.1,FAIL,Body V1.2; script drift
-06,06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md,Documentation Repository Alignment,yes,yes,yes,yes — wrong path V1.1,FAIL,Body V1.2; script drift
-07,07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.0.md,Post-Remediation Code Readiness Verification,yes,yes,yes,no,PASS,Audit-only; not in integrity script
-10,10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,Consolidated Software Remediation,no,n/a,n/a,n/a,MISSING,Outputs present; command file not in repo
-integrity_script,Scripts/validate_commands_for_cursor_integrity.sh,Launch order gate,yes,n/a,n/a,self,FAIL,References superseded V2.1/V1.1 filenames
+02,02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.2.md,iOS Full Deep,yes,yes,yes,yes — wrong path V1.1,FAIL,Body OK; script drift (CONS-046)
+03,03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md,UI/UX Full Deep,yes,yes,yes,yes — wrong path V2.2,FAIL,Body V2.3 OK; script drift (CONS-046)
+04,04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.2.md,Main Code Sync Security Performance,yes,yes,yes,yes — wrong path V1.1,FAIL,Body V1.2 OK; script drift (CONS-046)
+05,05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md,Release QA Evidence Compliance,yes,yes,yes,yes — wrong path V1.1,FAIL,Body V1.2 OK; script drift (CONS-046)
+06,06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md,Documentation Repository Alignment,yes,yes,yes,yes — wrong path V1.1,FAIL,Body V1.2 OK; script drift (CONS-046)
+07,07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.0.md,Post-Remediation Code Readiness Verification,yes,yes,yes,no,PASS,Audit-only; executed @ 451f8fb
+10,10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,Consolidated Software Remediation,no,n/a,n/a,n/a,MISSING,Outputs present; command file not on disk — doc-only gap
+integrity_script,Scripts/validate_commands_for_cursor_integrity.sh,Launch order gate,yes,n/a,n/a,self,FAIL,References superseded V2.1/V1.1 filenames @ 451f8fb

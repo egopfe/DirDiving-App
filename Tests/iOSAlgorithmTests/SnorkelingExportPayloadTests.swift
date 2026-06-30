@@ -1,5 +1,4 @@
 import XCTest
-@testable import DIRDivingiOSApp
 
 final class SnorkelingExportPayloadTests: XCTestCase {
     func testShareTextIncludesDistanceDurationAndSafetyCopy() {
