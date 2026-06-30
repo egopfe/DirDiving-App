@@ -42,6 +42,10 @@ final class SnorkelingImportedRouteStore: ObservableObject {
         (activatedPackage ?? pendingPackage)?.body.routePlan
     }
 
+    var activePlanningMetadata: SnorkelingRoutePlanningMetadata? {
+        (activatedPackage ?? pendingPackage)?.body.planningMetadata
+    }
+
     func importPayload(_ package: SnorkelingRouteSyncPackage, source: String, sessionInProgress: Bool) -> Bool {
         staleRevisionRejected = false
         let fingerprint = "\(package.body.packageID.uuidString)|\(package.body.revision)|\(package.payloadChecksumSHA256)"

@@ -71,6 +71,7 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
 
     func armSession(at wallClock: Date = Date()) {
         configureDefaultSession()
+        engine.resetRouteRuntimeTracking()
         engine.armSession(at: wallClock)
         sessionArmed = true
         sessionStarted = false
@@ -276,9 +277,17 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
 
     private func configureDefaultSession() {
         engine.configureWatchDefaultsIfNeeded()
+        applyImportedRouteIfAvailable()
         engine.setMissionModeEnabled(missionModeEnabled)
         engine.setHapticsEnabled(hapticsEnabled)
         updateBattery()
+    }
+
+    private func applyImportedRouteIfAvailable() {
+        let store = SnorkelingImportedRouteStore.shared
+        guard let plan = store.activeRoutePlan else { return }
+        engine.setRoutePlans([plan], activePlanID: plan.id)
+        engine.setRoutePlanningMetadata(store.activePlanningMetadata)
     }
 
     private func startSensors() {
@@ -620,7 +629,13 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
             markerDistanceFromEntryText: entryDistanceText(snapshot.returnNavigation.distanceToEntryMeters),
             sessionSaveState: sessionSaveState,
             isRecoveredSession: isRecoveredSession,
-            recoveryWarning: checkpointRestoreWarning
+            recoveryWarning: checkpointRestoreWarning,
+            gpsQualityBand: snapshot.gpsQualityBand,
+            routeProgressPercent: snapshot.routeProgressPercent,
+            offRouteDistanceMeters: snapshot.offRouteDistanceMeters,
+            isOffRoute: snapshot.isOffRoute,
+            offRouteWarningPaused: snapshot.offRouteWarningPaused,
+            plannedReturnAlertActive: snapshot.plannedReturnAlertActive
         )
     }
 
@@ -697,6 +712,12 @@ extension SnorkelingWatchPresentationInput {
         markerDistanceFromEntryText: nil,
         sessionSaveState: .notSaved,
         isRecoveredSession: false,
-        recoveryWarning: nil
+        recoveryWarning: nil,
+        gpsQualityBand: nil,
+        routeProgressPercent: nil,
+        offRouteDistanceMeters: nil,
+        isOffRoute: false,
+        offRouteWarningPaused: false,
+        plannedReturnAlertActive: false
     )
 }
