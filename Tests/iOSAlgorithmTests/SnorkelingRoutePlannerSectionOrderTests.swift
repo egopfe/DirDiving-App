@@ -6,11 +6,16 @@ final class SnorkelingRoutePlannerSectionOrderTests: XCTestCase {
         let source = try String(contentsOf: root.appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingRoutePlannerView.swift"))
         let mapIndex = try XCTUnwrap(source.range(of: "mapSection")?.lowerBound)
         let pointsIndex = try XCTUnwrap(source.range(of: "waypointList", range: mapIndex..<source.endIndex)?.lowerBound)
-        let profilesIndex = try XCTUnwrap(source.range(of: "profilesSection", range: pointsIndex..<source.endIndex)?.lowerBound)
-        let estimatesIndex = try XCTUnwrap(source.range(of: "estimatesCard", range: profilesIndex..<source.endIndex)?.lowerBound)
+        let safetyIndex = try XCTUnwrap(source.range(of: "routeSafetySection", range: pointsIndex..<source.endIndex)?.lowerBound)
+        let profilesIndex = try XCTUnwrap(source.range(of: "profilesSection", range: safetyIndex..<source.endIndex)?.lowerBound)
+        let transferIndex = try XCTUnwrap(source.range(of: "transferSection", range: profilesIndex..<source.endIndex)?.lowerBound)
         XCTAssertLessThan(mapIndex, pointsIndex)
-        XCTAssertLessThan(pointsIndex, profilesIndex)
-        XCTAssertLessThan(profilesIndex, estimatesIndex)
+        XCTAssertLessThan(pointsIndex, safetyIndex)
+        XCTAssertLessThan(safetyIndex, profilesIndex)
+        XCTAssertLessThan(profilesIndex, transferIndex)
+        XCTAssertTrue(source.contains("routeSafetySection"))
+        XCTAssertTrue(source.contains("checklistSection"))
+        XCTAssertTrue(source.contains("exportSection"))
     }
 
     func testRoutePlannerIncludesCenterLocationAndResetControls() throws {

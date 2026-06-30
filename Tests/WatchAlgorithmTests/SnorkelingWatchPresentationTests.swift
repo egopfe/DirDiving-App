@@ -313,7 +313,13 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
             markerDistanceFromEntryText: "180 m",
             sessionSaveState: .notSaved,
             isRecoveredSession: false,
-            recoveryWarning: nil
+            recoveryWarning: nil,
+            gpsQualityBand: .good,
+            routeProgressPercent: 42,
+            offRouteDistanceMeters: nil,
+            isOffRoute: false,
+            offRouteWarningPaused: false,
+            plannedReturnAlertActive: false
         )
     }
 }

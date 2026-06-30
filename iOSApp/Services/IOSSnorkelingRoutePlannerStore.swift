@@ -22,12 +22,44 @@ final class IOSSnorkelingRoutePlannerStore: ObservableObject {
         SnorkelingRoutePlanValidator.validationIssues(for: draft)
     }
 
-    var estimatedDistanceMeters: Double {
-        SnorkelingRoutePlanValidator.routeDistanceMeters(draft.orderedPoints)
+    func validationResult(profile: SnorkelingCompanionProfile?) -> SnorkelingRouteValidationResult {
+        SnorkelingRouteValidator.validate(draft: draft, profile: profile)
     }
 
-    var estimatedDurationSeconds: TimeInterval {
-        SnorkelingRoutePlanValidator.estimatedDurationSeconds(for: draft)
+    var estimatedDistanceMeters: Double {
+        SnorkelingDistanceCalculator.distanceMeters(points: draft.routingPoints)
+    }
+
+    func estimatedDurationSeconds(profile: SnorkelingCompanionProfile?) -> TimeInterval {
+        SnorkelingDurationEstimator.estimatedDurationSeconds(
+            distanceMeters: estimatedDistanceMeters,
+            draft: draft,
+            profile: profile
+        )
+    }
+
+    func returnToEntryPreview(
+        currentLatitude: Double?,
+        currentLongitude: Double?
+    ) -> SnorkelingReturnToEntryPreview {
+        guard let entry = draft.entryPoint else {
+            return SnorkelingReturnToEntryPreview(distanceMeters: nil, bearingDegrees: nil, isAvailable: false)
+        }
+        guard let currentLatitude, let currentLongitude else {
+            return SnorkelingReturnToEntryPreview(distanceMeters: nil, bearingDegrees: nil, isAvailable: false)
+        }
+        let entryCoord = SnorkelingCoordinate(entry)
+        let currentCoord = SnorkelingCoordinate(latitude: currentLatitude, longitude: currentLongitude)
+        let distance = SnorkelingDomainSupport.distanceMeters(
+            from: (currentCoord.latitude, currentCoord.longitude),
+            to: (entryCoord.latitude, entryCoord.longitude)
+        )
+        let bearing = SnorkelingBearingCalculator.bearingDegrees(from: currentCoord, to: entryCoord)
+        return SnorkelingReturnToEntryPreview(
+            distanceMeters: distance,
+            bearingDegrees: bearing,
+            isAvailable: true
+        )
     }
 
     func setProfileID(_ profileID: UUID?) {
@@ -36,6 +68,40 @@ final class IOSSnorkelingRoutePlannerStore: ObservableObject {
            let profile = SnorkelingCompanionProfilePresets.bundledPresets().first(where: { $0.id == profileID }) {
             draft.maxDistanceLimitMeters = profile.maxDistanceMeters
         }
+        persistDraft()
+    }
+
+    func setRouteType(_ routeType: SnorkelingRouteType) {
+        draft.routeType = routeType
+        if routeType == .roundTrip {
+            draft.exitPoint = nil
+        }
+        persistDraft()
+    }
+
+    func setReturnAlertPolicy(_ policy: SnorkelingReturnAlertPolicy) {
+        draft.returnAlertPolicy = policy
+        persistDraft()
+    }
+
+    func setRouteProfileKind(_ kind: SnorkelingRouteProfileKind?) {
+        draft.routeProfileKind = kind
+        if let kind, draft.maxDistanceLimitMeters == nil {
+            draft.maxDistanceLimitMeters = kind.recommendedMaxDistanceMeters
+        }
+        persistDraft()
+    }
+
+    func setChecklistValue(_ keyPath: WritableKeyPath<SnorkelingPreSnorkelingChecklist, Bool>, value: Bool) {
+        var checklist = draft.resolvedChecklist
+        checklist[keyPath: keyPath] = value
+        draft.checklist = checklist
+        persistDraft()
+    }
+
+    func renameWaypoint(id: UUID, name: String) {
+        guard let index = draft.waypoints.firstIndex(where: { $0.id == id }) else { return }
+        draft.waypoints[index].name = name
         persistDraft()
     }
 
@@ -107,8 +173,8 @@ final class IOSSnorkelingRoutePlannerStore: ObservableObject {
     }
 
     @discardableResult
-    func saveCurrentPlan() -> Bool {
-        guard SnorkelingRoutePlanValidator.isValid(draft: draft) else { return false }
+    func saveCurrentPlan(profile: SnorkelingCompanionProfile?) -> Bool {
+        guard validationResult(profile: profile).allowsWatchTransfer else { return false }
         var copy = draft
         copy.updatedAt = Date()
         savedPlans.removeAll { $0.id == copy.id }

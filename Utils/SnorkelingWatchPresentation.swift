@@ -58,6 +58,12 @@ struct SnorkelingWatchPresentationInput: Equatable {
     var sessionSaveState: SnorkelingWatchSessionSaveState
     var isRecoveredSession: Bool
     var recoveryWarning: String?
+    var gpsQualityBand: SnorkelingWatchGPSPresentationBand?
+    var routeProgressPercent: Double?
+    var offRouteDistanceMeters: Double?
+    var isOffRoute: Bool
+    var offRouteWarningPaused: Bool
+    var plannedReturnAlertActive: Bool
 }
 
 enum SnorkelingWatchSessionSaveState: String, Equatable {
@@ -125,6 +131,10 @@ struct SnorkelingWatchPresentationOutput: Equatable {
     var recoveredSessionAccessibilityLabel: String?
     var returnAdvisorAccessibilityLabel: String?
     var overlayAccessibilityLabel: String?
+    var routeProgressText: String
+    var offRouteText: String?
+    var gpsQualityBandText: String?
+    var plannedReturnAlertText: String?
 }
 
 enum SnorkelingWatchColorToken: String, Equatable {
@@ -140,7 +150,11 @@ enum SnorkelingWatchColorToken: String, Equatable {
 enum SnorkelingWatchPresentation {
     static func make(_ input: SnorkelingWatchPresentationInput) -> SnorkelingWatchPresentationOutput {
         let stage = resolveStage(input)
-        let gps = gpsPresentation(for: input.gpsPresentationState, underwater: input.isUnderwater)
+        let gps = gpsPresentation(
+            for: input.gpsPresentationState,
+            underwater: input.isUnderwater,
+            qualityBand: input.gpsQualityBand
+        )
         let startEnabled = canStart(input)
         let turn = turnPresentation(
             instruction: navigationTurnInstruction(for: input, stage: stage),
@@ -218,7 +232,13 @@ enum SnorkelingWatchPresentation {
             returnAdvisorAccessibilityLabel: advisorText == nil
                 ? nil
                 : DIRWatchLocalizer.string("snorkeling.a11y.return_advisor"),
-            overlayAccessibilityLabel: overlayAccessibilityLabel(for: overlay)
+            overlayAccessibilityLabel: overlayAccessibilityLabel(for: overlay),
+            routeProgressText: routeProgressText(input.routeProgressPercent),
+            offRouteText: offRouteText(input),
+            gpsQualityBandText: input.gpsQualityBand.map { DIRWatchLocalizer.string($0.localizationKey) },
+            plannedReturnAlertText: input.plannedReturnAlertActive
+                ? DIRWatchLocalizer.string("snorkeling.watch.time_to_return")
+                : nil
         )
     }
 
@@ -398,10 +418,21 @@ enum SnorkelingWatchPresentation {
 
     private static func gpsPresentation(
         for state: SnorkelingGPSPresentationState,
-        underwater: Bool
+        underwater: Bool,
+        qualityBand: SnorkelingWatchGPSPresentationBand?
     ) -> (text: String, color: SnorkelingWatchColorToken) {
         if underwater {
             return (DIRWatchLocalizer.string("snorkeling.gps.underwater"), .secondary)
+        }
+        if let qualityBand {
+            let color: SnorkelingWatchColorToken
+            switch qualityBand {
+            case .good: color = .green
+            case .medium: color = .yellow
+            case .poor: color = .orange
+            case .lost: color = .red
+            }
+            return (DIRWatchLocalizer.string(qualityBand.localizationKey), color)
         }
         switch state {
         case .tracking:
@@ -413,6 +444,22 @@ enum SnorkelingWatchPresentation {
         case .unavailable, .underwaterUnavailable:
             return (DIRWatchLocalizer.string("snorkeling.gps.unavailable"), .red)
         }
+    }
+
+    private static func routeProgressText(_ percent: Double?) -> String {
+        guard let percent, percent.isFinite else {
+            return "\(DIRWatchLocalizer.string("snorkeling.watch.route_progress")) —"
+        }
+        return "\(DIRWatchLocalizer.string("snorkeling.watch.route_progress")) \(Int(percent.rounded()))%"
+    }
+
+    private static func offRouteText(_ input: SnorkelingWatchPresentationInput) -> String? {
+        if input.offRouteWarningPaused {
+            return DIRWatchLocalizer.string("snorkeling.watch.off_route_paused")
+        }
+        guard input.isOffRoute else { return nil }
+        let distance = input.offRouteDistanceMeters.map { Formatters.zero($0) } ?? "--"
+        return "\(DIRWatchLocalizer.string("snorkeling.watch.off_route")) \(distance) m"
     }
 
     private static func depthSensorText(
