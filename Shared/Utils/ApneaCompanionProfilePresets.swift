@@ -33,7 +33,8 @@ enum ApneaCompanionProfilePresets {
                 allowEarlyDiveWhenIncomplete: false
             ),
             targetDepthMeters: 15,
-            alarms: [depthAlarm(depth: 20, label: "preset.alarm.basic")]
+            alarms: [depthAlarm(depth: 20, label: "preset.alarm.basic")],
+            profileKind: .freeTraining
         )
     }
 
@@ -51,7 +52,8 @@ enum ApneaCompanionProfilePresets {
                 allowEarlyDiveWhenIncomplete: false
             ),
             targetDepthMeters: 25,
-            alarms: [depthAlarm(depth: 25, label: "preset.alarm.advanced"), depthAlarm(depth: 30, label: "preset.alarm.depth")]
+            alarms: [depthAlarm(depth: 25, label: "preset.alarm.advanced"), depthAlarm(depth: 30, label: "preset.alarm.depth")],
+            profileKind: .depthConstantWeight
         )
     }
 
@@ -63,7 +65,8 @@ enum ApneaCompanionProfilePresets {
             isPreset: true,
             recoveryPolicy: .default,
             targetDepthMeters: 20,
-            markers: [ApneaDepthMarker(label: "preset.marker.plate", depthMeters: 20)]
+            markers: [ApneaDepthMarker(label: "preset.marker.plate", depthMeters: 20)],
+            profileKind: .depthConstantWeight
         )
     }
 
@@ -80,7 +83,8 @@ enum ApneaCompanionProfilePresets {
                 phases: [.surfaceRest],
                 allowEarlyDiveWhenIncomplete: false
             ),
-            targetDepthMeters: 30
+            targetDepthMeters: 30,
+            profileKind: .depthConstantWeight
         )
     }
 
@@ -91,7 +95,8 @@ enum ApneaCompanionProfilePresets {
             discipline: .dynamic,
             isPreset: true,
             recoveryPolicy: ApneaRecoveryPolicy(mode: .ratio1to1, minimumSurfaceSeconds: 45, recommendedSurfaceSeconds: 60, phases: [.surfaceRest], allowEarlyDiveWhenIncomplete: false),
-            targetDurationSeconds: 90
+            targetDurationSeconds: 90,
+            profileKind: .dynamicApnea
         )
     }
 
@@ -102,7 +107,8 @@ enum ApneaCompanionProfilePresets {
             discipline: .photo,
             isPreset: true,
             recoveryPolicy: ApneaRecoveryPolicy(mode: .informationalOnly, minimumSurfaceSeconds: 30, recommendedSurfaceSeconds: 45, phases: [.surfaceRest], allowEarlyDiveWhenIncomplete: true),
-            targetDepthMeters: 12
+            targetDepthMeters: 12,
+            profileKind: .freeTraining
         )
     }
 

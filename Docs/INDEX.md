@@ -7,6 +7,16 @@
 
 ## Aggiornamento indice 2026-06-17 — CONS-046 V1.5 integrity script @ `6a0005b`
 
+## Aggiornamento indice 2026-06-17 — Apnea P1/P2/P3 @ `76f3703`
+
+Apnea profiles, session check, recovery timer, training tables; INTERNAL_READY / PHYSICAL_QA_PENDING.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [APNEA_IOS_WATCH_P1_P2_P3_IMPLEMENTATION_REPORT_CURRENT.md](APNEA_IOS_WATCH_P1_P2_P3_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Verdict** | **APNEA_P1_P2_P3_INTERNAL_READY** · **PHYSICAL_QA_PENDING** |
+
+
 Post-merge V1.5 command upgrade: integrity script aligned to V1.5 paths; consolidated readiness PASS.
 
 | Campo | Valore |

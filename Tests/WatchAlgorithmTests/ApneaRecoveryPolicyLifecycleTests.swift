@@ -112,7 +112,12 @@ final class ApneaRecoveryPolicyLifecycleTests: XCTestCase {
             averageDiveDurationSeconds: 90,
             sessionWarnings: [],
             dataQualityDegraded: false,
-            activeOverlay: nil
+            activeOverlay: nil,
+            runtimeLayout: .freeTrainingCompact,
+            sensorQualityLabels: [],
+            maxRepetitions: nil,
+            averageRecoverySeconds: 0,
+            dataQualityLevel: .good
         )
         let output = ApneaWatchPresentation.make(input)
         XCTAssertFalse(output.startEnabled)
@@ -276,7 +281,12 @@ final class ApneaRecoveryPolicyLifecycleTests: XCTestCase {
             averageDiveDurationSeconds: 90,
             sessionWarnings: [],
             dataQualityDegraded: false,
-            activeOverlay: nil
+            activeOverlay: nil,
+            runtimeLayout: .freeTrainingCompact,
+            sensorQualityLabels: [],
+            maxRepetitions: nil,
+            averageRecoverySeconds: 0,
+            dataQualityLevel: .good
         )
         let output = ApneaWatchPresentation.make(input)
         XCTAssertTrue(output.startEnabled)
