@@ -56,6 +56,27 @@ struct IOSApneaSettingsContent: View {
                 ) {
                     IOSApneaBuddySafetyView()
                 }
+                IOSCompanionSettingsNavigationRow(
+                    title: DIRIOSLocalizer.string("apnea.session_check.title"),
+                    systemImage: "checkmark.shield",
+                    identifier: "apnea.settings.session_check"
+                ) {
+                    IOSApneaSessionCheckView()
+                }
+                IOSCompanionSettingsNavigationRow(
+                    title: DIRIOSLocalizer.string("apnea.checklist.title"),
+                    systemImage: "checklist",
+                    identifier: "apnea.settings.checklist"
+                ) {
+                    IOSApneaChecklistView()
+                }
+                IOSCompanionSettingsNavigationRow(
+                    title: DIRIOSLocalizer.string("apnea.training.title"),
+                    systemImage: "tablecells",
+                    identifier: "apnea.settings.training_tables"
+                ) {
+                    IOSApneaTrainingTablesView()
+                }
             }
 
             DIRCard(DIRIOSLocalizer.string("apnea.ios.settings.feedback"), icon: "hand.tap.fill", accent: DIRTheme.yellow) {

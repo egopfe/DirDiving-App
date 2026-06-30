@@ -1524,3 +1524,13 @@
 "snorkeling.watch.off_route" = "Off route";
 "snorkeling.watch.off_route_paused" = "GPS weak — route warning paused";
 "snorkeling.watch.route_progress" = "Route";
+
+"apnea.watch.sensors_ok" = "Sensors OK";
+"apnea.watch.depth_weak" = "Depth weak";
+"apnea.watch.hr_unavailable" = "HR unavailable";
+"apnea.watch.recovery_target_reached" = "Recovery target reached";
+"apnea.watch.layout.hold" = "HOLD";
+"apnea.watch.layout.depth" = "DEPTH";
+"apnea.watch.layout.time" = "TIME";
+"apnea.summary.reps" = "Reps";
+"apnea.summary.max_depth" = "Max depth";

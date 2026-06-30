@@ -233,6 +233,20 @@ struct ApneaView: View {
                     .accessibilityLabel(String(localized: "apnea.surface.a11y.recovery_state"))
                     .accessibilityValue(ui.recoveryStateText)
 
+                if let reached = ui.recoveryTargetReachedText {
+                    Text(reached)
+                        .font(DiveUI.Typography.hintCaption)
+                        .foregroundStyle(DiveUI.green)
+                }
+
+                if let layout = ui.profileLayoutMetrics {
+                    profileLayoutSection(layout)
+                }
+
+                if !input.sensorQualityLabels.isEmpty {
+                    sensorQualityRow
+                }
+
                 if runtime.isSessionActive {
                     DiveCommandButton(String(localized: "apnea.summary.open"), systemImage: "list.bullet", color: DiveUI.blue) {
                         runtime.requestSessionSummary()
@@ -255,6 +269,16 @@ struct ApneaView: View {
                 metricRow(label: String(localized: "apnea.summary.average_time"), value: ui.summaryAverageTimeText, valueColor: .white)
                 metricRow(label: String(localized: "apnea.summary.total_underwater"), value: ui.summaryTotalUnderwaterText, valueColor: .white)
                 metricRow(label: String(localized: "apnea.summary.session_duration"), value: ui.summarySessionDurationText, valueColor: .white)
+
+                if let metrics = ui.sessionSummaryMetrics {
+                    metricRow(label: String(localized: "apnea.summary.best_hold"), value: Formatters.time(metrics.bestHoldSeconds), valueColor: DiveUI.green)
+                    if metrics.maxDepthMeters > 0 {
+                        metricRow(label: String(localized: "apnea.summary.max_depth"), value: String(format: "%.1f m", metrics.maxDepthMeters), valueColor: .white)
+                    }
+                    metricRow(label: String(localized: "apnea.summary.reps"), value: "\(metrics.repetitionCount)", valueColor: .white)
+                    metricRow(label: String(localized: "apnea.summary.average_recovery"), value: Formatters.time(metrics.averageRecoverySeconds), valueColor: .white)
+                    metricRow(label: String(localized: "apnea.data_quality.title"), value: metrics.dataQuality.rawValue.capitalized, valueColor: DiveUI.cyan)
+                }
 
                 if let warnings = ui.summaryWarningsText {
                     Text(warnings)
@@ -515,6 +539,40 @@ struct ApneaView: View {
         case .completed: DiveUI.green
         case .inProgress: DiveUI.yellow
         case .insufficient: DiveUI.orange
+        }
+    }
+
+    @ViewBuilder
+    private func profileLayoutSection(_ layout: ApneaWatchProfileLayoutMetrics) -> some View {
+        VStack(spacing: 4) {
+            metricRow(
+                label: String(localized: String.LocalizationValue(layout.primaryLabelKey)),
+                value: layout.primaryValue,
+                valueColor: recoveryAccentColor
+            )
+            if let secondaryValue = layout.secondaryValue, let secondaryKey = layout.secondaryLabelKey {
+                metricRow(
+                    label: String(localized: String.LocalizationValue(secondaryKey)),
+                    value: secondaryValue,
+                    valueColor: .white
+                )
+            }
+            if let rep = layout.repetitionText {
+                metricRow(label: String(localized: "apnea.summary.reps"), value: rep, valueColor: .white)
+            }
+        }
+    }
+
+    private var sensorQualityRow: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(String(localized: "apnea.sensor_quality.title"))
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.secondaryText)
+            ForEach(input.sensorQualityLabels, id: \.self) { key in
+                Text(String(localized: String.LocalizationValue(key)))
+                    .font(DiveUI.Typography.rowTitle)
+                    .foregroundStyle(DiveUI.cyan)
+            }
         }
     }
 }

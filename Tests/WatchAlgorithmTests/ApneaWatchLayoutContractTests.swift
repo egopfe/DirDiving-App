@@ -148,7 +148,12 @@ final class ApneaWatchLayoutContractTests: XCTestCase {
             averageDiveDurationSeconds: 55,
             sessionWarnings: [],
             dataQualityDegraded: sensorDegraded,
-            activeOverlay: nil
+            activeOverlay: nil,
+            runtimeLayout: .freeTrainingCompact,
+            sensorQualityLabels: [],
+            maxRepetitions: nil,
+            averageRecoverySeconds: 0,
+            dataQualityLevel: .good
         )
     }
 
