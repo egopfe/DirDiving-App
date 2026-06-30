@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ `dbe5d8b`
+**Branch consigliato:** `main` = `origin/main` @ `8f224da`
+
+---
+
+## Aggiornamento indice 2026-06-17 — Master audit orchestrator V1.3 + audit 07 @ `8f224da`
+
+Orchestrator consolidation at `bb204f5`; post-remediation verification (build PASS); CONS-046 script drift, CONS-047 stale upstream audits, CONS-048 Snorkeling physical QA pending.
+
+| Campo | Valore |
+|-------|--------|
+| **Plan** | [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md) |
+| **Verdict** | [`MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md`](MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md) |
+| **Findings** | [`MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`](MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv) |
+| **Verdict** | **PARTIAL** · **PHYSICAL_QA_PENDING** · **APP_STORE_NOT_READY** |
 
 ---
 
