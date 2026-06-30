@@ -14,8 +14,8 @@ CONC-012,HapticService,Watch,@MainActor haptic coordination,P4,ACCEPTED,MainActo
 CONC-013,CloudSyncStore,iOS,KVS sync on init,P3,MONITOR,Startup I/O,Generation token success delay,MainDeepCodeAnalysisRemediationV1Tests,
 CONC-014,FullComputerRuntimeEngine,Watch,Overlap guard on tick,P4,MITIGATED,Reentrant tick,tickInProgress flag,FullComputerRuntimeEngineTests,
 CONC-015,ActivitySyncSignedTransport,Both,Sendable DTOs,P4,PASS,Cross-actor payloads,Sendable conformance,Compile-time + tests,
-CONC-016,PlannerStore,iOS,deinit without task cancel,P2,OPEN,planningUpdateTask/saveTask survive deinit,Cancel in deinit,Code review 7dfefe2,MASTER-PERF-007 PC-02
-CONC-017,PlannerStore,iOS,refreshAnalysis on MainActor before detach,P2,OPEN,Cache miss duplicates analyze on main,Move into detached snapshot,Code review 7dfefe2,MASTER-PERF-007 PC-01
+CONC-016,PlannerStore,iOS,deinit without task cancel,P2,PASS,planningUpdateTask/saveTask cancelled in deinit,Cancel in deinit,Code review @ 451f8fb,CONS-027 FIXED
+CONC-017,PlannerStore,iOS,refreshAnalysis on MainActor before detach,P3,MONITOR,Cache miss may still prefetch on main,Move into detached snapshot,Code review @ 451f8fb,Lower severity; deinit cancel mitigates leak
 CONC-018,iOS WatchSyncService,iOS,Unused retention/attempt budget,P2,OPEN,isRetentionExpired never checked in iOS queue,Enforce in normalization,IOSWatchSyncPendingTransfer definitions only,MASTER-PERF-007
 CONC-019,SnorkelingSessionMapPresentation,Both,Sync map build on caller thread,P2,OPEN,Large track blocks before downsample,Consider detached build,SnorkelingRoutePresentationSampling tests,MASTER-PERF-004 overlap
 CONC-020,DiveManager,Watch,GPS confirmation uncancelled Task,P2,OPEN,showGPSConfirmation Task without weak self,Add weak self + cancel,Code review 7dfefe2,PC-13

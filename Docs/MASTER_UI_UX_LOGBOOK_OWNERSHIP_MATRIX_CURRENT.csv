@@ -1,8 +1,9 @@
 Logbook_ID,Activity,Platform,Entry_Point,List_View,Detail_View,Store,Session_Type,Filters,Statistics,Export,Sync,Deep_Link,Restoration,Visible_From_Diving,Visible_From_Apnea,Visible_From_Snorkeling,Cross_Activity_Leak,Evidence,Pass,Notes
-diving_logbook,Diving,Watch+iOS,Crown page / Diving tab,DiveLogListView,DiveDetailView,DiveLogStore,DiveSession,yes,yes,yes,yes,Diving,Diving,no,WatchActivityLogbookRoutingTests,PASS,Watch tab gated to Diving activity,,,
-apnea_logbook,Apnea,iOS,Apnea sessions tab,IOSApneaSessionsListView,IOSApneaSessionDetailView,IOSApneaLogbookStore,ApneaSession,yes,yes,no,yes,Apnea,Apnea,no,IOSActivityLogbookRoutingTests,PASS,Watch saves only; browse iOS-only,,,
-snorkeling_logbook,Snorkeling,iOS,Snorkeling sessions tab,IOSSnorkelingSessionsListView,IOSSnorkelingSessionDetailView,IOSSnorkelingLogbookStore,SnorkelingSession,yes,yes,no,yes,Snorkeling,Snorkeling,no,IOSActivityLogbookRoutingTests,PASS,Watch saves only; browse iOS-only,,,
-cross_diving_apnea,Diving→Apnea,Watch+iOS,n/a,n/a,n/a,IOSApneaLogbookStore,n/a,no,no,no,blocked,Apnea,n/a,no,IOSActivityLogbookRoutingTests,PASS,P0 route blocked,,,
-cross_diving_snorkeling,Diving→Snorkeling,Watch+iOS,n/a,n/a,n/a,IOSSnorkelingLogbookStore,n/a,no,no,no,blocked,Snorkeling,n/a,no,IOSActivityLogbookRoutingTests,PASS,P0 route blocked,,,
-cross_apnea_diving,Apnea→Diving,Watch+iOS,n/a,n/a,n/a,DiveLogStore,n/a,no,no,no,blocked,Diving,n/a,no,WatchActivityLogbookRoutingTests,PASS,Watch diveLog tab not mounted,,,
-universal_hub,Global,Watch+iOS,n/a,n/a,n/a,none,n/a,no,no,no,blocked,none,n/a,no,IOSActivityLogbookRoutingPolicy,PASS,No mixed logbook hub,,,
+LB-001,Diving,Watch,Diving tab DiveLog,DiveLogListView,DiveDetailView,DiveLogStore,Diving sessions,yes,partial,yes,yes,no,yes,yes,no,no,no,WatchActivityLogbookRoutingTests,yes,Diving-only tag
+LB-002,Diving,iOS,Logbook tab,LogbookView,DiveDetailView,DiveLogStore,Diving sessions,yes,yes,yes,yes,no,yes,yes,no,no,no,IOSActivityLogbookRoutingTests,yes,
+LB-003,Apnea,Watch,Apnea session save,Apnea logbook in ApneaView,Apnea session detail,ApneaLogbookStore,Apnea sessions,partial,partial,partial,yes,no,yes,no,yes,no,no,ApneaLogbookStoreTests,yes,
+LB-004,Apnea,iOS,Apnea section,IOSApneaSessionsListView,IOSApneaSessionDetailView,IOSApneaLogbookStore,Apnea sessions,yes,yes,yes,yes,no,yes,no,yes,no,no,IOSActivityLogbookDataIsolationTests,yes,
+LB-005,Snorkeling,Watch,Snorkeling session save,Snorkeling summary,Snorkeling detail,SnorkelingLogbookStore,Snorkeling sessions,partial,partial,partial,yes,no,yes,no,no,yes,no,SnorkelingLogbookStoreTests,yes,
+LB-006,Snorkeling,iOS,Snorkeling section,IOSSnorkelingSessionsListView,IOSSnorkelingSessionDetailView,IOSSnorkelingLogbookStore,Snorkeling sessions,yes,yes,yes,yes,no,yes,no,no,yes,no,IOSActivityLogbookDataIsolationTests,yes,
+LB-007,Diving,iOS,Manual dive editor,LogbookView,ManualDiveEditorView,DiveLogStore,Manual diving,yes,n/a,yes,yes,no,yes,yes,no,no,no,ManualDiveEditorLogicTests,yes,
+LB-008,Global,iOS,Mixed logbook route,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,no,no,no,no,IOSUIUXRemediationTests,yes,No global mixed logbook route

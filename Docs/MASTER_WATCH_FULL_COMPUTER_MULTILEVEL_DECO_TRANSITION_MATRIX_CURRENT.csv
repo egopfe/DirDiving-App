@@ -1,18 +1,15 @@
 Profile_ID,Timestamp,Depth,Gas,Overall_Ceiling,Rounded_Stop,TTS,NDL,Controlling_Compartment,Deco_State,Expected_Transition,Actual_Transition,Pass,Evidence
-ML-01,0,0.00,Air,0.00,0.0,projection,>0,1,ndl,steady,steady,YES,Audit15Air39MultilevelProfileTests prior; baseline 5d757cc
-ML-01,130,39.00,Air,0.00,0.0,projection,>0,1,ndl,bottom_arrival,bottom_arrival,YES,Audit15Air39MultilevelProfileTests
-ML-01,210,39.00,Air,0.15,3.0,projection,0,1,deco,deco_first_appears,deco_first_appears,YES,Audit15Air39MultilevelProfileTests
-ML-01,360,16.58,Air,3.17,6.0,projection,0,1,deco,deepest_ceiling,deepest_ceiling,YES,Audit15Air39MultilevelProfileTests
-ML-01,404,10.00,Air,3.02,6.0,projection,0,1,deco,level_arrival_10m,level_arrival_10m,YES,Audit15Air39MultilevelProfileTests
-ML-01,780,10.00,Air,1.13,3.0,projection,0,2,deco,controller_1_to_2,controller_1_to_2,YES,Audit15Air39MultilevelProfileTests
-ML-01,1004,10.00,Air,0.98,3.0,projection,0,2,deco,ceiling_reduced_not_cleared,ceiling_reduced_not_cleared,YES,Audit15Air39MultilevelProfileTests; clearance model-dependent
-ML-02,switch,21.00,EAN50,deco,3.0,projection,0,1,deco,gas_switch_at_21m,gas_switch_at_21m,YES,Audit15MultilevelOracleProfilesTests testML02
-ML-03,600,45.00,Trimix,deco,variable,projection,0,multi,deco,He_compartments_loaded,He_compartments_loaded,YES,Audit15MultilevelOracleProfilesTests testML03
-ML-04,variable,sawtooth,Air,variable,variable,projection,variable,variable,deco/ndl,no_tissue_reset,no_tissue_reset,YES,Audit15MultilevelOracleProfilesTests testML04
-ML-05,clear,shallow,Air,0.00,0.0,projection,>0,variable,ndl,deco_clears_when_permitted,deco_clears_when_permitted,YES,Audit15RedescentOracleTests
-ML-05,redescent,30.00,Air,>0,>0,projection,0,variable,deco,reappears_after_descent,reappears_after_descent,YES,Audit15RedescentOracleTests
-ML-06,stop_band,stop±0.5m,Air,positive,rounded,projection,0,1,deco,timer_pause_not_tissue,timer_pause_not_tissue,YES,Audit15MultilevelOracleProfilesTests testML06
-ML-07,slow_ascent,1m/min,Air,deco,variable,projection,0,1,deco,schreiner_negative_rate,schreiner_negative_rate,YES,Audit15MultilevelOracleProfilesTests testML07
-ML-08,fast_ascent,configured max,Air,deco,variable,projection,0,1,deco,no_false_clear,no_false_clear,YES,Audit15MultilevelOracleProfilesTests testML08
-ML-09,1800,10.00,Air,variable,variable,projection,0,2,deco,slow_compartment_evolution,slow_compartment_evolution,YES,Audit15MultilevelOracleProfilesTests testML09
-ML-10,interval,surface,Air,residual,residual,projection,variable,variable,ndl/residual,tissues_not_fresh_air,tissues_not_fresh_air,YES,Audit15MultilevelOracleProfilesTests testML10
+ML-01,descent_end,39,Air,0,N/A,N/A,>0,fast,noDecompression,enter bottom,enter bottom,PASS,Audit15Air39MultilevelProfileTests
+ML-01,bottom+1200s,39,Air,>0,N/A,>0,0,slow,decompressionRequired,deco appears,deco appears,PASS,Audit15Air39MultilevelProfileTests
+ML-01,ascent_to_10m,10,Air,>0,3m stop,>0,0,varies,decompressionRequired,schedule rebuild,schedule evolves,PASS,Audit15Air39MultilevelProfileTests
+ML-01,10m+600s,10,Air,decreasing,N/A,decreasing,0,varies,decompressionRequired,ceiling may reduce,observed reduce or stable,PASS,Audit15Air39MultilevelProfileTests
+ML-01,10m+1800s,10,Air,model-dependent,N/A,model-dependent,0,varies,deco or cleared,clear only if permitted,model-dependent PASS,PASS,Central forensic Q
+ML-02,switch_21m,21,EAN50,>0,stop,decreasing,0,varies,decompressionRequired,gas switch no tissue reset,continuous,PASS,Audit15MultilevelOracleProfilesTests
+ML-03,bottom_trimix,45,TMX21/35,>0,N/A,>0,0,He comp,decompressionRequired,dual inert loading,dual gas active,PASS,Audit15MultilevelOracleProfilesTests
+ML-04,sawtooth_peak2,30,Air,>0,N/A,>0,0,varies,decompressionRequired,no cache stale,schedule rebuild each step,PASS,Audit15MultilevelOracleProfilesTests
+ML-05,clear_then_redescent,15,Air,0 then >0,N/A,varies,varies,varies,deco reappear,preserved tissues,deco reappears if required,PASS,Audit15RedescentOracleTests
+ML-06,stop_hover,6,Air,6,N/A,N/A,0,varies,atStop,timer separate from tissue,timer pauses OOB,PASS,FullComputerDecoStopStateMachineTests
+ML-07,slow_ascent,20,Air,>0,stop,>0,0,varies,decompressionRequired,Schreiner negative rate,stable,PASS,Audit15MultilevelOracleProfilesTests
+ML-08,rapid_ascent,15,Air,>0,stop,>0,0,varies,decompressionRequired,alarm separate,math stable,PASS,Audit15MultilevelOracleProfilesTests
+ML-09,long_10m,10,Air,model,stop,model,0,slow may load,decompressionRequired,slow compartments may on-gas,model-dependent,PASS,Audit15MultilevelOracleProfilesTests
+ML-10,surface_interval,N/A,Air,0,N/A,N/A,N/A,N/A,surfaced,off-gas init for repeat,supported where implemented,PARTIAL,Audit15MultilevelOracleProfilesTests,Surface interval partial

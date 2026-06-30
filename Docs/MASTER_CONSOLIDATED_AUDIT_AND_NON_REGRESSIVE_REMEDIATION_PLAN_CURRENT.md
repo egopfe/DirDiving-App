@@ -4,52 +4,51 @@
 **Execution date:** 2026-06-30  
 **Repository:** `egopfe/DirDiving-App`  
 **Branch:** `main`  
-**Execution HEAD:** `bb204f5` (command upgrade V1.2/V2.2/V2.3; Snorkeling P1/P2/P3 @ `dbe5d8b`–`70cf0d9`; prior orchestrator @ `0126699`; remediation @ `5d757cc`)  
+**Execution HEAD:** `451f8fb` (orchestrator V1.3 full audit rerun; Snorkeling P1/P2/P3 @ `dbe5d8b`; command upgrade @ `bb204f5`; remediation @ `5d757cc`)  
 **Execution mode:** Read-only orchestration — no production code modified
 
 ---
 
 ## A. Executive Summary
 
-Orchestrator **V1.3** executed @ `bb204f5`. Consolidates six upstream master audits after **Command 10 consolidated software remediation** (@ `5d757cc`), **Snorkeling P1/P2/P3 software wave** (@ `dbe5d8b`), and **post-remediation verification audit 07** (this session). Upstream domain audits **01–06 are STALE_UPSTREAM_AUDIT_OUTPUT** — last doc commit `905692e` (2026-06-29), predating Snorkeling and command refresh.
+Orchestrator **V1.3** full audit sequence executed @ **`451f8fb`**. All domain audits **01–06 rerun** at HEAD; post-remediation verification **07** refreshed. Consolidates findings after **Command 10 software remediation** (@ `5d757cc`), **Snorkeling P1/P2/P3** (@ `dbe5d8b`), and **2026-06-30 comprehensive audit wave**.
 
-**Overall verdict: PARTIAL.** Prior **software-actionable scope: 100%** closed (@ `5d757cc`). **New P1 OPEN:** CONS-046 (script drift). **P2 STALE:** CONS-047 (audits 01–06). **P1 PENDING_PHYSICAL:** CONS-048 (12 Snorkeling QA templates). Physical and external evidence remain **0% executed** — do not claim PASS.
+**Overall verdict: PARTIAL.** **Software-actionable remediations CONS-001..045 remain closed.** **Open software gates:** CONS-046 (script drift), **IOS-P1-001 / CONS-049** (iOS Algorithm Tests compile failure @ HEAD). **Physical/external:** CONS-048 (12 Snorkeling QA), CONS-010/021/022/042 and aggregate physical matrices — **0% executed**.
 
 | Dimension | Score | Class |
 |-----------|------:|-------|
-| Watch FC software | **92%** | SOFTWARE_READY (pre-Snorkeling audit; rerun 01 required) |
-| iOS companion software | **92%** | SOFTWARE_READY (+ Snorkeling @ dbe5d8b unaudited in 02) |
-| UI/UX software | **100%** | SOFTWARE_READY (audit 03 stale vs Snorkeling planner) |
-| Main code / sync / security | **93%** | SOFTWARE_READY |
-| Release / QA / legal software | **78%** | Mixed — physical/legal pending + Snorkeling QA |
-| Documentation alignment | **68%** | PARTIAL — command upgrade + script drift (CONS-046) |
-| Snorkeling P1/P2/P3 software | **95%** | SOFTWARE_READY @ dbe5d8b — domain audits STALE |
+| Watch FC software | **94%** | SOFTWARE_READY — 0 P0 @ 451f8fb |
+| iOS companion software | **88%** | PARTIAL — test gate regression IOS-P1-001 |
+| UI/UX software | **100%** | SOFTWARE_READY |
+| Main code / sync / security | **91%** | SOFTWARE_READY — CONS-046 script FAIL |
+| Release / QA / legal software | **68%** | Mixed — iOS tests blocked |
+| Documentation alignment | **68%** | PARTIAL — README baseline stale |
+| Snorkeling P1/P2/P3 software | **92%** | SOFTWARE_READY — field QA pending |
 | Physical QA | **0%** | PENDING_PHYSICAL (+ 12 Snorkeling templates) |
 | External validation | **0%** | PENDING_EXTERNAL_VALIDATION |
-| **Overall consolidated release readiness** | **~70%** | PARTIAL |
+| **Overall consolidated release readiness** | **~65%** | PARTIAL |
 
-**Release posture:** Internal TestFlight software **CONDITIONAL** (rerun 01–06) · External TestFlight **NOT READY** · App Store **NOT READY**
+**Release posture:** Internal TestFlight **CONDITIONAL** (fix IOS-P1-001 + CONS-046) · External TestFlight **NOT READY** · App Store **NOT READY**
 
-**Recommended next:** Fix integrity script (CONS-046) → rerun audits 01–06 (CONS-047) → Snorkeling + Diving physical QA campaigns.
+**Recommended next:** Fix IOS-P1-001 Snorkeling test compile → fix `validate_commands_for_cursor_integrity.sh` (CONS-046) → physical QA Batch-8.
 
 ---
 
 ## B. Source Audit Inputs and Completeness
 
-| Audit | Command (filename) | Body @ bb204f5 | Last output commit | Outputs | Completeness |
-|-------|-------------------|----------------|-------------------|---------|--------------|
-| **01** Watch FC Forensic | `01-...V2.2.md` | **ALIGNED** | **STALE** @ `905692e` | 14+ `MASTER_WATCH_FULL_COMPUTER_*` | **STALE_UPSTREAM** |
-| **02** iOS Deep | `02-...V1.2.md` | **ALIGNED** | **STALE** @ `905692e` | 9+ `MASTER_IOS_*` | **STALE_UPSTREAM** |
-| **03** UI/UX Deep | `03-...V2.3.md` | **ALIGNED** | **STALE** @ `905692e` | 17+ `MASTER_UI_UX_*` | **STALE_UPSTREAM** |
-| **04** Main/Sync/Security/Perf | `04-...V1.2.md` | **ALIGNED** | **STALE** @ `905692e` | 17+ `MASTER_MAIN_CODE_*` | **STALE_UPSTREAM** |
-| **05** Release/QA/Legal | `05-...V1.2.md` | **ALIGNED** | **STALE** @ `905692e` | 10+ release gate matrices | **STALE_UPSTREAM** |
-| **06** Documentation | `06-...V1.2.md` | **ALIGNED** | **STALE** @ `905692e` | 7+ `MASTER_DOCUMENTATION_*` | **STALE_UPSTREAM** |
-| **07** Post-remediation | `07-...V1.0.md` | **ALIGNED** | **CURRENT** @ `bb204f5` | 8 verification deliverables | **COMPLETE** |
+| Audit | Command | Body @ 451f8fb | Output @ 451f8fb | Completeness |
+|-------|---------|----------------|------------------|--------------|
+| **01** Watch FC Forensic | V2.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
+| **02** iOS Deep | V1.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
+| **03** UI/UX Deep | V2.3 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
+| **04** Main/Sync/Security | V1.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
+| **05** Release/QA/Legal | V1.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
+| **06** Documentation | V1.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
+| **07** Post-remediation | V1.0 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
 
-**All 66 expected upstream files PRESENT** but **STALE** relative to `dbe5d8b` Snorkeling wave and `bb204f5` command upgrade.
-
-**CONS-001 command body permutation:** **FIXED** @ 5d757cc — filenames V2.2/V1.2/V2.3 bodies match launch order.  
-**CONS-046 script drift:** **OPEN** — `validate_commands_for_cursor_integrity.sh` still references superseded V2.1/V1.1 paths in `OOLD/`.
+**CONS-047 STALE upstream:** **VERIFIED FIXED** — audits 01–06 refreshed @ 451f8fb.  
+**CONS-046 script drift:** **OPEN** — integrity script still references V2.1/V1.1.  
+**CONS-049 (new):** iOS Algorithm Tests compile failure @ 451f8fb (IOS-P1-001).
 
 ---
 
@@ -57,13 +56,14 @@ Orchestrator **V1.3** executed @ `bb204f5`. Consolidates six upstream master aud
 
 | Field | Value |
 |-------|-------|
-| Branch | `main` ✓ @ `bb204f5` |
+| Branch | `main` ✓ @ `451f8fb` |
 | Snorkeling P1/P2/P3 | `dbe5d8b`–`70cf0d9` |
-| Command upgrade | `bb204f5` (V1.2/V2.2/V2.3; old → `commands_for_cursor/OOLD/`) |
+| Command upgrade | `bb204f5` |
 | Remediation commit | `5d757cc` (Command 10) |
-| Prior orchestrator | `0126699` @ 2026-06-29 |
-| Upstream audit doc baseline | `905692e` / `4d415c0` (pre-Snorkeling) |
-| iOS + Watch build | **SUCCEEDED** @ bb204f5 |
+| Full audit rerun | **2026-06-30** @ `451f8fb` |
+| iOS + Watch build | **SUCCEEDED** @ 451f8fb |
+| iOS Algorithm Tests | **BUILD FAILED** (IOS-P1-001) |
+| Watch Algorithm Tests | **NOT_EXECUTED** this session |
 | `commands_for_cursor/` | Present; **01–07 ALIGNED**; script gate **FAIL** |
 
 ---
@@ -72,13 +72,14 @@ Orchestrator **V1.3** executed @ `bb204f5`. Consolidates six upstream master aud
 
 | Lane | Status | Evidence |
 |------|--------|----------|
-| Software-actionable findings (pre-Snorkeling) | **100% closed** | Command 10 @ 5d757cc |
-| Snorkeling P1/P2/P3 software | **DELIVERED** | dbe5d8b — 14 test files; implementation report |
-| Domain audits 01–06 | **STALE** | CONS-047 — predates Snorkeling |
-| Internal TestFlight (software) | **CONDITIONAL** | Rerun 01–06 after Snorkeling |
-| External TestFlight | **NOT READY** | Physical QA 0%; +12 Snorkeling templates |
+| Software-actionable findings (pre-Snorkeling) | **100% closed** | Command 10 @ 5d757cc; verified @ 451f8fb |
+| Snorkeling P1/P2/P3 software | **DELIVERED** | Audits 02/03/04/05 @ 451f8fb |
+| Domain audits 01–06 | **CURRENT** | CONS-047 closed |
+| iOS automated regression | **BLOCKED** | IOS-P1-001 / CONS-049 |
+| Internal TestFlight (software) | **CONDITIONAL** | Fix test compile + CONS-046 |
+| External TestFlight | **NOT READY** | Physical QA 0%; 12 Snorkeling templates |
 | App Store | **NOT READY** | + legal/marketing (CONS-044) |
-| Physical QA execution | **0%** | CONS-048 adds 12 Snorkeling folders |
+| Physical QA execution | **0%** | CONS-048 |
 | Command integrity automation | **FAIL** | CONS-046 |
 
 **Snorkeling P1/P2/P3 wave — consolidated status @ dbe5d8b:**

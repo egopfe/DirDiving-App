@@ -1,0 +1,7 @@
+Risk_ID,Component,Failure_Mode,Severity,Software_Mitigation,Test_Coverage,Physical_QA,Verdict,Evidence,Notes
+WAO-001,WatchSubmersionLaunchProbe,400ms timeout returns not submerged,P2,Timeout fail-safe to surface launch,WatchSubmersionLaunchProbeTests,PENDING,PASS software,PENDING physical,Utils/WatchSubmersionLaunchProbe.swift @451f8fb,CONS-020 documented limitation
+WAO-002,WatchWaterAutoOpenPolicy,Water path bypasses DepthCapabilityPolicy,P2,Fixed: policy gate applied,WatchWaterAutoOpenPolicyTests;DepthCapabilityTests,PENDING,PASS,CONS-019 FIXED,DIRActivitySelectionStore.beginWaterAutoLaunch @451f8fb,
+WAO-003,WatchLaunchRoutingPolicy,Cold-launch routing race overlapping covers,P2,Single authority routing policy,WatchLaunchRoutingPolicyTests,PENDING,PASS,Utils/WatchLaunchRoutingPolicy.swift,Router-only; no session start from WAO intent alone
+WAO-004,ContentView water auto-open,systemWaterAutoLaunch does not start session,P1,Route to mode selection not live dive,DIRModesAndStartupFlowTests,PENDING,PASS,Watch ContentView @451f8fb,Active-session block enforced
+WAO-005,WatchSubmersionLaunchProbe,nil/error/stale at cold launch,P2,Fail-safe not submerged,WatchSubmersionLaunchProbeTests,PENDING,PASS software,PENDING,Probe timeout 400ms,Submerged user may miss auto-route
+WAO-006,Battery impact submersion probe,Repeated cold-launch probing,P3,Single probe at launch,NOT_EXECUTED,PENDING,NOT_EXECUTED,Performance budget undocumented,Field battery unknown CONS-023

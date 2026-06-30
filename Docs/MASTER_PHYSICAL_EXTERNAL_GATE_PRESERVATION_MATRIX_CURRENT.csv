@@ -1,0 +1,25 @@
+Gate_ID,Gate_Type,Description,Pre_Remediation_Status,Post_Remediation_Status,Evidence_Required,Evidence_Present,Falsely_Closed,Preservation_Verdict,Finding_ID,Notes
+PEG-001,PHYSICAL,Watch Ultra wet depth QA,PENDING_PHYSICAL,PENDING_PHYSICAL,Signed QA artifacts,None,no,PASS,None,0% executed @ 451f8fb
+PEG-002,PHYSICAL,CMAltimeter CoreMotion samples,PENDING_PHYSICAL,PENDING_PHYSICAL,Field CoreMotion logs,None,no,PASS,REQ-FC-08,Simulator not upgraded
+PEG-003,PHYSICAL,Shallow wet Gauge session,PENDING_PHYSICAL,PENDING_PHYSICAL,Wet session log,None,no,PASS,SDG-010,Correctly open
+PEG-004,PHYSICAL,Shallow wet FC internal test,PENDING_PHYSICAL,PENDING_PHYSICAL,Dev toggle wet log,None,no,PASS,SDG-011,Internal TF only
+PEG-005,PHYSICAL,Water auto-open end-to-end,PENDING_PHYSICAL,PENDING_PHYSICAL,WAO field artifacts,None,no,PASS,WAO-PHY-001,Software policy PASS
+PEG-006,PHYSICAL,System Auto-Launch listing,PENDING_PHYSICAL,PENDING_PHYSICAL,Apple platform listing proof,None,no,PASS,WAO-PHY-002,Truthful limitation copy
+PEG-007,PHYSICAL,Water Lock physical QA,PENDING_PHYSICAL,PENDING_PHYSICAL,Water Lock session,None,no,PASS,HWC-PHY-004,Not falsely closed
+PEG-008,PHYSICAL,Digital Crown underwater paging,PENDING_PHYSICAL,PENDING_PHYSICAL,Crown paging under Water Lock,None,no,PASS,HWC-PHY-001,Unit tests only
+PEG-009,PHYSICAL,Action Button underwater,PENDING_PHYSICAL,PENDING_PHYSICAL,AB assignment wet test,None,no,PASS,HWC-PHY-003,Router-only policy PASS
+PEG-010,PHYSICAL,iPhone VoiceOver journey,PENDING_PHYSICAL,PENDING_PHYSICAL,VoiceOver field log,None,no,PASS,PDQ-I-014,Manual a11y pending
+PEG-011,PHYSICAL,Paired WC sync smoke,PENDING_PHYSICAL,PENDING_PHYSICAL,Sync field artifacts,None,no,PASS,PDQ-P-001,Codec tests PASS software
+PEG-012,PHYSICAL,iCloud two-device tombstones,PENDING_PHYSICAL,PENDING_PHYSICAL,Two-device QA log,None,no,PASS,PDQ-P-006,Opt-in diving only
+PEG-013,PHYSICAL,Snorkeling 12 field templates,PENDING_PHYSICAL,PENDING_PHYSICAL,12 signed folders,None,no,PASS,CONS-048,12/12 PENDING
+PEG-014,EXTERNAL,Bühlmann third-party oracle,PENDING_EXTERNAL,PENDING_EXTERNAL,External golden profiles,None,no,PASS,WFC-P1-001,Internal oracle PASS
+PEG-015,EXTERNAL,Schreiner external golden,PENDING_EXTERNAL,PENDING_EXTERNAL,External golden set,None,no,PASS,MEXT-SCHR-01,Bundled campaign
+PEG-016,EXTERNAL,Subsurface CSV round-trip,PENDING_EXTERNAL,PENDING_EXTERNAL,Subsurface import log,None,no,PASS,MEXT-SS-01,Unit tests PASS
+PEG-017,EXTERNAL,CCR rebreather external,PENDING_EXTERNAL,PENDING_EXTERNAL,External review,None,no,PASS,MEXT-CCR-01,Reference-only
+PEG-018,LEGAL,Marketing counsel sign-off,PENDING_LEGAL,PENDING_LEGAL,Counsel approval,None,no,PASS,CONS-044,Not falsely closed
+PEG-019,LEGAL,ASC metadata final,PENDING_LEGAL,PENDING_LEGAL,ASC screenshots/metadata,None,no,PASS,MASB-L-03,Incomplete in repo
+PEG-020,SOFTWARE,iOS full test suite,PASS @ 5d757cc,FAIL @ 451f8fb,Compile+run green,Compile FAIL,no,N/A — regression,IOS-P1-001,Not a fake physical gate; real regression
+PEG-021,SOFTWARE,Command integrity script,PASS @ 5d757cc,FAIL @ 451f8fb,Script PASS,Script FAIL,no,N/A — regression,CONS-046,Not a fake external gate
+PEG-022,SOFTWARE,GF import parity OPEN,OPEN @ pre,PASS @ 451f8fb,CONS-002 tests,Verified,yes — correctly closed,PASS,CONS-002,Legitimate software closure
+PEG-023,SOFTWARE,Sync ACK cleanup OPEN,OPEN @ pre,PASS @ 451f8fb,CONS-003 code,Verified,yes — correctly closed,PASS,CONS-003,Legitimate closure
+PEG-024,SOFTWARE,Tombstone HMAC OPEN,OPEN @ pre,PASS @ 451f8fb,CONS-005 code,Verified,yes — correctly closed,PASS,CONS-005,Legitimate closure

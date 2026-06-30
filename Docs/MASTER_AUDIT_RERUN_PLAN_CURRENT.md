@@ -1,27 +1,36 @@
 # Master Audit Rerun Plan — Current
 
-**Orchestrator:** V1.3 @ `bb204f5`  
+**Orchestrator:** V1.3 @ `451f8fb`  
 **Remediation baseline:** `5d757cc` · **Snorkeling wave:** `dbe5d8b`–`70cf0d9` · **Date:** 2026-06-30  
-**Policy:** Rerun upstream master audits after remediation batches and major feature waves. **CONS-046 OPEN** — integrity script must be fixed before trusting automated gate.
+**Policy:** Rerun upstream master audits after remediation batches and major feature waves.
 
 ---
 
-## Required reruns (STALE — CONS-047)
+## Completed reruns (@ 451f8fb · 2026-06-30)
 
-Upstream audits **01–06** last refreshed @ `905692e` / post-remediation @ `4d415c0` (2026-06-29). **Snorkeling P1/P2/P3** landed @ `dbe5d8b` with 14 test files and 12 QA templates — **not reflected** in domain audit outputs.
+| Audit | Status | Notes |
+|-------|--------|-------|
+| **01** Watch FC | **COMPLETE** | 0 P0; CONS-002/006/007/008 verified |
+| **02** iOS | **COMPLETE** | IOS-P1-001 test compile regression |
+| **03** UI/UX | **COMPLETE** | 0 software P0 |
+| **04** Main | **COMPLETE** | CONS-046 script FAIL |
+| **05** Release/QA | **COMPLETE** | Physical 0% |
+| **06** Documentation | **COMPLETE** | Command parity PASS |
+| **07** Post-remediation | **COMPLETE** | PARTIAL verdict |
+| **00** Orchestrator | **COMPLETE** | This consolidation |
 
-| Audit | Status | Trigger | Verify |
-|-------|--------|---------|--------|
-| **01** Watch FC | **STALE_UPSTREAM** | Snorkeling Watch runtime; cross-domain isolation | Snorkeling isolation; no FC regression |
-| **02** iOS | **STALE_UPSTREAM** | Snorkeling iOS planner, route safety, export | 14 Snorkeling iOS test suites; CONS-002 GF unchanged |
-| **03** UI/UX | **STALE_UPSTREAM** | Snorkeling planner sections; Watch presentation | Route planner UX; cross-activity routing |
-| **04** Main/Sync/Security | **STALE_UPSTREAM** | Snorkeling route sync codec; runtime evaluator | Activity isolation; sync namespace |
-| **05** Release/QA/Legal | **STALE_UPSTREAM** | 12 Snorkeling QA templates; release gates | CONS-048 physical register; no fake PASS |
-| **06** Documentation | **STALE_UPSTREAM** | Command V1.2/V2.2/V2.3 @ bb204f5; Snorkeling docs | INDEX; command version matrix; CONS-046 |
-| **00** Orchestrator | **COMPLETE** @ `bb204f5` | V1.3 consolidation | This refresh |
-| **07** Post-remediation | **COMPLETE** @ `bb204f5` | Orchestrator 0D consumption | 8 verification deliverables |
+**CONS-047 CLOSED** — upstream audits current @ HEAD.
 
-**Execute 01–06 in order before next external release claim.** Do not consolidate Snorkeling as generic UI-only — spans 01, 02, 03, 04, 05, 06.
+---
+
+## Next reruns (after remediation)
+
+| Trigger | Rerun |
+|---------|-------|
+| Fix IOS-P1-001 (CONS-049) | 02, 05, 07 |
+| Fix CONS-046 script | 06, 07 |
+| Physical QA Batch-8 | 01, 03, 05, 07 |
+| Any FC algorithm change | 01, 04, 05, 07 |
 
 ---
 
