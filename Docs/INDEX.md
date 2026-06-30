@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ `b230672`
+**Branch consigliato:** `main` = `origin/main` @ (pending commit)
+
+---
+
+## Aggiornamento indice 2026-06-17 — iOS Snorkeling map UX improvements @ `7a88e9c`
+
+Center-on-location button, reset map with confirmation, section reorder (Map → Route points → Profiles) in iOS Route Planner.
+
+| Campo | Valore |
+|-------|--------|
+| **Spec** | [`IOS_SNORKELING_MAP_UX_IMPROVEMENTS.md`](IOS_SNORKELING_MAP_UX_IMPROVEMENTS.md) |
+| **Report** | [`IOS_SNORKELING_MAP_UX_IMPROVEMENTS_IMPLEMENTATION_REPORT_CURRENT.md`](IOS_SNORKELING_MAP_UX_IMPROVEMENTS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **QA** | SNK-QA-MAP-001…005 · `Docs/QA_EVIDENCE/IOS_SNORKELING_MAP_*` |
+| **Verdict** | **INTERNAL_READY** · **PHYSICAL_QA_PENDING** |
 
 ---
 

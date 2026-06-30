@@ -6,6 +6,7 @@ import SwiftUI
 final class IOSLocationPermissionService: NSObject, ObservableObject {
     @Published private(set) var authorizationStatus: CLAuthorizationStatus
     @Published private(set) var permissionState: ApneaMapPermissionState
+    @Published private(set) var lastKnownCoordinate: CLLocationCoordinate2D?
 
     private let locationManager = CLLocationManager()
 
@@ -15,6 +16,8 @@ final class IOSLocationPermissionService: NSObject, ObservableObject {
         permissionState = Self.map(status)
         super.init()
         locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        lastKnownCoordinate = locationManager.location?.coordinate
     }
 
     func refresh() {
@@ -43,6 +46,16 @@ final class IOSLocationPermissionService: NSObject, ObservableObject {
         authorizationStatus == .denied || authorizationStatus == .restricted
     }
 
+    var currentCoordinate: CLLocationCoordinate2D? {
+        locationManager.location?.coordinate ?? lastKnownCoordinate
+    }
+
+    func requestCurrentLocationForMapCenter() {
+        refresh()
+        guard isAuthorized else { return }
+        locationManager.requestLocation()
+    }
+
     nonisolated static func map(_ status: CLAuthorizationStatus) -> ApneaMapPermissionState {
         switch status {
         case .authorizedAlways, .authorizedWhenInUse:
@@ -64,6 +77,18 @@ extension IOSLocationPermissionService: CLLocationManagerDelegate {
         Task { @MainActor in
             authorizationStatus = manager.authorizationStatus
             permissionState = Self.map(manager.authorizationStatus)
+            lastKnownCoordinate = manager.location?.coordinate ?? lastKnownCoordinate
         }
+    }
+
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let coordinate = locations.last?.coordinate else { return }
+        Task { @MainActor in
+            lastKnownCoordinate = coordinate
+        }
+    }
+
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        _ = error
     }
 }
