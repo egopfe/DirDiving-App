@@ -4,6 +4,7 @@ import MapKit
 
 struct IOSSnorkelingSessionDetailView: View {
     let session: SnorkelingSession
+    var isDemoSession: Bool = false
     @EnvironmentObject private var logbook: IOSSnorkelingLogbookStore
     @EnvironmentObject private var photoStore: IOSSnorkelingSessionPhotoStore
     @EnvironmentObject private var equipmentStore: IOSSnorkelingEquipmentStore
@@ -35,7 +36,7 @@ struct IOSSnorkelingSessionDetailView: View {
                     header
                     heroMetrics
                     depthChartSection
-                    IOSSnorkelingSessionMapView(model: mapModel)
+                    IOSSnorkelingSessionMapView(model: mapModel, isDemoSession: isDemoSession)
                     secondaryChartsSection
                     dipsSection
                     photosSection
@@ -51,13 +52,19 @@ struct IOSSnorkelingSessionDetailView: View {
         .navigationTitle(summary.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    IOSSnorkelingSessionExportView(session: session)
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
+            if isDemoSession {
+                ToolbarItem(placement: .topBarTrailing) {
+                    DemoLogbookBadge()
                 }
-                .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.ios.export.title"))
+            } else {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        IOSSnorkelingSessionExportView(session: session)
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.ios.export.title"))
+                }
             }
         }
         .onAppear {
@@ -67,6 +74,12 @@ struct IOSSnorkelingSessionDetailView: View {
 
     private var header: some View {
         DIRCard(DIRIOSLocalizer.string("snorkeling.ios.session.detail.title"), icon: "water.waves", accent: DIRTheme.cyan) {
+            if isDemoSession {
+                DemoLogbookBadge()
+                Text(DIRIOSLocalizer.string("settings.demo_logbook.not_saved_real"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+            }
             Text(summary.dateText)
                 .font(.headline)
                 .foregroundStyle(.white)
@@ -488,12 +501,14 @@ struct IOSSnorkelingDipDetailView: View {
 
 struct IOSSnorkelingSessionMapView: View {
     let model: SnorkelingSessionMapModel
+    var isDemoSession: Bool = false
     @EnvironmentObject private var settingsStore: IOSSnorkelingSettingsStore
 
     var body: some View {
         DIRCard(DIRIOSLocalizer.string("snorkeling.ios.map.session_title"), icon: "map.fill", accent: DIRTheme.cyan) {
             if model.isAvailable {
-                Map(initialPosition: mapPosition) {
+                ZStack(alignment: .topTrailing) {
+                    Map(initialPosition: mapPosition) {
                     ForEach(model.segments) { segment in
                         MapPolyline(
                             coordinates: segment.coordinates.map {
@@ -512,6 +527,12 @@ struct IOSSnorkelingSessionMapView: View {
                 .mapStyle(IOSSnorkelingMapStyleMapper.mapStyle(for: settingsStore.mapType))
                 .frame(minHeight: 220)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    if isDemoSession {
+                        DemoLogbookBadge()
+                            .padding(8)
+                    }
+                }
 
                 HStack {
                     if let start = model.sessionStartText {
