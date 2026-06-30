@@ -1,11 +1,11 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ pending CONS-046 V1.5 fix
+**Branch consigliato:** `main` = `origin/main` @ `6a0005b`
 
 ---
 
-## Aggiornamento indice 2026-06-17 — CONS-046 V1.5 integrity script @ pending
+## Aggiornamento indice 2026-06-17 — CONS-046 V1.5 integrity script @ `6a0005b`
 
 Post-merge V1.5 command upgrade: integrity script aligned to V1.5 paths; consolidated readiness PASS.
 
