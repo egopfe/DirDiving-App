@@ -2,23 +2,61 @@ import SwiftUI
 
 struct IOSSnorkelingSessionsListView: View {
     @EnvironmentObject private var logbook: IOSSnorkelingLogbookStore
+    @EnvironmentObject private var demoLogbookSettings: IOSActivityDemoLogbookSettingsStore
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
 
+    private var realEntries: [IOSSnorkelingLogbookDisplayEntry] {
+        IOSLogbookDisplayComposer.snorkelingEntries(realSessions: logbook.sessions, demoSessions: [])
+    }
+
+    private var demoEntries: [IOSSnorkelingLogbookDisplayEntry] {
+        guard demoLogbookSettings.isSnorkelingFakeLogbookEnabled else { return [] }
+        return IOSLogbookDisplayComposer.snorkelingEntries(
+            realSessions: [],
+            demoSessions: FakeSnorkelingLogbookProvider.entries()
+        )
+    }
+
+    private var hasRealLogs: Bool { !logbook.sessions.isEmpty }
+    private var hasDemoLogs: Bool { !demoEntries.isEmpty }
+    private var isEmpty: Bool { !hasRealLogs && !hasDemoLogs }
+
     var body: some View {
         NavigationStack {
             DIRScreenContainer {
-                if logbook.sessions.isEmpty {
+                if isEmpty {
                     emptyState
                 } else {
-                    List(logbook.sessions) { session in
-                        NavigationLink {
-                            IOSSnorkelingSessionDetailView(session: session)
-                        } label: {
-                            sessionRow(for: session)
+                    List {
+                        if hasDemoLogs && !hasRealLogs {
+                            demoOnlyBanner
+                                .listRowBackground(Color.clear)
                         }
-                        .listRowBackground(Color.clear)
+                        if hasRealLogs {
+                            if hasDemoLogs {
+                                Section(DIRIOSLocalizer.string("settings.demo_logbook.real_logs")) {
+                                    ForEach(realEntries) { entry in
+                                        sessionLink(entry)
+                                    }
+                                }
+                                .listRowBackground(Color.clear)
+                            } else {
+                                ForEach(realEntries) { entry in
+                                    sessionLink(entry)
+                                }
+                                .listRowBackground(Color.clear)
+                            }
+                        }
+                        if hasDemoLogs {
+                            Section(DIRIOSLocalizer.string("settings.demo_logbook.demo_logs")) {
+                                ForEach(demoEntries) { entry in
+                                    sessionLink(entry)
+                                }
+                            }
+                            .listRowBackground(Color.clear)
+                        }
                     }
                     .scrollContentBackground(.hidden)
                 }
@@ -26,6 +64,18 @@ struct IOSSnorkelingSessionsListView: View {
             .navigationTitle(DIRIOSLocalizer.string("snorkeling.ios.sessions.title"))
         }
         .accessibilityIdentifier("snorkeling.ios.logbook")
+    }
+
+    private var demoOnlyBanner: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(DIRIOSLocalizer.string("settings.demo_logbook.viewing_demo_banner"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.orange)
+            Text(DIRIOSLocalizer.string("settings.demo_logbook.not_saved_real"))
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+        }
+        .padding(.vertical, 4)
     }
 
     private var emptyState: some View {
@@ -43,9 +93,21 @@ struct IOSSnorkelingSessionsListView: View {
         }
     }
 
-    private func sessionRow(for session: SnorkelingSession) -> some View {
-        let row = IOSSnorkelingLogbookPresentationMapper.sessionRow(session, units: unitPreference)
+    @ViewBuilder
+    private func sessionLink(_ entry: IOSSnorkelingLogbookDisplayEntry) -> some View {
+        NavigationLink {
+            IOSSnorkelingSessionDetailView(session: entry.session, isDemoSession: entry.isDemo)
+        } label: {
+            sessionRow(for: entry)
+        }
+    }
+
+    private func sessionRow(for entry: IOSSnorkelingLogbookDisplayEntry) -> some View {
+        let row = IOSSnorkelingLogbookPresentationMapper.sessionRow(entry.session, units: unitPreference)
         return HStack(spacing: 12) {
+            if entry.isDemo {
+                DemoLogbookBadge()
+            }
             if row.showsQualityWarning {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(DIRTheme.orange)
@@ -97,7 +159,8 @@ struct IOSSnorkelingStatisticsView: View {
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
 
     private var stats: SnorkelingAggregateStatistics {
-        let scoped = SnorkelingLogbookAnalytics.filteredSessions(in: range, from: logbook.sessions)
+        let realOnly = logbook.sessions.filter { !DemoSnorkelingSessionCatalog.isDemoSession(id: $0.id) }
+        let scoped = SnorkelingLogbookAnalytics.filteredSessions(in: range, from: realOnly)
         let sessions = eligibleOnly
             ? scoped.filter { SnorkelingRecordEligibilityPolicy.isEligibleForRecords($0) }
             : scoped

@@ -20,6 +20,7 @@ enum IOSApneaSessionDetailTab: String, CaseIterable, Identifiable {
 
 struct IOSApneaSessionDetailView: View {
     let session: ApneaSession
+    var isDemoSession: Bool = false
     @EnvironmentObject private var logbook: IOSApneaLogbookStore
     @EnvironmentObject private var locationPermission: IOSLocationPermissionService
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
@@ -59,13 +60,19 @@ struct IOSApneaSessionDetailView: View {
         .navigationTitle(summary.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    IOSApneaSessionExportView(session: session)
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
+            if isDemoSession {
+                ToolbarItem(placement: .topBarTrailing) {
+                    DemoLogbookBadge()
                 }
-                .accessibilityLabel(DIRIOSLocalizer.string("apnea.ios.export.title"))
+            } else {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        IOSApneaSessionExportView(session: session)
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .accessibilityLabel(DIRIOSLocalizer.string("apnea.ios.export.title"))
+                }
             }
         }
         .onAppear {
@@ -75,6 +82,12 @@ struct IOSApneaSessionDetailView: View {
 
     private var header: some View {
         DIRCard(DIRIOSLocalizer.string("apnea.ios.session.detail.title"), icon: "clock.fill", accent: DIRTheme.cyan) {
+            if isDemoSession {
+                DemoLogbookBadge()
+                Text(DIRIOSLocalizer.string("settings.demo_logbook.not_saved_real"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+            }
             Text(summary.dateText)
                 .font(.headline)
                 .foregroundStyle(.white)
