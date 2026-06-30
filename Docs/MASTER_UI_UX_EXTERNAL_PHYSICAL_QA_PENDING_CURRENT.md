@@ -1,105 +1,85 @@
 # Master UI/UX External & Physical QA Pending — Current
 
-**Audit:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md`  
-**Date:** 2026-06-29  
-**Commit:** `15c8068` on `main`
-
-Software UI/UX gates pass at `15c8068`. Consolidated remediation (CONS-019, CONS-006/007, CONS-002) verified at software layer. No physical, paired-device, external validation, or App Store review evidence was executed during this audit rerun. All items below remain **PENDING** unless a folder contains completed evidence.
+**Audit date:** 2026-06-30  
+**Baseline:** `main` @ `451f8fb`  
+**Related command:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md`
 
 ---
 
-## SOFTWARE_READY (no physical execution required)
+## Summary
 
-| Area | Status |
-|------|--------|
-| Water auto-open policy, Settings, routing logic + **depth gate (CONS-019)** | SOFTWARE_READY |
-| Crown underwater page clamp + toast | SOFTWARE_READY |
-| Action Button / App Intents router + legacy intent safety | SOFTWARE_READY |
-| Cold-launch modal sequencing | SOFTWARE_READY |
-| Shallow depth capability UI + developer toggles (**default OFF**, CONS-006) | SOFTWARE_READY |
-| Depth entitlement compile authority (CONS-007) | SOFTWARE_READY |
-| GF preset selection UI + iOS import parity (CONS-002) | SOFTWARE_READY |
-| iOS Settings mode switch + activity ownership | SOFTWARE_READY |
-| Mockup path validity (59/59) | SOFTWARE_READY |
-| Accessibility contract scripts | SOFTWARE_READY (`audit_accessibility_contracts.sh` PASS) |
+Software UI/UX gates pass at `451f8fb`. **No physical Apple Watch, paired-device, manual accessibility, pixel-diff, PDF render, or external validation evidence was executed during this audit session.** All items below remain open until signed artifacts exist under `Docs/QA_EVIDENCE/`.
+
+| Category | Count | Status |
+|----------|------:|--------|
+| PENDING_PHYSICAL | 8 | OPEN |
+| PENDING_PAIRED_DEVICE_QA | 1 | OPEN |
+| PENDING_EXTERNAL_VALIDATION | 3 | OPEN |
+| NOT_EXECUTED (this session) | 1 | Watch xcodebuild test bootstrap |
 
 ---
 
-## Script results (@ `15c8068`)
+## PENDING_PHYSICAL Gates
 
-| Script | Result | Notes |
-|--------|--------|-------|
-| `audit_accessibility_contracts.sh` | **PASS** | Watch underwater + water auto-open keys EN/IT |
-| `capture_visual_regression_baselines.sh` | **PENDING_MANUAL_EXECUTION** | Scaffold at `Docs/QA_EVIDENCE/PHYSICAL_PIXEL_DIFF/captures`; 0/59 baselines captured |
-| `validate_commands_for_cursor_integrity.sh` | **PASS** | Launch order 01–06 aligned |
-
----
-
-## Physical Apple Watch UI/UX
-
-| ID | Area | Evidence path | Status |
-|----|------|---------------|--------|
-| PHY-WATCH-001 | Water Lock + Crown paging | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK/` | PENDING_PHYSICAL |
-| PHY-WATCH-002 | Action Button Ultra | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_ACTION_BUTTON/` | PENDING_PHYSICAL |
-| PHY-WATCH-003 | Crown navigation underwater | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_NAVIGATION/` | PENDING_PHYSICAL |
-| PHY-WATCH-004 | Water auto-open preferred mode | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED/` | PENDING_PHYSICAL |
-| PHY-WATCH-005 | System Auto-Launch listing | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_SYSTEM_LISTING/` | PENDING_PHYSICAL |
-| PHY-WATCH-006 | Active session water-auto-open block | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_ACTIVE_SESSION_BLOCK/` | PENDING_PHYSICAL |
-| PHY-WATCH-007 | Apnea underwater session UI | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_APNEA/` | PENDING_PHYSICAL |
-| PHY-WATCH-008 | Snorkeling GPS/dip UI | `Docs/QA_EVIDENCE/WATCH_SNORKELING_GPS/` | PENDING_PHYSICAL |
-| PHY-WATCH-009 | 41 mm smallest layout | `Docs/QA_EVIDENCE/PHYSICAL_41MM_WATCH_VISUAL_QA_TEMPLATE.md` | PENDING_PHYSICAL |
-| PHY-WATCH-010 | Full Computer deco UI physical | `Docs/QA_EVIDENCE/WATCH_FULL_COMPUTER_PHYSICAL/` | PENDING_PHYSICAL |
-| PHY-WATCH-011 | WAO depth gate on shallow hardware | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED/` | PENDING_PHYSICAL — software CONS-019 PASS |
+| ID | Area | Requirement | Template / Matrix | Finding |
+|----|------|-------------|-------------------|---------|
+| PHY-001 | Water auto-open | End-to-end wet routing + system listing | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_*` | MUIUX-P1-001 |
+| PHY-002 | Underwater hardware | Water Lock + Crown + Action Button | `WATCH_UNDERWATER_FAST_CONTROLS_*` | MUIUX-P1-002 |
+| PHY-003 | Shallow depth | Wet shallow vs full-depth separation | `MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX` | MUIUX-P1-005 |
+| PHY-004 | Full Computer | Ultra wet depth + CMAltimeter | `MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX` | CONS-010 |
+| PHY-005 | Snorkeling | 12 SNORKELING_* field procedures | `Docs/QA_EVIDENCE/SNORKELING_*` | MUIUX-P2-003 |
+| PHY-006 | Visual regression | 59/59 pixel-diff baselines | `capture_visual_regression_baselines.sh` | MUIUX-P2-001 |
+| PHY-007 | Accessibility | VoiceOver + Dynamic Type manual matrix | `ACCESSIBILITY_MANUAL_QA_TEMPLATE.md` | MUIUX-P1-003 |
+| PHY-008 | Performance | Long-session FC battery/thermal | `PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md` | CONS-023 |
 
 ---
 
-## Physical iPhone UI/UX
+## PENDING_PAIRED_DEVICE_QA
 
-| ID | Area | Evidence path | Status |
-|----|------|---------------|--------|
-| PHY-IOS-001 | PDF Planner render | `Docs/QA_EVIDENCE/PDF_PHYSICAL_RENDER_QA_TEMPLATE.md` | PENDING_PHYSICAL |
-| PHY-IOS-002 | PDF Checklist render | `Docs/QA_EVIDENCE/PDF_PHYSICAL_RENDER_QA_TEMPLATE.md` | PENDING_PHYSICAL |
-
----
-
-## Paired-device QA
-
-| ID | Area | Status |
-|----|------|--------|
-| PHY-PAIR-001 | Watch↔iOS sync UI flows | PENDING_PAIRED_DEVICE_QA |
-| PHY-PAIR-002 | Briefing card transfer UI | PENDING_PAIRED_DEVICE_QA |
-| PHY-PAIR-003 | Image delete ACK UI | PENDING_PAIRED_DEVICE_QA |
+| ID | Area | Requirement | Finding |
+|----|------|-------------|---------|
+| PAIR-001 | Sync UI | Tombstone HMAC, briefing transfer, large payload | MUIUX-P1-004 / CONS-011 |
 
 ---
 
-## Manual accessibility
+## PENDING_EXTERNAL_VALIDATION
 
-| ID | Area | Status |
-|----|------|--------|
-| PHY-A11Y-001 | VoiceOver critical flows | PENDING_PHYSICAL |
-| PHY-A11Y-002 | Dynamic Type largest sizes | PENDING_PHYSICAL |
-
----
-
-## External validation
-
-| ID | Area | Status |
-|----|------|--------|
-| EXT-001 | Bühlmann external validation | PENDING_EXTERNAL_VALIDATION |
-| EXT-002 | GF preset spot-check (CONS-043) | PENDING_EXTERNAL_VALIDATION |
-| EXT-003 | CCR reference-only review | PENDING_EXTERNAL_VALIDATION |
-| EXT-004 | App Store legal/marketing review | PENDING_EXTERNAL_VALIDATION |
+| ID | Area | Requirement | Finding |
+|----|------|-------------|---------|
+| EXT-001 | Bühlmann | Third-party decompression comparison | CONS-009 |
+| EXT-002 | GF presets | External preset spot-check | CONS-043 |
+| EXT-003 | Release legal | Counsel + marketing sign-off | CONS-044 |
 
 ---
 
-## Do not claim without evidence
+## What Software Evidence DOES Exist (@ `451f8fb`)
 
-- Physical Apple Watch / iPhone QA
-- Paired-device QA
-- Underwater / Water Lock QA
-- watchOS system submerged Auto-Launch listing
-- External decompression validation
-- App Store approval readiness
-- Pixel-perfect mockup fidelity (0/59 captured)
+- `Scripts/audit_accessibility_contracts.sh` — PASS
+- Unit tests: `WatchUnderwaterPagePolicyTests`, `WatchUnderwaterNavigationClampPolicyTests`, `WatchUnderwaterActionRouterTests`, `WatchWaterAutoOpenPolicyTests`, `WatchWaterAutoOpenSettingsCopyTests`
+- Settings ownership: `WatchActivitySettingsOwnershipTests`, `IOSActivitySettingsModeSwitchTests`
+- Logbook isolation: `IOSActivityLogbookDataIsolationTests`, `WatchActivityLogbookRoutingTests`
+- Mockup structural mapping: 59 PNG paths validated; `MockupAntiEmbeddingTests`, `IOSMockupRasterSnapshotTests` (structural)
 
-**Post-remediation audit @ `15c8068` — Docs only; no production changes.**
+---
+
+## Do Not Claim Without Evidence
+
+- Physical Apple Watch / Water Lock / Action Button QA passed
+- System submerged auto-launch listing verified on watchOS
+- Shallow-depth testing equals production full-depth decompression guidance
+- App Store / EN13319 / ISO 6425 / certified dive-computer status
+- Paired sync UI verified on two devices
+- Pixel-diff visual regression baselines captured
+
+---
+
+## Final Status
+
+```text
+PHYSICAL_WATCH_UI_QA: PENDING_PHYSICAL
+PHYSICAL_IOS_UI_QA: PENDING_PHYSICAL
+PAIRED_WATCH_IOS_UI_QA: PENDING_PHYSICAL
+ACCESSIBILITY_MANUAL_QA: PENDING_PHYSICAL
+APP_STORE_REVIEW_READINESS: PENDING_EXTERNAL_VALIDATION
+UI_UX_PHYSICAL_QA_STATUS: PENDING_PHYSICAL
+```

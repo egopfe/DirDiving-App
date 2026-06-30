@@ -1,7 +1,7 @@
 # Master Performance Signpost Catalog (Current)
 
-**Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.0  
-**Branch:** `main` @ `7dfefe2`  
+**Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.2  
+**Branch:** `main` @ `451f8fb`  
 **Registry source:** `Shared/Performance/DIRPerformanceSignpost.swift`  
 **Categories:** 24 (`DIRPerformanceSignpostCategory.allCases`)
 

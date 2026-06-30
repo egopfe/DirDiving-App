@@ -1,0 +1,6 @@
+Policy_ID,Intent_or_Control,Active_Session_Block,Router_Only,Starts_Dive_Session,Test_Coverage,Verdict,Evidence,Notes
+INTENT-001,Action Button underwater router,Yes,Yes,No,WatchIntentSafetyPolicyTests,PASS,Services/WatchIntentSafetyPolicy.swift,Blocks legacy intents during active session
+INTENT-002,App Intent water auto-launch,Yes,Yes,No,WatchLaunchRoutingPolicyTests,PASS,Services/ActionButtonIntents.swift,Routes to selection not live FC
+INTENT-003,WatchUnderwaterActionRouter,Crown/page navigation only,Yes,Yes,No,WatchUnderwaterPagePolicy tests,PENDING partial,Services/WatchUnderwaterActionRouter.swift,Physical Water Lock QA pending CONS-022
+INTENT-004,Digital Crown underwater clamp,Clamp paging not settings mutation,Yes,Yes,No,WatchUnderwaterNavigationClampPolicy,PENDING physical,Utils/WatchUnderwaterNavigationClampPolicy.swift,Software PASS; wet QA pending
+INTENT-005,iOS Action Button exposure,N/A iOS live dive,N/A,N/A,N/A,N/A,iOS companion reference-only,N/A,iOS does not run live underwater FC

@@ -18,15 +18,16 @@ Command_File,Current_Status,Sequence_Position,Merged_Into,Still_Active,Supersede
 15-DIR_DIVING_WATCH_LIVE_BUHLMANN_SCHREINER_MULTILEVEL_AUDIT_V1.0.md,missing from active dir,legacy 15,01-MASTER_WATCH,no,yes,Multilevel merged into Watch FC,no,yes,OOLD 01WWATCH variant
 16-DIR_DIVING_COMPLETE_UI_UX_IMPLEMENTATION_COHERENCE_AUDIT_V1.0.md,missing from active dir,legacy 16,03-MASTER_UI_UX,no,yes,Coherence in UI/UX V2.x,no,yes,Not in repo active path
 IOS_PERFORMANCE_OPTIMIZATION_AUDIT_COMMAND_V1.0.md,orphan command doc,parallel,04-MASTER_MAIN_CODE partial,no,yes,Partial merge into 04,no,yes,IOS performance audit outputs remain indexed
-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.1.md,aligned active (inner V2.0),01,15+2+0W,yes,no,Launch order 01 PASS; filename V2.1 inner header V2.0,yes,no,CONS-001 FIXED @ 5d757cc; optional header bump P2
-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.1.md,aligned active,02,0+1+3,yes,no,Launch order 02 PASS; body V1.1,no,no,CONS-001 FIXED
-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md,aligned active (inner V2.1),03,4+11+14+16,yes,no,Launch order 03 PASS; filename V2.2 inner header V2.1,yes,no,CONS-001 FIXED; optional header bump P2
-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.1.md,aligned active (inner V1.0),04,5+8+9+10,yes,no,Launch order 04 PASS; filename V1.1 inner header V1.0,yes,no,CONS-001 FIXED; optional header bump P2
-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.1.md,aligned active,05,12+13,yes,no,Body matches filename,no,no,Output MASTER_RELEASE_* exists
-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.1.md,aligned active,06,6,yes,no,This audit command,no,no,Output this pass @ 5d757cc
-00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.2.md,aligned active,00,orchestrates 01–06,yes,no,V1.2 correct filename/body,no,no,Subcommands launch-order aligned post CONS-001
-00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-28.md,active helper,00,documents 01–06,yes,no,Correct sequence doc,yes,no,Partially indexed; Command 06 block pending
-commands_for_cursor/OOLD/04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.0.md,archive,04 prior,superseded by V1.1,no,yes,V1.0 prior version,no,yes,Archive reference
-commands_for_cursor/OOLD/03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.1.md,archive,03 prior,superseded by V2.2,no,yes,V2.1 prior,no,yes,Archive reference
-commands_for_cursor/OOLD/02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.0.md,archive,02 prior,superseded by V1.1,no,yes,V1.0 prior,no,yes,Archive reference
-commands_for_cursor/OOLD/01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.0.md,archive,01 prior,superseded by V2.1,no,yes,V2.0 Watch body,no,yes,Archive reference
+MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.2.md,aligned active,01,15+2+0W,yes,no,Launch order 01; filename/body V2.2 match,no,no,@ 451f8fb
+MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.2.md,aligned active,02,0+1+3,yes,no,Launch order 02; filename/body V1.2 match,no,no,@ 451f8fb
+MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md,aligned active,03,4+11+14+16,yes,no,Launch order 03; filename/body V2.3 match,no,no,@ 451f8fb
+MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.2.md,aligned active,04,5+8+9+10,yes,no,Launch order 04; filename/body V1.2 match,no,no,@ 451f8fb
+MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md,aligned active,05,12+13,yes,no,Launch order 05; filename/body V1.2 match,no,no,@ 451f8fb
+MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md,aligned active,06,6,yes,no,This audit command,no,no,Output this pass @ 451f8fb
+MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.0.md,aligned active,07,post-remediation verify,yes,no,Launch order 07; audit-only not remediation,no,no,INDEX documents; outputs expected after run
+MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,missing from disk,10,remediation not audit,no,yes,Indexed but file absent,yes,no,Restore from archive or regenerate; CONS-047
+00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.3.md,aligned active,00,orchestrates 01–07,yes,no,V1.3 correct filename/body,no,no,References V2.2/V2.3/V1.2 wave
+00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-30.md,active helper,00,documents 01–07,yes,no,Correct sequence doc,yes,no,Supersedes 2026-06-28 launch doc
+commands_for_cursor/OOLD/01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.1.md,archive,01 prior,superseded by V2.2,no,yes,V2.1 prior filename,no,yes,Archive reference
+commands_for_cursor/OOLD/03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md,archive,03 prior,superseded by V2.3,no,yes,V2.2 prior filename,no,yes,Archive reference
+Scripts/validate_commands_for_cursor_integrity.sh,stale gate,integrity,01–06 paths,yes,no,Expects V2.1/V1.1 filenames; disk V2.2/V2.3/V1.2,yes,no,CONS-046; update script not command bodies

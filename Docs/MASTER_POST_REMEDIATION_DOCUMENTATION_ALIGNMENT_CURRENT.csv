@@ -1,0 +1,13 @@
+CONS_ID,Remediation_Topic,Documented_In,Doc_Claim,Remediation_Status,Doc_Status,Physical_External_Gates,Required_Doc_Update,Priority,Notes
+CONS-001,Command body permutation repair,MASTER_CONSOLIDATED_FINDINGS_REGISTER; INDEX orchestrator block,01–07 launch order trustworthy,FIXED_SOFTWARE,TRUE,PENDING,Update integrity script paths; remove stale permutation notes,P1,Bodies fixed; script gate stale
+CONS-002,iOS ↔ Watch GF preset parity,MASTER_IOS_GF_PRESET_PARITY_POST_REMEDIATION_MATRIX; DIR_DIVING_IOS_DECO_GF_PRESET_CARD_SELECTOR_REPORT,Three presets aligned,FIXED_SOFTWARE,TRUE,PENDING,Cross-link GF matrices in INDEX,P2,
+CONS-003,inFlightOutboundSessionIDs failed-ACK cleanup,MASTER_IOS_SYNC_ACK_POST_REMEDIATION_MATRIX,Pending queue retries after failure,FIXED_SOFTWARE,TRUE,PENDING,None,P3,
+CONS-004,symmetric Watch↔iOS diveImportAck,MASTER_SYNC_SECURITY_POST_REMEDIATION_MATRIX,Symmetric ACK documented,FIXED_SOFTWARE,TRUE,PENDING,None,P3,
+CONS-005,legacy unsigned tombstone hardening,MASTER_IOS_TOMBSTONE_SECURITY_POST_REMEDIATION_MATRIX,Signed-only tombstones,FIXED_SOFTWARE,TRUE,PENDING,None,P3,
+CONS-006,shallow FC developer testing toggle,MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX,Internal/TestFlight only; default OFF,FIXED_SOFTWARE,TRUE,PENDING,Reinforce non-production-deco disclaimer in public docs,P1,
+CONS-007,runtime depth capability authority,MASTER_DEPTH_CAPABILITY_POST_REMEDIATION_MATRIX,Compile authority > plist metadata,FIXED_SOFTWARE,TRUE,PENDING,None,P3,
+CONS-008,independent TTS/schedule oracle,MASTER_WATCH_FULL_COMPUTER_ORACLE_INDEPENDENCE_MATRIX,Independent oracle path,FIXED_SOFTWARE,PARTIAL,PENDING_EXTERNAL,Note partial altitude/oracle external validation,P2,
+CONS-019,Water auto-open FC depth gate,MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT,DepthCapabilityPolicy in automatic step,FIXED_SOFTWARE,TRUE,PENDING,Feature matrix row missing,P1,
+CONS-046,validate_commands_for_cursor_integrity.sh drift,INDEX orchestrator V1.3 block,Script expects old filenames,OPEN,PARTIAL,n/a,Update script to V2.2/V2.3/V1.2 paths,P1,Documented in INDEX; script not fixed
+CONS-047,stale upstream audit outputs,MASTER_CONSOLIDATED_AUDIT plan,01–06 outputs predating Snorkeling wave,PARTIAL,PARTIAL,PENDING,Re-run upstream audits @ 451f8fb or update baseline notes,P1,
+CONS-048,Snorkeling physical QA pending,SNORKELING_* docs; INDEX Snorkeling blocks,INTERNAL_READY · PHYSICAL_QA_PENDING,TRUE,TRUE,PENDING,None if labels kept,P3,Snorkeling docs aligned

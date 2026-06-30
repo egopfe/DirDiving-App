@@ -1,10 +1,9 @@
 # DIR DIVING — Master External Validation Gaps (Current)
 
-**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.1.md`  
-**Date:** 2026-06-28  
-**Branch:** `main` @ `5d757cc`  
-**Pre-remediation baseline:** `7dfefe2`  
-**Merged sources:** Commands 12 + 13; post-remediation audit 05 @ `5d757cc`
+**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md`  
+**Date:** 2026-06-30  
+**Branch:** `main` @ `451f8fb`  
+**Upstream audits:** 01–04, 06 @ `451f8fb`
 
 **Policy:** External validation and physical QA remain **NOT PASSED** until signed artifacts exist in `Docs/QA_EVIDENCE/`. Simulator and automated tests do **not** close these gaps. **Do not upgrade simulator evidence to physical validation.**
 
@@ -20,11 +19,14 @@
 | Underwater / entitlement depth | **1** | **No** |
 | Water auto-open physical | **3** | **No** |
 | Hardware controls physical | **4** | **No** |
+| Snorkeling field QA (CONS-048) | **12** | **No** |
 | External algorithm reference | **4** | **No** |
 | App Store / legal / marketing | **2** | **No** |
-| **Total NOT PASSED** | **76** | — |
+| iOS test compile (IOS-P1-001) | **1** | **No** — blocks automated regression |
+| Command integrity (CONS-046) | **1** | **No** — blocks audit preflight |
+| **Total NOT PASSED** | **90** | — |
 
-**SOFTWARE_READY @ 7dfefe2:** iOS **1526/1526** tests PASS; Watch **1089/1091** PASS (2 test-case failures — test maintenance, not algorithm safety). Audit-15 oracle suites PASS. Internal fixtures and validation scripts PASS.
+**SOFTWARE_READY @ 451f8fb:** Watch **353/355** tests PASS (audit 01); iOS full suite **BUILD FAILED** (IOS-P1-001). Internal oracle and engine tests SOFTWARE_READY where executed.
 
 ---
 
@@ -58,7 +60,7 @@
 | MEXT-SS-01 | CSV export opened/imported in Subsurface externally | `QA_EVIDENCE/SUBSURFACE_EXTERNAL/` | Import compatibility claim |
 | MEXT-SS-02 | Round-trip metadata preservation | `QA_EVIDENCE/SUBSURFACE_CSV/` | Export UX |
 
-**Software status:** CSV metadata round-trip unit tests **PASS**. **External tool NOT EXECUTED.**
+**Software status:** CSV metadata round-trip unit tests **PASS** where iOS target compiles. **External tool NOT EXECUTED.**
 
 ---
 
@@ -78,45 +80,50 @@
 | Gap ID | Description | Status |
 |--------|-------------|--------|
 | MEXT-RD-01 | External ratio deco reference cases | Optional / PENDING |
-| MEXT-RB-01 | Rock Bottom estimate external review | Software PASS; external optional |
-| MEXT-GL-01 | Gas ledger bar estimate external review | Software PASS; external optional |
+| MEXT-RB-01 | Rock Bottom external reference | Internal estimate tests PASS |
+| MEXT-GL-01 | Gas ledger bar estimate external reference | Internal formatter tests PASS |
 
 ---
 
-## Physical QA gaps (June 2026 scope)
+## Snorkeling field QA (CONS-048)
 
-| Gap ID | Gate | Status |
-|--------|------|--------|
-| MEXT-PHY-SHALLOW-01 | Shallow wet Gauge (SDG-010) | PENDING_PHYSICAL |
-| MEXT-PHY-SHALLOW-02 | Developer shallow FC wet (SDG-011) | PENDING_PHYSICAL |
-| MEXT-PHY-WAO-01 | End-to-end water auto-open (WAO-PHY-001) | PENDING_PHYSICAL |
-| MEXT-PHY-WAO-02 | System Auto-Launch listing (WAO-PHY-002) | PENDING_PHYSICAL |
-| MEXT-PHY-HW-01 | Water Lock physical (HWC-PHY-004) | PENDING_PHYSICAL |
-| MEXT-PHY-HW-02 | Action Button underwater (HWC-PHY-003) | PENDING_PHYSICAL |
-| MEXT-PHY-HW-03 | Crown paging underwater (HWC-PHY-002) | PENDING_PHYSICAL |
-| MEXT-PHY-CMA-01 | CMAltimeter CoreMotion samples | PENDING_PHYSICAL |
+12 templates under `Docs/QA_EVIDENCE/SNORKELING_*` — all **PENDING_PHYSICAL**:
 
-See: `MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX_CURRENT.csv`, `MASTER_WATER_AUTO_OPEN_PHYSICAL_QA_GATE_CURRENT.csv`, `MASTER_WATCH_HARDWARE_CONTROLS_QA_GATE_CURRENT.csv`.
+1. SNORKELING_IOS_ROUTE_SAFETY_CHECK  
+2. SNORKELING_IOS_ROUTE_TYPE_ROUND_TRIP  
+3. SNORKELING_IOS_ROUTE_DISTANCE_DURATION  
+4. SNORKELING_IOS_SEND_TO_WATCH_VALIDATION  
+5. SNORKELING_LOGBOOK_GPS_QUALITY  
+6. SNORKELING_NO_CROSS_ACTIVITY_REGRESSION  
+7. SNORKELING_WATCH_GPS_QUALITY  
+8. SNORKELING_WATCH_IMPORTED_ROUTE  
+9. SNORKELING_WATCH_NEXT_WAYPOINT  
+10. SNORKELING_WATCH_OFF_ROUTE_WARNING  
+11. SNORKELING_WATCH_RETURN_ALERT  
+12. SNORKELING_WATCH_RETURN_TO_ENTRY_DISTANCE  
+
+**Do not claim Snorkeling navigation verified on hardware.**
 
 ---
 
-## Legal / App Store / accessibility
+## Software regression gaps (@ 451f8fb)
 
-| Gap ID | Description | Status |
-|--------|-------------|--------|
-| MEXT-LEGAL-01 | External legal counsel sign-off | PENDING_LEGAL_REVIEW |
-| MEXT-ASC-01 | App Store screenshots + marketing pack | PENDING |
-| MEXT-A11Y-01 | Manual VoiceOver + Dynamic Type QA | PENDING_PHYSICAL |
-| MEXT-INC-01 | Incident/rollback drill execution | PENDING |
+| Gap ID | Description | Severity |
+|--------|-------------|----------|
+| IOS-P1-001 | iOS Algorithm Tests compile failure (Snorkeling) | P1 |
+| CONS-046 | `validate_commands_for_cursor_integrity.sh` FAIL | P1 |
 
 ---
 
 ## Remediation priority
 
-1. **P0:** Maintain zero false physical/external/certification claims (current posture **CLEAR**).
-2. **P1 (software):** Fix IOS-MASTER-F016 GF preset mismatch; address MAIN sync P1 findings before internal TF confidence.
-3. **P1 (evidence):** CMAltimeter physical gate + paired sync smoke.
-4. **P2:** Execute full physical matrices; external Bühlmann/Schreiner/CCR campaigns; shallow wet QA.
-5. **P3:** Legal counsel, accessibility manual QA, App Store assets.
+1. Fix IOS-P1-001 test compile  
+2. Fix CONS-046 script paths  
+3. Execute Snorkeling Batch-8 (12 templates)  
+4. Execute legacy physical campaigns (Watch Ultra, CMAltimeter, WAO, HW)  
+5. Execute external Bühlmann/Subsurface/CCR campaigns  
+6. Legal counsel + ASC metadata review  
 
-**Do not mark any physical or external gap closed without signed artifacts in `Docs/QA_EVIDENCE/`.**
+---
+
+**Status:** OPEN @ `451f8fb` · 2026-06-30

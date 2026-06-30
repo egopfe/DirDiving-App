@@ -1,33 +1,24 @@
-Case_ID,Area,Initial_State,Fault,Expected_Result,Actual_Result,Environment_Authority_After_Fault,Start_Allowed,Runtime_Output,UI_Diagnostic,Subscription_Cleanup,Severity,Evidence,Required_Remediation,Acceptance_Test
-FI-001,CMAltimeter,Predive idle,absolute altitude unavailable,unavailable; draft/manual unchanged,unavailable per FakeAbsoluteAltitudeProvider,draft/manual/import unchanged,no,sampling blocked,unavailable/hidden,yes stop,P2,WatchCMAltimeterLifecycleTests,None,WatchCMAltimeterLifecycleTests
-FI-002,CMAltimeter,Predive sampling,motion permission denied,unavailable or failed,prior draft unchanged,PENDING_PHYSICAL,PENDING,PENDING,PENDING,PENDING,P1,PENDING_PHYSICAL,Physical deny test,PENDING_PHYSICAL
-FI-003,CMAltimeter,Sampling active,Core Motion callback error,failed; prior draft unchanged,failed state,draft unchanged,no,error diagnostic,yes stop,P1,WatchCMAltimeterLifecycleTests,None,WatchCMAltimeterLifecycleTests
-FI-004,CMAltimeter,Sampling,timeout no data 8s,timedOut,draft unchanged,draft unchanged,no,timeout message,yes stop,P2,WatchCMAltimeterLifecycleTests,None,WatchCMAltimeterLifecycleTests
-FI-005,CMAltimeter,Sampling,inaccurate-only accuracy>30m,no proposal,draft unchanged,draft unchanged,no,sampling continues,yes stop at timeout,P2,WatchCMAltimeterLifecycleTests,None,policy unit tests
-FI-006,CMAltimeter,Sampling,unstable spread>12m,no proposal,draft unchanged,draft unchanged,no,sampling,yes stop,P2,WatchCMAltimeterLifecycleTests,None,policy unit tests
-FI-007,CMAltimeter,proposalReady,late error after success,proposalReady preserved,terminal guard PASS,pending intact,no,accept/reject panel,yes stop,P1,WatchCMAltimeterLifecycleTests,None,WCMA-001 regression
-FI-008,CMAltimeter,Sampling,cancel before first sample,idle,draft unchanged,draft unchanged,no,idle,yes stop,P2,WatchCMAltimeterLifecycleTests,None,lifecycle tests
-FI-009,CMAltimeter,Sampling,cancel after partial window,idle,draft unchanged,draft unchanged,no,idle,yes stop,P2,WatchCMAltimeterLifecycleTests,None,lifecycle tests
-FI-010,CMAltimeter,Sampling,two rapid requestProposal,latest generation only,draft unchanged,draft unchanged,no,single active window,yes stop old,P1,WatchCMAltimeterLifecycleTests,None,requestGeneration tests
-FI-011,CMAltimeter,Sampling,late callback old request,ignored,draft unchanged,draft unchanged,no,no mutation,yes stop,P1,WatchCMAltimeterLifecycleTests,None,WCMA-002
-FI-012,CMAltimeter,Confirmation,dismiss without accept,draft manual/import preserved,dismissPendingSensorProposal,draft unchanged,no,no pending panel,N/A,P2,WatchCMAltimeterLifecycleTests,None,accept/reject tests
-FI-013,CMAltimeter,Sampling,app background during sampling,timeout or resume policy,draft unchanged,draft unchanged,no,sampling/orange,PARTIAL,P2,PENDING_PHYSICAL,Physical suspend test,PENDING_PHYSICAL
-FI-014,Environment,Predive,relaunch before start,pending lost; draft persisted,ephemeral pending policy,draft only,no,no pending after relaunch,N/A,P2,WCMA-006 documented,By design — document UX,PENDING_PHYSICAL
-FI-015,Environment,Active dive,altitude change attempt,setDraftEnvironment no-op,frozen runtime env,checkpoint env,no,settings blocked,N/A,P0 prevention,canEdit=false tests,None,Orchestrated tests
-FI-016,Runtime,Active dive,NaN depth sample,reject ingest degraded,no optimistic deco,unchanged tissues,no,degraded banner,N/A,P0 prevention,FullComputerReleaseHardValidationTests,None,hard validation tests
-FI-017,Runtime,Active dive,duplicate timestamp,no double integration,second ignored,tissues unchanged,yes ingest skipped,N/A,N/A,P0 prevention,FullComputerTimingFaultTests,None,timing fault matrix
-FI-018,Runtime,Active dive,negative dt out-of-order,reject degraded,non_monotonic_timestamp,tissues unchanged,no,degraded,N/A,P0 prevention,FullComputerTimingFaultTests,None,timing fault matrix
-FI-019,Runtime,Active dive,long suspension 600s,integrate full elapsed + degraded,no false zero deco,tissues loaded,yes,conservative fallback if slow,P2,FullComputerTimingFaultTests,Document UX policy,timing tests
-FI-020,Restore,Checkpoint corrupt,SHA256 mismatch,reject restore no fresh tissues,fail-closed,prior checkpoint env,N/A,error state,N/A,P0 prevention,FullComputerRecoveryCheckpointTests,None,recovery tests
-FI-021,Restore,Future schema version,reject decode,fail-closed,N/A,N/A,no,error,N/A,P1,FullComputerRuntimeCheckpointCodec,Schema migration tests,recovery tests
-FI-022,Sync,Malformed planner card,!referenceOnly,reject unsupported,FreshnessPolicy.unsupported,N/A,no,reference label,N/A,P0 prevention,PlannerBriefingFreshnessPolicy,None,briefing tests
-FI-023,Sync,HMAC failure,tampered payload,reject,no session mutation,N/A,no,sync error,N/A,P1,WatchSyncCryptographicLogicTests,None,crypto tests
-FI-024,Runtime,Solver slow,budget exceeded 50ms,prior conservative presentation,no optimistic zero deco,stale presentation flagged,yes,usedConservativeFallback,P2,FullComputerDecoSolverTests,None,solver tests
-FI-025,Environment,Start without env,runtimePlan nil,unavailable snapshot missing_environment,none blocked,no,missing_environment UI,N/A,P0 prevention,OrchestratedAltitudeEnvironmentTests,None,runtimePlan nil test
-FI-026,CMAltimeter,Sampling,nil data nil error,3-strike failed,draft unchanged,draft unchanged,no,failed after strikes,yes stop,P2,WatchCMAltimeterRemediationTests,None,WCMA-007
-FI-027,Planner,Stale briefing card,superseded manifest,stale display only,no FC mutation,N/A,no,stale badge,N/A,P2,PlannerBriefingCardStoreTests,None,briefing tests
-FI-028,Runtime,Schedule non-convergence,N/A forward sim,conservative TTS,bounded minutes steps,N/A,yes,TTS may over-estimate,P2,Audit15TTSScheduleOracleSweepTests,External compare,MWFC-P2-003
-FI-029,Memory,Memory pressure during dive,N/A,degraded not silent clear,PENDING,PENDING,PENDING,PENDING,PENDING,P2,NOT_EXECUTED,Instruments on device,PENDING_PHYSICAL
-FI-030,Calculation,Computation exceeds 1s tick,actual dt on next sample,catch-up integrate,PENDING static review,actual dt semantics,yes,degraded if >2s,P2,FullComputerRuntimeEngine static,Physical profiling,PENDING_PHYSICAL
-FI-031,Depth capability,Shallow entitlement FC start attempt,appleShallow no dev toggle,start blocked,FC unavailable reason shown,no runtime,N/A,no FC engine init,P2,DepthCapabilityTests; resolveAutomaticStep,None,Production gate @5d757cc CONS-019
-FI-032,Water auto-open,Submerged cold launch without predive confirm,route only,FC predive still required,no tissue start,N/A,predive gate intact,P2,DIRModesAndStartupFlowTests 14/14 PASS,None,PENDING_PHYSICAL UX
+Case_ID,Area,Initial_State,Fault,Expected_Result,Actual_Result,Environment_Authority_After_Fault,Start_Allowed,Runtime_Output,Severity,Evidence,Required_Remediation,Acceptance_Test
+FI-001,CMAltimeter,idle,absolute altitude unavailable,unavailable state; no auto authority,preserved manual/import,unchanged,NO,N/A,P4,WatchCMAltimeterLifecycleTests,N/A,testUnavailable
+FI-002,CMAltimeter,sampling,Core Motion error,failed; subscription stopped,prior authority preserved,unchanged,NO,N/A,P3,FullComputerEnvironmentSensorService,Ensure stopAbsoluteAltitudeUpdates,N/A
+FI-003,CMAltimeter,sampling,timeout 8s,timedOut; no proposal,unchanged,unchanged,NO,N/A,P3,FullComputerAltitudeSamplingPolicy,N/A,testTimeout
+FI-004,CMAltimeter,sampling,nil data+nil error,nilDataStream fail-closed,unchanged,unchanged,NO,N/A,P3,WatchCMAltimeterLifecycleTests,N/A,testNilDataNilError
+FI-005,CMAltimeter,sampling,late callback old request,ignored by generation token,unchanged,unchanged,NO,N/A,P3,WatchCMAltimeterRemediationTests,N/A,testLateCallback
+FI-006,CMAltimeter,sampling,two rapid requestProposal,superseded request cancelled,unchanged,unchanged,NO,N/A,P3,WatchCMAltimeterLifecycleTests,N/A,testConcurrentRequests
+FI-007,Environment,confirmed manual,active dive alt change attempt,rejected immutable,unchanged,frozen,NO,unchanged,P4,FullComputerPrediveConfigurationStore,N/A,static review
+FI-008,Depth,sampling,NaN depth,markUnavailable,degraded/unavailable,N/A,N/A,degraded,P3,FullComputerRuntimeEngine,N/A,ingestSample test
+FI-009,Depth,sampling,Inf depth,markUnavailable,degraded,N/A,N/A,unavailable,P3,FullComputerRuntimeEngine,N/A,ingestSample test
+FI-010,Timing,active dive,negative dt,tick no-op,tick guard,N/A,N/A,unchanged,P4,FullComputerRuntimeEngine,N/A,tick test
+FI-011,Timing,active dive,out-of-order timestamp,reject sample,non_monotonic_timestamp,N/A,N/A,degraded,P3,FullComputerRuntimeEngine,N/A,ingestSample test
+FI-012,Timing,active dive,120s suspension,integrate full dt + degraded,missed_tick degraded,N/A,N/A,degraded not optimistic,P3,FullComputerTimingFaultTests,N/A,testLongSuspension
+FI-013,Checkpoint,active dive,corrupt payload,restore throws,no fresh tissues,N/A,N/A,fail-closed,P3,FullComputerRecoveryCheckpointTests,N/A,testCorruptCheckpoint
+FI-014,Checkpoint,active dive,future schema,restore throws,fail-closed,N/A,N/A,fail-closed,P3,FullComputerRecoveryCheckpointTests,N/A,testFutureSchema
+FI-015,Sync,idle,malformed plan HMAC,reject import,fail-closed,N/A,NO,N/A,P3,DivePlanPackageCodecTests,N/A,testInvalidHMAC
+FI-016,Sync,idle,duplicate ACK,idempotent handling,no duplicate apply,N/A,N/A,N/A,P4,WatchSyncServiceIntegrationTests,N/A,N/A
+FI-017,Planner,idle,stale briefing card,reference only no mutation,no runtime change,N/A,N/A,N/A,P4,PlannerBriefingReceiverTests,N/A,N/A
+FI-018,Solver,active dive,calculation slow,budget fallback conservative stale cache,conservative fallback,N/A,N/A,stale conservative,P4,FullComputerDecoSolver,N/A,FullComputerDecoSolverCacheIsolationTests
+FI-019,Gas,active dive,invalid gas switch,markDegraded invalid_gas_switch,degraded,N/A,N/A,degraded,P3,FullComputerRuntimeEngine,N/A,changeGas test
+FI-020,Restore,post-crash,tissue reset detection,recovery_tissue_reset_detected diagnostic,flagged,N/A,N/A,degraded,P3,recoverySelfCheckDiagnostics,N/A,FullComputerRecoveryCheckpointTests
+FI-021,Environment,missing env,start FC,canStart fails,no sea-level fallback,N/A,NO,start blocked,P4,FullComputerPrediveReadiness,N/A,OrchestratedAltitudeEnvironmentTests
+FI-022,Memory pressure,active dive,low memory,N/A NOT_EXECUTED,N/A,N/A,N/A,N/A,P2,N/A,Instruments profiling,PENDING
+FI-023,Physical,all,real Watch underwater,N/A,PENDING_PHYSICAL,N/A,N/A,N/A,P2,PHYSICAL_QA matrix,Execute wet QA,PENDING_PHYSICAL

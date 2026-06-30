@@ -1,0 +1,8 @@
+Check_ID,Activity,Publish_Path,Ingest_Path,HMAC_Required,Legacy_Unsigned_Fallback,Test_Coverage,CONS_ID,Verdict,Evidence,Notes
+TOMB-001,Diving,makeSignedTombstones when peer secret,ingestSignedTombstones verified IDs,yes,legacy UUID mirror still ingested,ActivitySyncTombstoneTests,CONS-005,PASS with caveat,ActivitySyncTombstoneCodec.sign/verify @451f8fb,Signed primary when secret present
+TOMB-002,Apnea,makeSignedTombstones,activity-scoped signed key only,yes,no unsigned fallback,ActivitySyncTombstoneTests,CONS-005,PASS,dirdiving_deleted_apnea_session_tombstones,Strict signed-only ingest
+TOMB-003,Snorkeling,makeSignedTombstones,activity-scoped signed key only,yes,no unsigned fallback,ActivitySyncTombstoneWatchTests,CONS-005,PASS,dirdiving_deleted_snorkeling_session_tombstones,Key isolation tested
+TOMB-004,Diving legacy UUID list,publishLegacyDivingUUIDTombstones when no secret,deletedSessionBroadcastKey ingest,no,yes when secret missing only,ActivitySyncTombstoneTests,CONS-005,PASS bootstrap,WatchSyncService L639-644,Bootstrap compat when no peer secret
+TOMB-005,Diving legacy UUID with secret present,N/A,still ingests unsigned UUID strings,no,residual mirror when signed path active,ActivitySyncTombstoneTests negative,CONS-005,PASS documented,P3 accepted risk,Apnea/snorkeling have no equivalent fallback
+TOMB-006,HMAC constant-time compare,N/A,verify(syncKey:),required,N/A,ActivitySyncTombstoneCodec,CONS-005,PASS,constantTimeEquals on received vs expected,SHA256 HMAC
+TOMB-007,Cross-activity key isolation,N/A,N/A,N/A,N/A,ActivitySyncTombstoneWatchTests,CONS-005,PASS,Separate keys per activity,Prevents cross-delete

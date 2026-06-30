@@ -1,23 +1,16 @@
-ID,Platform,Activity,Feature,Initial,Empty,Loading,Success,Partial,Stale,Offline,Unavailable,Permission_Denied,Validation_Error,Algorithm_Error,Sync_Error,Conflict,Destructive_Confirmation,Retry,Restored,Future_Schema,Accessibility,Status,Severity,Finding_ID,Notes
-ST-001,Watch,Diving Gauge,Live dive,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,yes,n/a,yes,yes,yes,n/a,partial,PARTIAL,P1,MUIUX-P1-001,Physical combined-banner states PENDING
-ST-002,Watch,Diving Full Computer,Predive environment,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,no,n/a,yes,n/a,yes,yes,yes,n/a,partial,PASS,,,Altitude/source/fallback states present @ 1f62235
-ST-003,Watch,Diving Full Computer,Live deco,yes,n/a,n/a,yes,yes,yes,n/a,yes,n/a,yes,yes,yes,n/a,yes,yes,yes,yes,partial,PASS,,,Audit15 degraded/stale/conservative fallback
-ST-004,Watch,Apnea,Session lifecycle,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,yes,n/a,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-001,Physical sensor QA PENDING
-ST-005,Watch,Snorkeling,Session/GPS,yes,yes,n/a,yes,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-001,GPS permission denied coded; field QA PENDING
-ST-006,iOS,Diving,Planner modes,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,yes,n/a,n/a,yes,yes,yes,yes,yes,PASS,,,
-ST-007,iOS,Diving,Equipment/checklist,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,n/a,yes,yes,yes,yes,yes,PASS,,,
-ST-008,iOS,Global,Settings mode switch,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,yes,n/a,yes,PASS,,,
-ST-009,iOS,Apnea,Root/logbook/settings,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-001,Physical QA PENDING
-ST-010,iOS,Snorkeling,Root/maps/logbook,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-001,Map/location physical QA PENDING
-ST-011,Watch+iOS,Global,Sync/conflict,yes,yes,yes,yes,yes,yes,yes,n/a,n/a,yes,n/a,yes,yes,n/a,yes,yes,yes,yes,yes,PARTIAL,P1,MUIUX-P1-002,Paired-device QA PENDING
-ST-012,Watch+iOS,Diving,Briefing card transfer,yes,yes,yes,yes,yes,yes,n/a,n/a,n/a,yes,n/a,yes,n/a,yes,yes,yes,yes,partial,PASS,,,Pending/transferred/failed/stale/superseded coded
-ST-013,Watch+iOS,Global,Accessibility states,yes,n/a,n/a,yes,partial,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,partial,PARTIAL,P1,MUIUX-P1-003,Physical VoiceOver/Dynamic Type PENDING
-ST-014,Watch+iOS,Global,Image transfer/delete,yes,yes,yes,yes,yes,yes,yes,n/a,n/a,yes,n/a,yes,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-002,Watch ACK truthfulness; paired QA PENDING
-ST-015,iOS,Diving,PDF/share/export,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,n/a,n/a,yes,yes,yes,yes,yes,PARTIAL,P1,MUIUX-P1-004,Physical PDF render PENDING
-ST-016,Watch,Diving Full Computer,Sensor simulation,yes,n/a,n/a,yes,yes,yes,n/a,yes,n/a,yes,yes,n/a,n/a,n/a,yes,yes,yes,n/a,partial,PASS,,,Simulation badges visible; developer gated
-ST-UW-001,Watch,Global,Underwater blocked nav toast,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,PASS,,,Per-activity keys @15c8068
-ST-UW-002,Watch,Global,Action unavailable toast+haptic,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,PASS,,,
-ST-WAO-001,Watch,Global,Water auto-open settings states,yes,yes,n/a,yes,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,yes,yes,n/a,yes,PASS,,,Disabled/blocked/active-dive states
-ST-WAO-002,Watch,Global,Water auto-open cold launch routing,yes,n/a,n/a,yes,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,yes,yes,n/a,partial,PASS,,,Physical submersion probe PENDING
-ST-FC-GF-001,Watch,Diving Full Computer,GF preset lock states,yes,n/a,n/a,yes,n/a,n/a,n/a,yes,n/a,yes,n/a,n/a,n/a,n/a,yes,yes,n/a,partial,PASS,,,Active dive/import/runtime locks
-ST-DEV-001,Watch,Global,Developer shallow toggles,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,yes,n/a,yes,PASS,,,Not exposed to public users
+Screen_ID,Activity,Platform,Feature,Initial,Empty,Loading,Success,Partial,Stale,Offline,Permission_Denied,Validation_Error,Algorithm_Error,Sync_Error,Conflict,Destructive_Confirm,Retry,Restored,Unsupported,Accessibility,Pass,Finding_ID,Notes
+ST-001,Global,Watch,Legal onboarding,yes,yes,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,partial,yes,,Disclaimer before location
+ST-002,Global,Watch,Cold launch modals,yes,n/a,n/a,yes,partial,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,partial,yes,,Submersion probe timeout documented
+ST-003,Diving,Watch,Live Gauge,yes,yes,n/a,yes,partial,yes,n/a,n/a,n/a,yes,n/a,n/a,yes,n/a,yes,n/a,partial,yes,,Sensor stale surfaced
+ST-004,Diving,Watch,Live Full Computer,yes,yes,n/a,yes,partial,yes,n/a,n/a,n/a,yes,n/a,n/a,yes,n/a,yes,n/a,partial,yes,,Deco UI state matrix tests
+ST-005,Diving,Watch,Water auto-open Settings,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,yes,yes,,Blocked during active session
+ST-006,Diving,Watch,Underwater toast,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,partial,yes,,Does not cover safety metrics
+ST-007,Diving,iOS,Planner results,yes,yes,yes,yes,partial,yes,n/a,n/a,yes,yes,n/a,n/a,n/a,yes,n/a,n/a,partial,yes,,Invalid input clears stale
+ST-008,Diving,iOS,Emergency/Rock Bottom,yes,yes,n/a,yes,partial,n/a,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,partial,yes,,Insufficiency visible
+ST-009,Apnea,iOS,Apnea Settings,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,yes,yes,,
+ST-010,Snorkeling,iOS,Route planner,yes,yes,n/a,yes,partial,n/a,n/a,yes,yes,yes,n/a,n/a,yes,yes,n/a,n/a,partial,yes,MUIUX-P2-003,GPS denied state present
+ST-011,Snorkeling,iOS,Snorkeling Logbook,yes,yes,n/a,yes,n/a,n/a,n/a,n/a,n/a,yes,n/a,n/a,yes,n/a,yes,n/a,partial,yes,,
+ST-012,Global,iOS,Sync pending/failed,yes,yes,yes,yes,partial,yes,yes,n/a,n/a,yes,yes,yes,n/a,yes,yes,n/a,partial,yes,MUIUX-P1-004,Paired QA pending
+ST-013,Diving,Watch,Briefing cards,yes,yes,n/a,yes,partial,yes,n/a,n/a,n/a,n/a,yes,n/a,yes,n/a,yes,n/a,partial,yes,,Reference-only stale states
+ST-014,Global,iOS,Settings mode switch,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,yes,yes,,No runtime mutation
+ST-015,Diving,Watch,Developer shallow toggles,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,partial,yes,MUIUX-P1-005,Footer warns not production depth
