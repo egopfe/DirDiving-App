@@ -56,6 +56,11 @@ struct ApneaWatchPresentationInput: Equatable {
     var sessionWarnings: [String]
     var dataQualityDegraded: Bool
     var activeOverlay: ApneaWatchOverlayPresentation?
+    var runtimeLayout: ApneaWatchRuntimeLayout
+    var sensorQualityLabels: [String]
+    var maxRepetitions: Int?
+    var averageRecoverySeconds: TimeInterval
+    var dataQualityLevel: ApneaDataQualityLevel
 }
 
 struct ApneaWatchPresentationOutput: Equatable {
@@ -84,6 +89,9 @@ struct ApneaWatchPresentationOutput: Equatable {
     var summaryWarningsText: String?
     var activeOverlay: ApneaWatchOverlayPresentation?
     var configuredAlarms: [String]
+    var profileLayoutMetrics: ApneaWatchProfileLayoutMetrics?
+    var sessionSummaryMetrics: ApneaSessionSummaryMetrics?
+    var recoveryTargetReachedText: String?
 }
 
 enum ApneaWatchPresentation {
@@ -139,6 +147,33 @@ enum ApneaWatchPresentation {
         let warnings = input.sessionWarnings + (input.dataQualityDegraded ? [String(localized: "apnea.summary.warning.data_quality")] : [])
         let summaryWarningsText = warnings.isEmpty ? nil : warnings.joined(separator: ", ")
 
+        let profileLayout = ApneaWatchProfileLayoutPresentation.make(
+            layout: input.runtimeLayout,
+            holdSeconds: input.recoveryInProgress ? input.lastDiveDurationSeconds : input.diveElapsedSeconds,
+            recoveryElapsed: input.recoveryElapsedSeconds,
+            recoveryTarget: input.requiredRecoverySeconds,
+            recoveryRemaining: input.recoveryRemainingSeconds,
+            currentDepthMeters: input.currentDepthMeters,
+            maxDepthMeters: input.sessionMaxDepthMeters,
+            repetitionCount: input.diveCount,
+            maxRepetitions: input.maxRepetitions,
+            sensorLabels: input.sensorQualityLabels
+        )
+
+        let summaryMetrics = input.showSessionSummary
+            ? ApneaWatchProfileLayoutPresentation.sessionSummary(
+                bestHoldSeconds: input.bestDiveDurationSeconds,
+                maxDepthMeters: input.sessionMaxDepthMeters,
+                reps: input.diveCount,
+                averageRecoverySeconds: input.averageRecoverySeconds,
+                quality: input.dataQualityLevel
+            )
+            : nil
+
+        let recoveryTargetReachedText = recoveryState == .completed && input.recoveryInProgress
+            ? String(localized: "apnea.watch.recovery_target_reached")
+            : nil
+
         return ApneaWatchPresentationOutput(
             stage: stage,
             startEnabled: startEnabled,
@@ -164,7 +199,10 @@ enum ApneaWatchPresentation {
             summarySessionDurationText: Formatters.time(input.sessionTotalSeconds),
             summaryWarningsText: summaryWarningsText,
             activeOverlay: input.activeOverlay,
-            configuredAlarms: input.configuredAlarmLabels
+            configuredAlarms: input.configuredAlarmLabels,
+            profileLayoutMetrics: profileLayout,
+            sessionSummaryMetrics: summaryMetrics,
+            recoveryTargetReachedText: recoveryTargetReachedText
         )
     }
 

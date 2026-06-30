@@ -29,6 +29,8 @@ struct ApneaCompanionProfile: Identifiable, Codable, Hashable, Sendable {
     var notes: String?
     var createdAt: Date
     var updatedAt: Date
+    /// Structured profile kind for P1/P2/P3 companion profiles (optional for legacy presets).
+    var profileKind: ApneaProfileKind?
 
     init(
         id: UUID = UUID(),
@@ -43,7 +45,8 @@ struct ApneaCompanionProfile: Identifiable, Codable, Hashable, Sendable {
         markers: [ApneaDepthMarker] = [],
         notes: String? = nil,
         createdAt: Date = Date(),
-        updatedAt: Date = Date()
+        updatedAt: Date = Date(),
+        profileKind: ApneaProfileKind? = nil
     ) {
         self.id = id
         self.schemaVersion = schemaVersion
@@ -58,6 +61,7 @@ struct ApneaCompanionProfile: Identifiable, Codable, Hashable, Sendable {
         self.notes = notes
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.profileKind = profileKind
     }
 
     func editableCopy(newID: UUID = UUID()) -> ApneaCompanionProfile {

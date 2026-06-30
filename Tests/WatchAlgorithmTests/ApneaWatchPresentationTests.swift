@@ -182,7 +182,12 @@ final class ApneaWatchPresentationTests: XCTestCase {
             averageDiveDurationSeconds: averageDiveDurationSeconds,
             sessionWarnings: [],
             dataQualityDegraded: sensorDegraded,
-            activeOverlay: activeOverlay
+            activeOverlay: activeOverlay,
+            runtimeLayout: .freeTrainingCompact,
+            sensorQualityLabels: [],
+            maxRepetitions: nil,
+            averageRecoverySeconds: 0,
+            dataQualityLevel: sensorDegraded ? .medium : .good
         )
     }
 }
