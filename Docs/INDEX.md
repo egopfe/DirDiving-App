@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ `8f224da`
+**Branch consigliato:** `main` = `origin/main` @ `abfb574`
+
+---
+
+## Aggiornamento indice 2026-06-17 — Full audit sequence 01–06 + 07 @ `abfb574`
+
+Orchestrator V1.3 comprehensive rerun @ `451f8fb`; all domain audits refreshed; CONS-047 closed; CONS-049 iOS test compile; PARTIAL verdict.
+
+| Campo | Valore |
+|-------|--------|
+| **Plan** | [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md) |
+| **Verdict** | [`MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md`](MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md) |
+| **Findings** | [`MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`](MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv) |
+| **Verdict** | **PARTIAL** · **IOS-P1-001** · **PHYSICAL_QA_PENDING** · **APP_STORE_NOT_READY** |
 
 ---
 
