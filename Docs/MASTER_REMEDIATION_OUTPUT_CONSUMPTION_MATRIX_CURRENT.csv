@@ -1,14 +1,14 @@
-Remediation_Output_File,Consumer_Audit,Consumer_Orchestrator,Consumption_Purpose,Present_at_bb204f5,Consumption_Status,Notes
-Docs/MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md,07,00-0D,Remediation scope and batch closure evidence,yes,CONSUMED,Command 10 remediation @ 5d757cc; software-actionable 100% closed
-Docs/MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv,07,00-0D,Finding-by-finding closure mapping CONS-001..045,yes,CONSUMED,48-row register requires append CONS-046..048 @ V1.3
-Docs/MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TEST_EVIDENCE_CURRENT.md,07,00-0D,Build/test evidence for claimed fixes,yes,CONSUMED,Pre-Snorkeling wave; rerun tests after dbe5d8b recommended
-Docs/MASTER_CONSOLIDATED_SOFTWARE_NON_REGRESSION_RESULTS_CURRENT.md,07,00-0D,Non-regression gate results,yes,CONSUMED,Does not cover Snorkeling P1/P2/P3 @ dbe5d8b
-Docs/MASTER_CONSOLIDATED_INTERNAL_TESTFLIGHT_SOFTWARE_READINESS_CURRENT.md,07,00-0D,Internal TF software posture,yes,STALE_UPSTREAM,Last aligned @ 0126699; Snorkeling wave unaudited in 01-06
-Docs/MASTER_CONSOLIDATED_PHYSICAL_EXTERNAL_PENDING_AFTER_SOFTWARE_REMEDIATION_CURRENT.csv,07,00-0D,Physical/external gates after remediation,yes,PARTIAL,Missing 12 Snorkeling P1/P2/P3 QA folders (CONS-048)
-Docs/MASTER_CONSOLIDATED_POST_REMEDIATION_AUDIT_RERUN_CHECKLIST_CURRENT.md,07,00,Audit rerun checklist post-remediation,yes,CONSUMED,Reruns 01-06 marked complete @ 4d415c0 — now STALE vs dbe5d8b (CONS-047)
-Docs/MASTER_CONSOLIDATED_SOFTWARE_READINESS_TO_100_COMPLETION_SUMMARY_CURRENT.md,07,00-0D,Executive remediation completion summary,yes,CONSUMED,Software lane complete; physical 0%
-Docs/MASTER_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md,07,00-0D,Legacy alias / prior remediation report,yes,CONSUMED,Superseded naming; retained for traceability
-Docs/MASTER_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv,07,00-0D,Legacy finding status CSV,yes,SUPERSEDED,Use MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv
-Docs/SNORKELING_IOS_WATCH_P1_P2_P3_IMPLEMENTATION_REPORT_CURRENT.md,07;02;03;04;05,00-0C,Snorkeling wave software scope and test inventory,yes,NEW_INPUT_NOT_IN_01-06,Implemented @ dbe5d8b; triggers audit reruns 01-06 (CONS-047)
-Docs/QA_EVIDENCE/SNORKELING_*/README.md (12 folders),07;05,00-0C,Snorkeling physical QA templates,yes,PENDING_PHYSICAL,All PENDING; CONS-048
-commands_for_cursor/10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,07,00-0D,Remediation command source,MISSING,NOT_IN_REPO,Remediation outputs present; command file not at canonical path @ bb204f5
+Remediation_Output_File,Consumer_Audit,Consumer_Orchestrator,Consumption_Purpose,Present_at_451f8fb,Consumption_Status,Notes
+Docs/MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md,07,00-0D,Remediation scope and batch closure evidence,yes,CONSUMED,Command 10 @ 5d757cc; CONS-001..045 software closed
+Docs/MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv,07,00-0D,Finding-by-finding closure mapping,yes,CONSUMED,Maps CONS-001..045; CONS-046..049 tracked in consolidated register
+Docs/MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TEST_EVIDENCE_CURRENT.md,07,00-0D,Build/test evidence for claimed fixes,yes,PARTIAL,Pre-451f8fb; iOS test regression CONS-049 not in prior evidence
+Docs/MASTER_CONSOLIDATED_SOFTWARE_NON_REGRESSION_RESULTS_CURRENT.md,07,00-0D,Non-regression gate results,yes,CONSUMED,Policy preservation PASS @ 451f8fb
+Docs/MASTER_CONSOLIDATED_INTERNAL_TESTFLIGHT_SOFTWARE_READINESS_CURRENT.md,07,00-0D,Internal TF software posture,yes,STALE,Superseded by audit 07 readiness matrix @ 451f8fb
+Docs/MASTER_CONSOLIDATED_PHYSICAL_EXTERNAL_PENDING_AFTER_SOFTWARE_REMEDIATION_CURRENT.csv,07,00-0D,Physical/external gates after remediation,yes,CONSUMED,Includes Snorkeling 12 templates CONS-048
+Docs/MASTER_CONSOLIDATED_POST_REMEDIATION_AUDIT_RERUN_CHECKLIST_CURRENT.md,07,00,Audit rerun checklist,yes,CONSUMED,01-06 complete @ 451f8fb — CONS-047 closed
+Docs/MASTER_CONSOLIDATED_SOFTWARE_READINESS_TO_100_COMPLETION_SUMMARY_CURRENT.md,07,00-0D,Executive remediation completion,yes,CONSUMED,Software lane complete; physical 0%
+Docs/MASTER_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md,07,00-0D,Legacy alias,yes,SUPERSEDED,Use consolidated report
+Docs/MASTER_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv,07,00-0D,Legacy finding status,yes,SUPERSEDED,Use consolidated finding status CSV
+Docs/SNORKELING_IOS_WATCH_P1_P2_P3_IMPLEMENTATION_REPORT_CURRENT.md,07;02;03;04;05,00-0C,Snorkeling wave scope,yes,CONSUMED,Now in domain audits @ 451f8fb
+Docs/QA_EVIDENCE/SNORKELING_*/README.md (12 folders),07;05,00-0C,Snorkeling physical QA templates,yes,PENDING_PHYSICAL,CONS-048 — 0% executed
+commands_for_cursor/10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,07,00-0D,Remediation command source,MISSING,NOT_IN_REPO,Outputs present; command body missing on disk

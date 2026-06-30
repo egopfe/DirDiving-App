@@ -2,7 +2,7 @@ import XCTest
 
 final class SnorkelingDistanceCalculatorTests: XCTestCase {
     func testZeroOrSinglePointReturnsZero() {
-        XCTAssertEqual(SnorkelingDistanceCalculator.distanceMeters(points: []), 0)
+        XCTAssertEqual(SnorkelingDistanceCalculator.distanceMeters(points: [] as [SnorkelingCoordinate]), 0)
         XCTAssertEqual(
             SnorkelingDistanceCalculator.distanceMeters(points: [SnorkelingCoordinate(latitude: 44.4, longitude: 8.94)]),
             0

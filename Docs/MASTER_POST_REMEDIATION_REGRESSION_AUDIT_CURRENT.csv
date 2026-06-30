@@ -1,19 +1,19 @@
-Regression_Area,Pre_Remediation_Baseline,Post_Remediation_Status,Verification_Method,Result,Regression_Detected,Notes
-Watch FC Bühlmann/Schreiner/GF,7dfefe2 audit,5d757cc remediation + tests,Audit 01 traceability + oracle tests,PASS,no,No algorithm change in remediation or Snorkeling
-iOS Planner math/exports,7dfefe2,5d757cc GF alignment,DivePlanPackageBuilderTests,PASS,no,CONS-002 verified
-GF preset parity Watch↔iOS,FAIL import,PASS all presets,FullComputerImportedPlanStoreTests,PASS,no,CONS-002 038 closed
-Watch↔iOS sync ACK/retry,Stuck in-flight,Released on failure,WatchSync remediation tests,PASS,no,CONS-003 004 closed
-Tombstone HMAC security,Unsigned fallback,Signed-only merge,ActivitySyncTombstoneTests,PASS,no,CONS-005 closed
-Depth capability authority,Plist-only,Compile authority,DepthCapabilityTests,PASS,no,CONS-006 007 closed
-Developer shallow testing gates,Exposure risk,Default OFF gated,validate_developer_shallow_testing_release_gate.sh,PASS,no,CONS-006 closed
-Water auto-open safety,Skipped depth gate,DepthCapabilityPolicy applied,WatchWaterAutoOpenPolicyTests,PASS,no,CONS-019 closed
-Action Button router-only policy,Prior audit PASS,Unchanged @ bb204f5,Policy code review,PASS,no,No Snorkeling change
-Digital Crown underwater clamp,Prior audit PASS,Unchanged,Policy code review,PASS,no,No change
-Activity Settings ownership,Isolated per activity,Snorkeling settings isolated,SnorkelingArchitectureIsolationTests,PASS,no,dbe5d8b
-Activity Logbook ownership,Isolated,Snorkeling logbook isolated,IOSActivityLogbookRoutingTests,PASS,no,dbe5d8b
-Snorkeling cross-activity leakage,N/A new scope,Isolated stores,SnorkelingCrossDomainIsolationTests,PASS,no,Software only; field QA pending
-Command body alignment,CONS-001 permuted,01-07 bodies aligned,Manual LAUNCH ORDER check,PASS,no,CONS-001 closed; CONS-046 is script only
-Command integrity script,PASS @ 5d757cc,FAIL @ bb204f5,validate_commands_for_cursor_integrity.sh,FAIL,yes,CONS-046 — tooling regression not product
-Privacy/security claims,No overclaim,Templates PENDING,Doc review,PASS,no,NO_FAKE_PHYSICAL PASS
-Release wording,Scanner PASS,Unchanged legal posture,validate_release_claims lane,PASS,no,CONS-044 still pending external
-Domain audit freshness,COMPLETE @ 4d415c0,STALE vs dbe5d8b,Output timestamp compare,STALE,yes,CONS-047 — audit coverage gap not code regression
+Regression_Area,Baseline_Expected,Post_Remediation_State,Verification_Method,Result,Release_Blocker,Related_Finding,Notes
+Watch FC Bühlmann/Schreiner/GF,Independent oracle + Schreiner vectors PASS,PASS @ 451f8fb,Audit 01 + Audit15 suites,PASS,no,CONS-008,No algorithm regression
+iOS Planner math/exports,GF presets 20/80 30/70 40/85 emit gradientFactorPreset,PASS @ 451f8fb,Code + DivePlanPackageBuilderTests,PASS,no,CONS-002,Import parity retained
+GF preset parity iOS↔Watch,All three presets import fail-closed removed,PASS @ 451f8fb,MASTER_IOS_GF_PRESET_PARITY matrix,PASS,no,CONS-002,External spot-check still pending CONS-043
+Watch↔iOS sync ACK/retry/idempotency,inFlight cleared; symmetric diveImportAck,PASS @ 451f8fb,Sync post-remediation matrices,PASS,no,CONS-003;CONS-004,Field paired QA still pending
+Tombstone security,Signed-only diving tombstones,PASS @ 451f8fb,ActivitySyncTombstone tests,PASS,no,CONS-005,
+Depth capability authority,runtimeAuthorityTier compile-driven,PASS @ 451f8fb,validate_depth_capability_runtime_authority.sh,PASS,no,CONS-007,Wet QA pending CONS-042
+Developer shallow testing gates,Default OFF; App Store FC blocked,PASS @ 451f8fb,validate_developer_shallow_testing_release_gate.sh,PASS,no,CONS-006,
+Water auto-open safety,No auto-start; FC predive; depth policy gate,PASS @ 451f8fb,WatchWaterAutoOpenPolicyTests,PASS,no,CONS-019,Physical WAO pending CONS-021
+Action Button router-only,Legal/safety gates preserved,PASS @ 451f8fb,App intent safety matrix,PASS,no,,
+Digital Crown underwater clamp,Activity-restricted paging,PASS @ 451f8fb,Underwater hardware matrix software rows,PASS,no,CONS-022,Physical HW pending
+Activity Settings ownership,Diving/Apnea/Snorkeling isolated,PASS @ 451f8fb,Settings ownership matrices,PASS,no,,
+Activity Logbook ownership,No cross-activity leakage,PASS @ 451f8fb,Logbook ownership matrices,PASS,no,,
+Privacy/security claims,No weakened HMAC/ACK,PASS @ 451f8fb,Security threat model @ 451f8fb,PASS,no,,
+Release wording,No fake physical/external PASS,PASS @ 451f8fb,validate_no_fake_* scripts,PASS,no,,
+Docs command alignment,01-06 filename/body match,PASS @ 451f8fb,Command version matrix,PASS,no,CONS-001,Script automation FAIL CONS-046
+Domain audit freshness,01-06 current @ HEAD,COMPLETE @ 451f8fb,Output timestamps @ 451f8fb,PASS,no,CONS-047,Closed — not a code regression
+iOS automated test lane,Full iOS Algorithm Tests green,REGRESSED @ 451f8fb,xcodebuild test,FAIL,yes,CONS-049,Snorkeling test compile — test infra only
+Snorkeling route safety software,14 test files + runtime evaluator,PASS @ 451f8fb,Snorkeling*Tests compile in app target,PASS,no,CONS-048,Field QA templates PENDING

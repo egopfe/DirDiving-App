@@ -87,7 +87,7 @@ Orchestrator **V1.3** full audit sequence executed @ **`451f8fb`**. All domain a
 | Feature area | SOFTWARE_READY | PENDING_PHYSICAL / STALE_AUDIT |
 |--------------|:--------------:|-------------------------------|
 | Route safety check + validation | **PASS** | Field open-water validation |
-| iOS route planner P1/P2/P3 sections | **PASS** | Audit 02/03 STALE |
+| iOS route planner P1/P2/P3 sections | **PASS** | Field open-water validation |
 | Watch runtime evaluator (GPS, off-route, return) | **PASS** | 12 QA templates PENDING |
 | Route sync iOS→Watch | **PASS** | Paired-device field QA |
 | Cross-activity isolation | **PASS** (tests) | SNORKELING_NO_CROSS_ACTIVITY_REGRESSION pending |
@@ -102,7 +102,8 @@ Orchestrator **V1.3** full audit sequence executed @ **`451f8fb`**. All domain a
 | Gate | Status | Top blockers |
 |------|--------|--------------|
 | Command integrity script | **BLOCKED** | CONS-046 |
-| Internal TestFlight (software) | **CONDITIONAL** | CONS-047 stale audits |
+| iOS automated regression | **BLOCKED** | CONS-049 (IOS-P1-001) |
+| Internal TestFlight (software) | **CONDITIONAL** | Fix CONS-046 + CONS-049 |
 | Internal TestFlight (full) | **NOT READY** | Physical QA not started |
 | External TestFlight | **NOT READY** | Physical 0%; Snorkeling QA; CONS-009 external |
 | App Store | **NOT READY** | External TF + CONS-044 legal |
@@ -111,17 +112,17 @@ Orchestrator **V1.3** full audit sequence executed @ **`451f8fb`**. All domain a
 
 ## F. Consolidated Finding Register Summary
 
-**48 consolidated findings** (CONS-001..048). See `MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`.
+**49 consolidated findings** (CONS-001..049). See `MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`.
 
-| Severity | Open software | Pending physical/external/legal/stale | Notes |
-|----------|--------------:|---------------------------------------:|-------|
+| Severity | Open software | Pending physical/external/legal | Notes |
+|----------|--------------:|--------------------------------:|-------|
 | **P0** | **0** | 0 | CONS-001 FIXED |
-| **P1** | **1** | **10+** | CONS-046 OPEN; evidence 009–013, 021–022, 042, 044, 048 |
-| **P2** | **4** | **13** | CONS-047 STALE; 015 partial; field QA open |
+| **P1** | **2** | **10** | CONS-046, CONS-049 OPEN; evidence 009–013, 021–022, 042, 044, 048 PENDING |
+| **P2** | **0** | **13** | 015 partial; field QA open; CONS-047 VERIFIED |
 | **P3** | **6** | 0 | 028, 035–037, 040–041 |
 | **P4** | 0 | 1 accepted | CONS-039 |
 
-**New @ V1.3:** CONS-046 (script drift), CONS-047 (stale audits), CONS-048 (Snorkeling physical QA).
+**Wave @ 451f8fb:** CONS-047 **CLOSED** (audits refreshed); **CONS-049 NEW** (iOS test compile); CONS-046 **OPEN**; CONS-048 **PENDING_PHYSICAL**.
 
 ---
 
@@ -136,8 +137,9 @@ Orchestrator **V1.3** full audit sequence executed @ **`451f8fb`**. All domain a
 | Finding | Escalation | Rationale | Status |
 |---------|------------|-----------|--------|
 | CONS-046 | **P1** (new) | Automated integrity gate FAIL after command upgrade | **OPEN** |
-| CONS-047 | **P2** | Domain audits untrustworthy for Snorkeling release scope | **STALE_UPSTREAM** |
+| CONS-047 | **P2** | Domain audits untrustworthy for Snorkeling release scope | **VERIFIED** @ 451f8fb |
 | CONS-048 | **P1** (physical) | 12 open-water QA templates block Snorkeling external claims | **PENDING_PHYSICAL** |
+| CONS-049 | **P1** (new) | iOS Algorithm Tests compile failure blocks regression gate | **OPEN** |
 
 Prior escalations (CONS-001..022, CONS-042) unchanged.
 
@@ -148,8 +150,8 @@ Prior escalations (CONS-001..022, CONS-042) unchanged.
 | Conflict | Resolution |
 |----------|------------|
 | Command filenames V2.2/V1.2 vs script V2.1/V1.1 | **CONS-046 OPEN** — bodies aligned; script not updated |
-| Snorkeling SOFTWARE_READY vs stale audit 02/03 | **No conflict** — preserve both; rerun required |
-| Prior orchestrator @ 0126699 "no stale" vs dbe5d8b | **Superseded** — CONS-047 documents STALE |
+| Snorkeling SOFTWARE_READY vs audit 02/03 @ 451f8fb | **Resolved** — audits current; physical still PENDING |
+| iOS builds PASS vs iOS tests FAIL | **No conflict** — CONS-049 test-infra regression only |
 | Water auto-open SOFTWARE_READY vs PENDING_PHYSICAL | **No conflict** — both preserved |
 
 **CROSS_AUDIT_CONFLICTS (technical): 0** · **COMMAND_INTEGRITY_CONFLICTS: 1** (CONS-046)
@@ -159,7 +161,7 @@ Prior escalations (CONS-001..022, CONS-042) unchanged.
 ## J. Root-Cause Clusters
 
 1. **Evidence execution gap** — physical 0%, external 0%, +12 Snorkeling QA (CONS-048, CONS-045)
-2. **Upstream audit staleness** — Snorkeling + command upgrade not in 01–06 (CONS-047)
+2. **Automated test regression** — iOS Algorithm Tests compile failure (CONS-049)
 3. **Command tooling drift** — validate script superseded paths (CONS-046)
 4. **Release/legal packaging** — counsel, PDF (CONS-013, CONS-044)
 5. **June 2026 wave physical gates** — WAO, Crown, shallow (CONS-021, CONS-022, CONS-042)
@@ -172,7 +174,7 @@ Prior escalations (CONS-001..022, CONS-042) unchanged.
 
 See `MASTER_FINDING_DEPENDENCY_GRAPH_CURRENT.md`.
 
-**Critical path @ bb204f5:** CONS-046 script fix → CONS-047 audit reruns 01–06 → CONS-048 Snorkeling physical QA → legacy physical campaigns → external validation → legal release.
+**Critical path @ 451f8fb:** CONS-049 iOS test fix → CONS-046 script fix → CONS-048 Snorkeling physical QA → legacy physical campaigns → external validation → legal release.
 
 ---
 
@@ -180,9 +182,9 @@ See `MASTER_FINDING_DEPENDENCY_GRAPH_CURRENT.md`.
 
 See `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`.
 
-**New rank order @ V1.3:**  
-1. CONS-046 script fix  
-2. CONS-047 audit reruns 01–06  
+**New rank order @ 451f8fb:**  
+1. CONS-049 iOS Snorkeling test compile fix  
+2. CONS-046 script fix  
 3. CONS-048 Snorkeling physical QA  
 4. Legacy physical/external campaigns (CONS-010..013, CONS-021..022, CONS-042)  
 5. Legal/docs (CONS-044, CONS-034 partial)
@@ -191,15 +193,15 @@ See `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`.
 
 ## M. Non-Regressive Batch Plan (V1.3)
 
-| Batch | Name | Status @ bb204f5 | Primary remaining |
+| Batch | Name | Status @ 451f8fb | Primary remaining |
 |-------|------|------------------|-------------------|
-| **0** | Baseline protection | **COMPLETE** | Build PASS @ bb204f5 |
+| **0** | Baseline protection | **PARTIAL** | iOS tests FAIL (CONS-049); builds PASS |
 | **1–7** | Software remediation | **COMPLETE** | Field QA remains |
 | **Snorkeling** | P1/P2/P3 software | **COMPLETE** @ dbe5d8b | CONS-048 physical |
 | **Script** | Command integrity | **OPEN** | CONS-046 |
-| **Rerun** | Domain audits 01–06 | **REQUIRED** | CONS-047 |
+| **Rerun** | Domain audits 01–06 | **COMPLETE** | CONS-047 closed |
 | **8** | Tests / QA / evidence | **ACTIVE** | All physical/external + Snorkeling 12 |
-| **9** | Release / legal / docs | **PARTIAL** | CONS-044; command matrix after 06 |
+| **9** | Release / legal / docs | **PARTIAL** | CONS-044; Command 10 file missing |
 
 ---
 
@@ -216,7 +218,7 @@ See `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`.
 
 See `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`.
 
-**Next:** CONS-046 script fix → CONS-047 reruns → CONS-048 physical QA.
+**Next:** CONS-049 test fix → CONS-046 script fix → CONS-048 physical QA.
 
 ---
 
@@ -224,7 +226,7 @@ See `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`.
 
 See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`.
 
-**01–06: STALE_UPSTREAM** after Snorkeling @ dbe5d8b. **07 + 00: COMPLETE** @ bb204f5.
+**01–06: COMPLETE** @ 451f8fb (CONS-047 closed). **07 + 00: COMPLETE** @ 451f8fb.
 
 ---
 
@@ -262,7 +264,7 @@ See `MASTER_READINESS_ROADMAP_7_14_30_DAYS_CURRENT.md`. Anchor date **2026-06-30
 
 See `MASTER_REMEDIATION_OUTPUT_CONSUMPTION_MATRIX_CURRENT.csv` and `MASTER_AUDIT_COMMAND_INTEGRITY_STATUS_CURRENT.csv`.
 
-Audit **07** consumes Command 10 remediation outputs + consolidated registers. This orchestrator refresh @ bb204f5 adds Snorkeling wave and CONS-046..048 tracking.
+Audit **07** consumes Command 10 remediation outputs + consolidated registers. This orchestrator refresh @ 451f8fb closes CONS-047 and adds CONS-049 test regression tracking.
 
 ---
 
@@ -273,7 +275,7 @@ MASTER_AUDIT_ORCHESTRATOR: PARTIAL
 COMMANDS_FOR_CURSOR_FOUND: PASS
 SUBCOMMAND_FILES_FOUND: PASS
 UPSTREAM_AUDITS_FOUND: PASS
-UPSTREAM_AUDITS_COMPLETE: STALE_UPSTREAM
+UPSTREAM_AUDITS_COMPLETE: PASS
 CONSOLIDATED_FINDINGS_REGISTER_CREATED: PASS
 DEDUPLICATION_MATRIX_CREATED: PASS
 DEPENDENCY_GRAPH_CREATED: PASS
@@ -288,26 +290,26 @@ READINESS_ROADMAP_CREATED: PASS
 AUDIT_COMMAND_INTEGRITY_STATUS_CREATED: PASS
 REMEDIATION_OUTPUT_CONSUMPTION_MATRIX_CREATED: PASS
 CONSOLIDATED_P0_FINDINGS: 0
-CONSOLIDATED_P1_FINDINGS: 11
-CONSOLIDATED_P2_FINDINGS: 15
+CONSOLIDATED_P1_FINDINGS: 12
+CONSOLIDATED_P2_FINDINGS: 14
 CONSOLIDATED_P3_FINDINGS: 7
 CONSOLIDATED_P4_FINDINGS: 0
-DUPLICATE_GROUPS_FOUND: 17
-SEVERITY_ESCALATIONS: 3
+DUPLICATE_GROUPS_FOUND: 18
+SEVERITY_ESCALATIONS: 4
 CROSS_AUDIT_CONFLICTS: 0
 COMMAND_INTEGRITY_CONFLICTS: 1
-INTERNAL_TESTFLIGHT_BLOCKERS: 1
+INTERNAL_TESTFLIGHT_BLOCKERS: 2
 EXTERNAL_TESTFLIGHT_BLOCKERS: 10
 APP_STORE_BLOCKERS: 12
-PHYSICAL_QA_BLOCKERS: 15
+PHYSICAL_QA_BLOCKERS: 16
 EXTERNAL_VALIDATION_BLOCKERS: 5
-OVERALL_CONSOLIDATED_READINESS: 70
+OVERALL_CONSOLIDATED_READINESS: 65
 REMEDIATION_EXECUTION_READINESS: CONDITIONAL
 INTERNAL_TESTFLIGHT_READINESS: CONDITIONAL
 EXTERNAL_TESTFLIGHT_READINESS: NOT_READY
 APP_STORE_READINESS: NOT_READY
-FIRST_REMEDIATION_BATCH: Script fix (CONS-046) then audit reruns 01-06 (CONS-047)
-NEXT_CURSOR_COMMAND_TO_RUN: Fix validate_commands_for_cursor_integrity.sh then rerun audits 01-06 @ HEAD
+FIRST_REMEDIATION_BATCH: Fix IOS-P1-001 Snorkeling test compile (CONS-049) then script fix (CONS-046)
+NEXT_CURSOR_COMMAND_TO_RUN: Fix Snorkeling test compile then validate_commands_for_cursor_integrity.sh
 ```
 
 ### Final questions (§21 summary)
@@ -315,22 +317,22 @@ NEXT_CURSOR_COMMAND_TO_RUN: Fix validate_commands_for_cursor_integrity.sh then r
 | # | Answer |
 |---|--------|
 | 1 | Six upstream groups found — **YES** (66 files present) |
-| 2 | Stale: **01–06 STALE** vs Snorkeling + bb204f5 (CONS-047) |
+| 2 | Stale: **NONE** — 01–06 current @ 451f8fb (CONS-047 closed) |
 | 3 | Technical conflicts: **0**; command script conflict: **1** (CONS-046) |
-| 4–7 | Active: P0=0 · P1=11 · P2=15 · P3=7 · P4=0 |
-| 8 | 17 duplicate groups |
-| 9 | 3 new escalations (CONS-046..048) |
-| 10 | Internal TF blockers: **1** (stale audits + script) |
+| 4–7 | Active: P0=0 · P1 open software=2 · P1 pending gates=10 · P2=14 · P3=7 · P4=0 |
+| 8 | 18 duplicate groups |
+| 9 | 4 escalations (CONS-046..049) |
+| 10 | Internal TF blockers: **2** (CONS-046 script + CONS-049 tests) |
 | 11 | External TF blockers: **10 P1 physical/external/legal** |
 | 12 | App Store blockers: **12** |
 | 13–14 | 15 physical · 5 external validation pending |
-| 15 | First batch: **Script fix + audit reruns** |
-| 19 | Rerun **01–06** immediately; 07/00 after refresh |
+| 15 | First batch: **CONS-049 test fix + CONS-046 script** |
+| 19 | Rerun **02/05/07** after CONS-049 fix; physical QA Batch-8 next |
 | 26 | Remediation execution: **CONDITIONAL** |
 | 27 | Internal TF software: **CONDITIONAL** |
 | 28–29 | External TF / App Store: **NOT READY** |
-| 30 | **Fix integrity script; rerun 01–06; Snorkeling physical QA** |
+| 30 | **Fix iOS test compile; fix integrity script; Snorkeling physical QA** |
 
 ---
 
-**CONSOLIDATED_PLAN_STATUS: COMPLETE @ bb204f5 · Orchestrator V1.3 · 2026-06-30**
+**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 451f8fb · Orchestrator V1.3 · 2026-06-30**
