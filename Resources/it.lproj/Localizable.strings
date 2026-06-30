@@ -1511,3 +1511,16 @@
 "watch.planner_briefing.delete.confirm.title" = "Eliminare il briefing?";
 "watch.planner_briefing.delete.confirm.action" = "Elimina briefing";
 "watch.reminder.suppression.note" = "I promemoria sono soppressi mentre allarmi di sicurezza critici sono attivi.";
+
+/* Snorkeling Watch P1/P2/P3 */
+"snorkeling.watch.return" = "Ritorno";
+"snorkeling.watch.next" = "Prossimo";
+"snorkeling.watch.entry" = "Ingresso";
+"snorkeling.watch.gps.good" = "GPS buono";
+"snorkeling.watch.gps.medium" = "GPS medio";
+"snorkeling.watch.gps.poor" = "GPS scarso";
+"snorkeling.watch.gps.lost" = "GPS perso";
+"snorkeling.watch.time_to_return" = "È ora di rientrare";
+"snorkeling.watch.off_route" = "Fuori rotta";
+"snorkeling.watch.off_route_paused" = "GPS debole — avviso rotta sospeso";
+"snorkeling.watch.route_progress" = "Rotta";

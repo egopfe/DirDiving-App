@@ -24,6 +24,7 @@ struct SnorkelingCompanionProfile: Identifiable, Codable, Hashable, Sendable {
     var isPreset: Bool
     var targetDurationSeconds: TimeInterval?
     var maxDistanceMeters: Double?
+    var estimatedSpeedMetersPerMinute: Double?
     var maxDepthMeters: Double?
     var missionModeEnabled: Bool
     var alarms: [SnorkelingAlarm]
@@ -39,6 +40,7 @@ struct SnorkelingCompanionProfile: Identifiable, Codable, Hashable, Sendable {
         isPreset: Bool = false,
         targetDurationSeconds: TimeInterval? = nil,
         maxDistanceMeters: Double? = nil,
+        estimatedSpeedMetersPerMinute: Double? = nil,
         maxDepthMeters: Double? = nil,
         missionModeEnabled: Bool = false,
         alarms: [SnorkelingAlarm] = [],
@@ -53,6 +55,7 @@ struct SnorkelingCompanionProfile: Identifiable, Codable, Hashable, Sendable {
         self.isPreset = isPreset
         self.targetDurationSeconds = targetDurationSeconds
         self.maxDistanceMeters = maxDistanceMeters
+        self.estimatedSpeedMetersPerMinute = estimatedSpeedMetersPerMinute
         self.maxDepthMeters = maxDepthMeters
         self.missionModeEnabled = missionModeEnabled
         self.alarms = alarms
@@ -69,6 +72,7 @@ struct SnorkelingCompanionProfile: Identifiable, Codable, Hashable, Sendable {
             isPreset: false,
             targetDurationSeconds: targetDurationSeconds,
             maxDistanceMeters: maxDistanceMeters,
+            estimatedSpeedMetersPerMinute: estimatedSpeedMetersPerMinute,
             maxDepthMeters: maxDepthMeters,
             missionModeEnabled: missionModeEnabled,
             alarms: alarms,

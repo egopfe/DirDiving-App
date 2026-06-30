@@ -241,7 +241,30 @@ struct SnorkelingView: View {
                 }
 
                 entryDistanceRow
+                routeRuntimeRows
             }
+        }
+    }
+
+    @ViewBuilder
+    private var routeRuntimeRows: some View {
+        if ui.routeProgressText.contains("%") || ui.routeProgressText.hasSuffix("—") {
+            Text(ui.routeProgressText)
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.cyan)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        if let alert = ui.plannedReturnAlertText {
+            Text(alert)
+                .font(DiveUI.Typography.warningTitle)
+                .foregroundStyle(DiveUI.yellow)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        if let offRoute = ui.offRouteText {
+            Text(offRoute)
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.orange)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -345,6 +368,9 @@ struct SnorkelingView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
+                        Text(String(localized: "snorkeling.watch.return"))
+                            .font(DiveUI.Typography.sectionHeading)
+                            .foregroundStyle(DiveUI.yellow)
                         Text(ui.returnDistanceText + " m")
                             .font(DiveUI.Typography.dashboardValue)
                             .monospacedDigit()

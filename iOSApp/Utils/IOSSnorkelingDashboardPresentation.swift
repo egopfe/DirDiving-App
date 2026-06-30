@@ -151,4 +151,21 @@ enum IOSSnorkelingRoutePresentation {
         case .duplicatePoint: return "snorkeling.ios.planner.issue.duplicate_point"
         }
     }
+
+    static func warningText(for warning: SnorkelingRouteValidationWarning) -> String {
+        switch warning {
+        case .exceedsProfileDistance: return "snorkeling.route_safety.warning.distance"
+        case .exceedsProfileDuration: return "snorkeling.route_safety.warning.duration"
+        case .exitFarFromEntry: return "snorkeling.route_safety.warning.exit_far"
+        case .waypointSpacingLarge: return "snorkeling.route_safety.warning.waypoint_spacing"
+        }
+    }
+
+    static func safetyStatusColorToken(for status: SnorkelingRouteValidationStatus) -> String {
+        switch status {
+        case .ready: return "green"
+        case .warning: return "orange"
+        case .incomplete, .blocked: return "red"
+        }
+    }
 }

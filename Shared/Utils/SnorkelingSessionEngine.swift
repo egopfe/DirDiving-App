@@ -58,6 +58,12 @@ struct SnorkelingSessionEngineSnapshot: Equatable, Hashable, Sendable {
     var activeOverlays: [SnorkelingOperationalOverlay]
     var pendingHapticCues: [SnorkelingHapticCue]
     var missionModePresentationProfile: SnorkelingMissionModePresentationProfile
+    var gpsQualityBand: SnorkelingWatchGPSPresentationBand?
+    var routeProgressPercent: Double?
+    var offRouteDistanceMeters: Double?
+    var isOffRoute: Bool
+    var offRouteWarningPaused: Bool
+    var plannedReturnAlertActive: Bool
 }
 
 /// UI-independent snorkeling session engine with shared depth/GPS feeds and dip lifecycle.
@@ -102,6 +108,9 @@ struct SnorkelingSessionEngine {
     private var operationalEventState = SnorkelingOperationalEventState.initial
     private var missionModeEnabled = false
     private var hapticsEnabled = true
+    private var routePlanningMetadata: SnorkelingRoutePlanningMetadata?
+    private var routeCoordinates: [SnorkelingCoordinate] = []
+    private var routeRuntimeState = SnorkelingRouteRuntimeState()
 
     init(
         configuration: SnorkelingLifecycleConfiguration = .default,
@@ -203,6 +212,8 @@ struct SnorkelingSessionEngine {
         )
         session.statistics = session.refreshedStatistics()
         refreshSnapshot(wallClock: wallClock, uptime: uptime)
+        session.runtimeSummary = buildRuntimeSummary()
+        snapshot.session = session
     }
 
     mutating func pauseSession(at wallClock: Date = Date(), uptime: TimeInterval = ProcessInfo.processInfo.systemUptime) {
@@ -266,8 +277,22 @@ struct SnorkelingSessionEngine {
         session.activeRoutePlanID = activePlanID
         if let activePlanID, let plan = plans.first(where: { $0.id == activePlanID }) {
             SnorkelingNavigationEngine.reorderRoutePlan(plan, state: &navigationRuntime)
+            routeCoordinates = plan.waypoints
+                .sorted { $0.routeOrder < $1.routeOrder }
+                .map { SnorkelingCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
+        } else {
+            routeCoordinates = []
         }
         refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func setRoutePlanningMetadata(_ metadata: SnorkelingRoutePlanningMetadata?) {
+        routePlanningMetadata = metadata
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func resetRouteRuntimeTracking() {
+        routeRuntimeState = SnorkelingRouteRuntimeState()
     }
 
     mutating func selectWaypoint(id: UUID) {
@@ -763,6 +788,24 @@ struct SnorkelingSessionEngine {
         )
         session.events.append(contentsOf: operational.events)
 
+        let currentCoordinate = gpsFeedState.lastAcceptedFix.map {
+            SnorkelingCoordinate(latitude: $0.latitude, longitude: $0.longitude)
+        }
+        let fixAge = gpsFeedState.lastAcceptedFix?.fixAgeSeconds
+        let routeRuntime = SnorkelingRouteRuntimeEvaluator.evaluate(
+            metadata: routePlanningMetadata,
+            routeCoordinates: routeCoordinates,
+            currentCoordinate: currentCoordinate,
+            horizontalAccuracyMeters: gpsFeedState.lastAcceptedFix?.horizontalAccuracyMeters,
+            fixAgeSeconds: fixAge,
+            sessionElapsedSeconds: sessionElapsed,
+            traveledDistanceMeters: gpsFeedState.accumulatedDistanceMeters,
+            monotonicNow: sessionElapsed,
+            state: &routeRuntimeState
+        )
+        var hapticCues = operational.hapticCues
+        hapticCues.append(contentsOf: routeRuntime.hapticCues)
+
         snapshot = SnorkelingSessionEngineSnapshot(
             phase: tracker.phase,
             session: session,
@@ -787,8 +830,23 @@ struct SnorkelingSessionEngine {
             waypointNavigation: navigationRuntime.lastWaypointNavigation,
             returnNavigation: navigationRuntime.lastReturnNavigation,
             activeOverlays: operational.overlays,
-            pendingHapticCues: operational.hapticCues,
-            missionModePresentationProfile: presentationProfile
+            pendingHapticCues: hapticCues,
+            missionModePresentationProfile: presentationProfile,
+            gpsQualityBand: routeRuntime.gpsQualityBand,
+            routeProgressPercent: routeRuntime.routeProgressPercent,
+            offRouteDistanceMeters: routeRuntime.offRouteDistanceMeters,
+            isOffRoute: routeRuntime.isOffRoute,
+            offRouteWarningPaused: routeRuntime.offRouteWarningPaused,
+            plannedReturnAlertActive: routeRuntime.plannedReturnAlertTriggered || routeRuntimeState.returnAlertTriggered
+        )
+    }
+
+    private func buildRuntimeSummary() -> SnorkelingSessionRuntimeSummary {
+        SnorkelingRouteRuntimeEvaluator.makeRuntimeSummary(
+            state: routeRuntimeState,
+            gpsQualityBand: snapshot.gpsQualityBand,
+            routeProgressPercent: snapshot.routeProgressPercent,
+            trackPointCount: session.trackPoints.count
         )
     }
 
@@ -953,7 +1011,13 @@ struct SnorkelingSessionEngine {
             returnNavigation: .unavailable,
             activeOverlays: [],
             pendingHapticCues: [],
-            missionModePresentationProfile: .standard
+            missionModePresentationProfile: .standard,
+            gpsQualityBand: nil,
+            routeProgressPercent: nil,
+            offRouteDistanceMeters: nil,
+            isOffRoute: false,
+            offRouteWarningPaused: false,
+            plannedReturnAlertActive: false
         )
     }
 }

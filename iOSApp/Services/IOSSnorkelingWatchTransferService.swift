@@ -44,7 +44,7 @@ final class IOSSnorkelingWatchTransferService: ObservableObject {
         connectivity: SnorkelingWatchTransferConnectivityContext
     ) -> Bool {
         lastErrorMessage = nil
-        guard SnorkelingRoutePlanValidator.isValid(draft: draft) else {
+        guard SnorkelingRouteValidator.validate(draft: draft, profile: profile).allowsWatchTransfer else {
             state = .failed(messageKey: "snorkeling.ios.planner.validation_failed")
             lastErrorMessage = "snorkeling.ios.planner.validation_failed"
             return false
