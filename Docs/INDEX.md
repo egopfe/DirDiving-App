@@ -5,7 +5,7 @@
 
 ---
 
-## Aggiornamento indice 2026-06-17 — iOS Snorkeling map UX improvements
+## Aggiornamento indice 2026-06-17 — iOS Snorkeling map UX improvements @ `7a88e9c`
 
 Center-on-location button, reset map with confirmation, section reorder (Map → Route points → Profiles) in iOS Route Planner.
 
