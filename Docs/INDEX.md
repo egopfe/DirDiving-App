@@ -1,11 +1,11 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ `8ca592f`
+**Branch consigliato:** `main` = `origin/main` @ `dbe5d8b`
 
 ---
 
-## Aggiornamento indice 2026-06-17 — Snorkeling iOS + Watch P1/P2/P3 (uncommitted)
+## Aggiornamento indice 2026-06-17 — Snorkeling iOS + Watch P1/P2/P3 @ `dbe5d8b`
 
 Route safety check, profile-based duration, route type, checklist, return alert policy, Watch runtime (GPS bands, route progress, off-route, 50% return alert), logbook runtime summary, export, tests, docs, QA templates.
 
