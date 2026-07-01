@@ -1,6 +1,6 @@
 # iOS Unified Activity Logbook — Implementation Report (Current)
 
-**Branch:** `main` (local, uncommitted)  
+**Branch:** `main` @ `d32ad96`  
 **Baseline commit:** `efda217` — *Implement Watch GPS capture through activity-specific logbooks end-to-end.*  
 **Date:** 2026-07-01  
 
