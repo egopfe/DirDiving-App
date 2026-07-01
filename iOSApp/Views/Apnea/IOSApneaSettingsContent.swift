@@ -106,6 +106,8 @@ struct IOSApneaSettingsContent: View {
                 IOSCompanionSettingsFootnoteText(text: DIRIOSLocalizer.string("settings.apnea.fake_logbook.description"))
             }
 
+            IOSActivityLogbookVisibilitySettingsSection(activity: .apnea)
+
             DIRCard(nil, icon: nil, accent: DIRTheme.orange) {
                 IOSCompanionSettingsResetButton(
                     title: DIRIOSLocalizer.string("apnea.ios.settings.reset"),
