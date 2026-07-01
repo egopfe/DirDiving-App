@@ -1,0 +1,11 @@
+Surface_ID,Activity,Platform,Element,VoiceOver_Label_EN,VoiceOver_Label_IT,Dynamic_Type,Contrast,Pass,Finding_ID,Notes
+APN-A11Y-001,Apnea,iOS,Settings mode switch,yes,yes,yes,pass,yes,,
+APN-A11Y-002,Apnea,iOS,Session list rows,yes,yes,yes,pass,yes,,
+APN-A11Y-003,Apnea,iOS,Recovery settings,yes,yes,yes,pass,yes,,
+APN-A11Y-004,Apnea,iOS,Training profile cards,partial,yes,partial,pass,partial,MUIUX-P2-007,Alarms not exposed
+APN-A11Y-005,Apnea,Watch,Live metrics,yes,yes,partial,pass,partial,,Glove readability PENDING_PHYSICAL
+APN-A11Y-006,Apnea,Watch,Recovery overlay,yes,yes,partial,pass,partial,,
+APN-A11Y-007,Apnea,Watch,Settings gear,yes,yes,yes,pass,yes,,
+APN-A11Y-008,Apnea,Watch,Navigation title,partial,no,yes,pass,partial,MUIUX-P2-006,Hardcoded Apnea
+APN-A11Y-009,Apnea,Watch,Underwater blocked toast,yes,yes,yes,pass,yes,,
+APN-A11Y-010,Apnea,Both,No deco terminology,n/a,n/a,n/a,n/a,yes,,Mandatory negative PASS

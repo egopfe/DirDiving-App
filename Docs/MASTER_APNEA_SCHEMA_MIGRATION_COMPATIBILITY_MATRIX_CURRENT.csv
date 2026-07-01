@@ -1,0 +1,11 @@
+domain,artifact,current_version,legacy_supported,future_schema_policy,migration_module,codec_validation,activity_envelope,test_reference,status,severity,notes
+Apnea WC session transport,ApneaSessionSyncCodec.Transport,3,1-2 via policy,unsupportedVersion throw,N/A,HMAC + replay + activityType=apnea,apnea,ApneaSessionSyncTransportNegativeTests,PASS,,payloadKey dirdiving_apnea_session
+Apnea persisted session,ApneaSession.schemaVersion,1,0 via ApneaSchemaMigration,future → schemaMigrated warning,Shared/Utils/ApneaSchemaMigration.swift,resilient decode,N/A,ApneaSessionMergeIntegrityTests,PASS,,Multi-dive body supported P1/P2/P3
+Apnea sync plan package,ApneaSyncCodec body,currentSchemaVersion,N/A,future rejected fail-closed,Shared/Utils/ApneaSyncCodec.swift,schemaVersion + checksum bounds,N/A,ApneaSyncCodecNegativePathTests,PASS,,Isolated from DivePlanPackageCodec
+Apnea local logbook JSON,dirdiving_apnea_sessions.json,envelope v1,corrupt quarantine,atomic write,ApneaLogbookPersistence,resilient decode,N/A,ApneaLogbookStoreTests,PASS,,Watch + iOS separate filenames
+Apnea runtime checkpoint,dirdiving_apnea_session_checkpoint.json,1,N/A,unsupportedSchema throw,N/A,checksum,N/A,ApneaCheckpointFoundationTests,PASS,,Not merged into Diving FC checkpoint
+Apnea tombstone wire,ActivitySyncTombstoneCodec,1,N/A,malformed reject,N/A,HMAC-SHA256,apnea,ActivitySyncTombstoneTests,PASS,,No unsigned Apnea fallback
+Apnea settings namespace,ApneaSettingsStore keys,N/A,N/A,unknown key ignore,ApneaSettingsStore.swift,type-safe keys,N/A,IOSActivitySettingsCoherenceTests,PASS,,No diving gas keys
+Cross: Diving session → Apnea ingest,N/A,N/A,N/A,reject at routing guard,ActivitySyncRoutingGuard,activity mismatch,diving vs apnea,ActivitySyncCrossDecodeRejectionTests,PASS,P0-class if broken,Mandatory isolation
+Cross: Snorkeling session → Apnea,N/A,N/A,N/A,reject,ActivitySyncRoutingGuard,activity mismatch,snorkeling vs apnea,ActivitySyncCrossDecodeRejectionTests,PASS,,Mandatory isolation
+Apnea training P1/P2/P3 fields,ApneaSession body extensions,1,N/A,forward-compatible decode,ApneaSchemaMigration,optional fields,N/A,ApneaArchitectureIsolationTests,PASS,,@ 76f3703 wave

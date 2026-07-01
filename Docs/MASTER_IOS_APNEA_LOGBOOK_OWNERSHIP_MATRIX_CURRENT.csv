@@ -1,0 +1,17 @@
+Route_ID,Source_Activity,Target_Logbook,Store,View,Allowed,Test_Evidence,Pass,Notes
+APNEA_TO_APNEA,Apnea,Apnea,IOSApneaLogbookStore,IOSApneaSessionsListView,yes,IOSActivityLogbookRoutingTests,PASS,Primary Apnea logbook
+APNEA_DETAIL,Apnea,Apnea,IOSApneaLogbookStore,IOSApneaSessionDetailView,yes,IOSApneaLogbookAnalyticsTests,PASS,Apnea-only detail fields
+APNEA_STATS,Apnea,Apnea,IOSApneaLogbookStore,Statistics tab,yes,IOSApneaLogbookAnalyticsTests,PASS,No mixed stats with Diving
+APNEA_EXPORT,Apnea,Apnea,IOSApneaLogbookStore,IOSApneaSessionExportView,yes,ApneaExportPayloadBuilderTests,PASS,GPX/JSON with privacy gates
+APNEA_DEMO,Apnea,Apnea,IOSActivityDemoLogbookSettingsStore,IOSApneaSessionsListView demo section,yes,ApneaDemoLogbookPresentationTests,PASS,Separate DEMO section when enabled
+DIVING_TO_APNEA,Diving,Apnea,n/a,n/a,no,IOSActivityLogbookRoutingTests.testSixForbiddenCrossActivityLogbookRoutesDataDriven,PASS,P0 if allowed
+APNEA_TO_DIVING,Apnea,Diving,n/a,n/a,no,IOSActivityLogbookRoutingTests,PASS,Forbidden
+APNEA_TO_SNORKEL,Apnea,Snorkeling,n/a,n/a,no,IOSActivityLogbookRoutingTests,PASS,Forbidden
+SNORKEL_TO_APNEA,Snorkeling,Apnea,n/a,n/a,no,IOSActivityLogbookRoutingTests,PASS,Forbidden
+ENV_APNEA_NO_DIVELOG,Apnea,Diving,n/a,applyApneaEnvironment,no,IOSCompanionEnvironmentIsolationTests,PASS,No DiveLogStore injection
+DATA_ISOLATION,Apnea,Apnea,IOSApneaLogbookStore,dirdiving_ios_apnea_sessions.json,yes,IOSActivityLogbookDataIsolationTests,PASS,Delete does not affect Diving/Snorkeling
+SYNC_APNEA_ONLY,Watch→iOS,Apnea,IOSApneaLogbookStore,ApneaSyncCodec,yes,ApneaSyncCodecTests;ApneaSessionSyncTransportNegativeTests,PASS,Signed activity envelope
+SYNC_CROSS_REJECT,Any,Mixed,n/a,ActivitySyncCrossDecodeRejectionTests,no,ActivitySyncCrossDecodeRejectionTests,PASS,Diving payload rejected in Apnea ingest
+DEEP_LINK_APNEA,Apnea,Apnea,IOSApneaNavigationStore,pendingSessionDetailID,yes,IOSCompanionNavigationRestorationTests,PASS,Cross-activity detail rejected
+TOMBSTONE_APNEA,Apnea,Apnea,ActivitySyncTombstoneBroadcast,dirdiving_deleted_apnea_session_tombstones,yes,ActivitySyncTombstoneTests,PASS,Signed tombstone path
+CLOUD_STUB,Apnea,Apnea,IOSApneaLogbookStore,ApneaCloudCapability stub,yes,ApneaCloudBackupStubTruthfulnessTests,PASS,IOS-P3-002 honest disclosure

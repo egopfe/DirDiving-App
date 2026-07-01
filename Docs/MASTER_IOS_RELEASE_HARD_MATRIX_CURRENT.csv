@@ -1,8 +1,8 @@
 Feature,Readiness_Percent,Blockers,Priority,Evidence,Physical_QA,External_Validation,Notes
-Bühlmann,94,IOS-P2-001,P2,BuhlmannEngine.swift;BUILD SUCCEEDED;prior 1527 tests @5d757cc,PENDING,PENDING,Shared BuhlmannCore ZH-L16C; no P0 math defect
+Bühlmann,94,IOS-P2-001,P2,BuhlmannEngine.swift;1655 iOS tests PASS @2c30412,PENDING,PENDING,Shared BuhlmannCore ZH-L16C; no P0 math defect; upstream WFC-P1-001 external pending
 Planner Base/Deco/Technical,92,External validation,P2,PlannerModePolicyTests;PlannerModeLimitsTests,PENDING,PENDING,Mode isolation enforced in tests
-Full Computer Watch parity,95,External validation,P2,BuhlmannCore + FullComputerGradientFactorPreset;CONS-002 PASS @451f8fb,PENDING,PENDING,iOS planner reference; GF preset parity verified
-GF Preset Override Compatibility,95,External Bühlmann spot-check CONS-043,P2,PlannerGFPreset 20/80 30/70 40/85;gradientFactorPreset emission,PENDING,PENDING,iOS↔Watch software parity PASS @451f8fb
+Full Computer Watch parity,95,External validation; WFC-P2-005 routing,P2,BuhlmannCore + FullComputerGradientFactorPreset;CONS-002 PASS @2c30412,PENDING,PENDING,iOS planner reference; FC math 0 P0 @ audit 01
+GF Preset Override Compatibility,95,External Bühlmann spot-check CONS-043,P2,PlannerGFPreset 20/80 30/70 40/85;gradientFactorPreset emission,PENDING,PENDING,iOS↔Watch software parity PASS
 CCR / Rebreather,90,EXT-IOS-CCR-01,P2,CCRPlannerTests;referenceOnly disclaimers,PENDING,PENDING,Reference-only by design
 CCR Setpoint,91,External validation,P2,CCRMathRemediationTests,PENDING,PENDING,Setpoint not treated as FO2
 CCR Diluent,90,Hypoxic edge external review,P3,CCRPlanValidator,PENDING,PENDING,Validator blocks invalid diluent
@@ -29,10 +29,10 @@ CCR Bailout Scenario,88,Heuristic,INFO,CCRBailoutScenarioCalculator,PENDING,PEND
 CCR Gas Density,90,None,P4,CCRGasDensityEstimator,PENDING,N/A,Metadata traceable
 Manual Dive,88,Profile editor IOS-P3-005,P3,ManualDiveEditorLogicTests,PENDING,N/A,Synthetic profile reliable
 Diving Logbook,93,None,P4,DiveLogStore;IOSActivityLogbookRoutingTests,PENDING,N/A,Strict diving ownership; fake demo toggle
-Apnea Logbook,91,Cloud stub IOS-P3-002,P3,IOSApneaLogbookStore;IOSApneaLogbookAnalyticsTests,PENDING,N/A,Fake logbook toggle independent
+Apnea Logbook,91,Cloud stub IOS-P3-002,P3,IOSApneaLogbookStore;IOSApneaLogbookAnalyticsTests,PENDING,N/A,iOS companion logbook; Watch live session primary
 Snorkeling Logbook,90,Field GPS IOS-P2-005;P1/P2/P3 physical IOS-P2-006,P2,IOSSnorkelingLogbookStore;SnorkelingRouteValidatorTests,PENDING,N/A,Route planner + fake logbook software PASS
 Diving Settings,92,Dual-binding IOS-P3-003,P3,IOSDivingSettingsEmbeddedContent;IOSDivingSettingsStore,PENDING,N/A,Mode switcher PASS
-Apnea Settings,93,None,P4,IOSApneaSettingsContent;IOSApneaSettingsStore,PENDING,N/A,Editable below switcher
+Apnea Settings,93,None,P4,IOSApneaSettingsContent;IOSApneaSettingsStore,PENDING,N/A,Editable below switcher; no GF/gas leakage
 Snorkeling Settings,94,None,P4,IOSSnorkelingSettingsContent;IOSSnorkelingSettingsStore,PENDING,N/A,GPS/map/fake logbook backed
 Shared Settings,92,None,P4,SharedIOSSettingsStore;MoreView,PENDING,N/A,Language/units/backup scoped
 Snorkeling Route Planner P1/P2/P3,91,Physical QA IOS-P2-006,P2,IOSSnorkelingRoutePlannerView;SnorkelingRouteValidatorTests,PENDING,N/A,P1 return-to-entry; P2 profiles; P3 off-route Watch runtime
@@ -45,9 +45,9 @@ Security / Privacy,88,Keychain CI skip IOS-P4-001,P4,SecurityPrivacyTrustRemedia
 Unit Conversion,93,None,P4,PressureModelUnificationTests,PENDING,N/A,Canonical meters/bar
 Localization,91,None,P4,DIRDivingCompleteLocalizationAuditTests,PENDING,N/A,EN/IT GF preset keys
 Accessibility,86,Manual QA pending,P2,UIUXRemediationV3AccessibilityTests,PENDING,N/A,Software contracts pass
-Performance / Numerical Robustness,91,None,P4,PerformanceConcurrencyBatteryRemediationTests;PlannerStore deinit cancel,PENDING,N/A,CONS-027 verified @451f8fb
-Test Coverage,78,IOS-P1-001 compile failure,P1,1290+ test funcs; BUILD FAILED @451f8fb Snorkeling tests,PENDING,N/A,Prior 1527 PASS @5d757cc; current HEAD blocked
-Internal TestFlight,88,IOS-P1-001 test gate,P1,Build green; test compile blocked,PENDING,PENDING,Conditional — fix Snorkeling test compile first
-External TestFlight,50,IOS-P2-001..006,P2,External QA matrix open,PENDING,PENDING,Not ready for external RC
-App Store,46,Legal + external gates,P2,ReleaseLegalClaimsRemediationTests,PENDING,PENDING,Non-certified posture preserved
-Overall,90,IOS-P1-001 + external/physical gates,P1,Audit @451f8fb,PENDING,PENDING,Software architecture PASS; test gate regression at HEAD
+Performance / Numerical Robustness,91,None,P4,PerformanceConcurrencyBatteryRemediationTests;PlannerStore deinit cancel,PENDING,N/A,CONS-027 verified
+Test Coverage,96,None,P4,1655 executed 0 failures @2c30412;1417 test func defs,PENDING,N/A,IOS-P1-001 closed; suite green
+Internal TestFlight,92,Physical QA pending,P2,Build+tests green @2c30412,PENDING,PENDING,Software gate READY; field QA open
+External TestFlight,52,IOS-P2-001..006,P2,External QA matrix open,PENDING,PENDING,Not ready for external RC
+App Store,48,Legal + external gates,P2,ReleaseLegalClaimsRemediationTests,PENDING,PENDING,Non-certified posture preserved
+Overall,94,External/physical gates,P2,Audit @2c30412,PENDING,PENDING,Software architecture PASS; CONS-046 V1.5 PASS

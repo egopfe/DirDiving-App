@@ -1,80 +1,71 @@
-# Master Finding Dependency Graph — Current
+# Finding Dependency Graph — CURRENT
 
-**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR...V1.3`  
-**Baseline:** `main` @ `451f8fb` (remediation @ `5d757cc`; Snorkeling @ `dbe5d8b`)  
-**Date:** 2026-06-30
-
----
-
-## Summary
-
-Post **Command 10** remediation, **Snorkeling P1/P2/P3**, and **full audit rerun 01–06 @ 451f8fb**, open work splits into: (1) **test/CI gates** — CONS-049 iOS test compile + CONS-046 script drift; (2) **evidence execution** — physical and external QA at **0%**; (3) **P3 maintainability**. Watch Full Computer **P0/P1 software = 0**. **CONS-047 closed.**
+**Baseline:** `main` @ `2c30412`  
+**Orchestrator:** V1.5 @ 2026-07-01
 
 ---
 
-## Critical path (@ 451f8fb)
+## Critical dependencies
+
+**CONS-009 / WFC-P1-001** must complete before any external TestFlight or App Store claim of decompression parity or certified planner behavior, because third-party Bühlmann validation evidence does not exist.
+
+**CONS-010, CONS-021, CONS-022, CONS-042, CONS-048, APNEA-PHY-001** must complete before any physical Watch/iPhone/Snorkeling/Apnea field claim, because physical QA matrices are 0% executed.
+
+**CONS-050 / WFC-P2-005** should be resolved (test alignment or documented routing policy) before treating Watch CI as fully green, because 13 routing failures block 1152/1152 PASS even though FC math tests are green.
+
+**CONS-053 (DOC-P0 legacy claims)** must be fixed before documentation or INDEX updates assert App Store or external validation readiness, because two legacy documents contradict audit PARTIAL verdicts.
+
+**CONS-054 (INDEX/README drift)** should follow technical truth fixes (CONS-050, physical gates) and must not precede them, because documentation must reflect known technical state per orchestrator policy §6.9.
+
+**CONS-044 (legal/marketing)** cannot close until CONS-013 PDF physical render and CONS-009 external validation posture are honestly documented for counsel review.
+
+---
+
+## Mermaid graph
 
 ```mermaid
 graph TD
-  TEST[CONS-049 iOS test compile] --> SCRIPT[CONS-046 script fix]
-  SCRIPT --> INTTF[Internal TestFlight software gate]
-  SNK[CONS-048 Snorkeling 12 QA] --> EXTTF[External TestFlight gate]
-  PHY[CONS-010 Physical Watch QA] --> EXT[CONS-009 External Bühlmann]
-  PAIR[CONS-011 Paired sync QA] --> EXTTF
-  WAO[CONS-021 WAO physical] --> EXTTF
-  HW[CONS-022 Underwater HW QA] --> EXTTF
-  SHAL[CONS-042 Shallow wet QA] --> EXTTF
-  GFEXT[CONS-043 GF external check] --> EXT
-  EXT --> REL[CONS-044 Legal release]
-  PDF[CONS-013 PDF evidence] --> REL
-  EXTTF --> REL
-  INTTF --> EXTTF
+  WFC_P1[WFC-P1-001 External Bühlmann] --> CONS_009[CONS-009]
+  CONS_009 --> EXT_TF[External TestFlight claims]
+  CONS_009 --> APP_STORE[App Store algorithm claims]
+
+  WFC_P2_005[WFC-P2-005 WAO routing tests] --> CONS_050[CONS-050]
+  CONS_050 --> WATCH_CI[1152/1152 Watch tests green]
+
+  CONS_010[CONS-010 Physical FC QA] --> PHY_TF[Physical release claims]
+  CONS_021[CONS-021 WAO physical] --> PHY_TF
+  CONS_022[CONS-022 Underwater HW] --> PHY_TF
+  CONS_042[CONS-042 Shallow wet QA] --> PHY_TF
+  CONS_048[CONS-048 Snorkeling 12 QA] --> PHY_TF
+  APNEA_PHY[APNEA-PHY-001 Apnea wet QA] --> PHY_TF
+
+  CONS_053[CONS-053 P0 legacy claim docs] --> DOC_GATE[Documentation truthfulness]
+  CONS_054[CONS-054 INDEX/README stale] --> DOC_GATE
+
+  CONS_044[CONS-044 Legal sign-off] --> APP_STORE
+  CONS_013[CONS-013 PDF physical render] --> CONS_044
+
+  CONS_046[CONS-046 Script integrity] -.FIXED.-> PREFLIGHT[Audit preflight trustworthy]
+  CONS_049[CONS-049 iOS tests] -.FIXED.-> IOS_CI[1655 iOS tests green]
 ```
 
 ---
 
-## Plain-text dependencies
+## Batch ordering constraints
 
-| Finding | Must precede | Because |
-|---------|--------------|---------|
-| **CONS-049** | Internal TF unconditional; audit 02/05/07 refresh | Full iOS regression lane blocked |
-| **CONS-046** | Trustworthy CI/orchestrator preflight | Script references superseded command paths |
-| **CONS-010** | CONS-009, CONS-042 | Hardware depth/environment before decompression release claims |
-| **CONS-011** | External TF sync sign-off | Field sync validates CONS-003..005 fixes |
-| **CONS-048** | Snorkeling external TF claims | 12 open-water templates unsigned |
-| **CONS-009** | App Store algorithm claims | Third-party Bühlmann compare required |
-| **CONS-043** | GF release narrative (optional) | Software parity achieved — external spot-check for claims only |
-| **CONS-021, CONS-022** | External TF WAO/HW gates | SOFTWARE_READY @ 451f8fb — physical validates only |
+| Finding cluster | Must fix before | Because |
+|-----------------|-----------------|---------|
+| FC math P0 (none open) | — | 0 P0 @ 2c30412 |
+| CONS-050 WFC-P2-005 | Watch suite green gate | CI regression noise |
+| CONS-051 Snorkeling progress | Snorkeling routing confidence | 1 isolated test failure |
+| Physical QA cluster | External TF | No simulator→physical upgrade |
+| CONS-009 external | App Store deco claims | Missing third-party evidence |
+| CONS-053/054 docs | Marketing/legal refresh | Docs after technical truth |
 
 ---
 
-## Resolved dependencies (do not reopen)
+## Non-dependencies (keep separate)
 
-| Finding | Closed @ | Unblocks |
-|---------|----------|----------|
-| **CONS-001** | 5d757cc | Trustworthy filename-based audit re-run |
-| **CONS-002** | 5d757cc | CONS-043 external GF narrative; Watch import path |
-| **CONS-003..005** | 5d757cc | CONS-011 paired QA validation |
-| **CONS-006, CONS-007** | 5d757cc | CONS-042 shallow wet QA (process gates met) |
-| **CONS-008, CONS-017..019** | 5d757cc | External oracle compare (CONS-009) |
-| **CONS-027** | 5d757cc | — (maintainability) |
-| **CONS-034** | 5d757cc partial | INDEX wave; README/matrix optional |
-| **CONS-047** | 451f8fb | Snorkeling scope in domain audits |
-
----
-
-## Physical QA blockers
-
-Cannot close without hardware or field execution:
-
-- CONS-010, CONS-011, CONS-012, CONS-021, CONS-022, CONS-023, CONS-024, CONS-025, CONS-026, CONS-029, CONS-031, CONS-032, CONS-042, CONS-045, **CONS-048**
-
-**SOFTWARE_READY preserved:** CONS-021, CONS-022, Snorkeling route safety @ 451f8fb.
-
----
-
-## External / legal blockers
-
-- CONS-009, CONS-030, CONS-033, CONS-043, CONS-044, CONS-013
-
-**Do not convert simulator/unit-test PASS into external validation PASS.**
+- **WFC-P2-004 TTS 1-minute quantization** is documented conservative limitation — does not block internal TestFlight software.
+- **CONS-039 Apnea cloud stub** is accepted risk — does not block Apnea software INTERNAL_READY.
+- **IOS-P3 navigation restore** is UX polish — does not block safety or internal TestFlight software.

@@ -1,0 +1,11 @@
+Check_ID,Surface,Requirement,Production_Source,Expected,Actual@2c30412,Pass,CONS-006,Evidence
+SHALLOW-UX-01,Developer settings,Toggle behind developer unlock,DeveloperSettingsView,Hidden without unlock,Hidden,PASS,CONS-006,DepthCapabilityTests
+SHALLOW-UX-02,Developer settings,FC shallow toggle default OFF,DeveloperSettings,OFF default,OFF,PASS,CONS-006,DeveloperSettings.swift
+SHALLOW-UX-03,Copy,Internal testing only wording,Localizable.strings,~6m internal only,Present,PASS,CONS-006,Static review
+SHALLOW-UX-04,Copy,No certified deco guidance claim,Localizable.strings,No certification claim,Compliant,PASS,N/A,ReleaseLegalClaimsRemediationWatchTests
+SHALLOW-UX-05,Depth policy,FC blocked on shallow without toggle,DepthCapabilityPolicy,supportsFullComputerRuntime false,Blocked,PASS,CONS-006,DepthCapabilityTests
+SHALLOW-UX-06,Visual,Simulation vs Apple source distinguishable,DeveloperSettingsView,Distinct labels,Distinct,PASS,N/A,DeveloperSensorSourceTests
+SHALLOW-UX-07,Production users,Cannot confuse shallow with full entitlement,DepthCapabilityResolver,Clear tier messaging,Clear,PASS,CONS-007,DepthCapabilityEntitlementProbe
+SHALLOW-UX-08,App Store path,FC blocked on shallow signing,DepthCapabilityPolicy,FC runtime false,Blocked,PASS,CONS-006,DepthCapabilityTests
+SHALLOW-UX-09,Physical QA,Shallow wet validation,PENDING_PHYSICAL,Field test required,NOT_EXECUTED,PENDING,CONS-042,PHYSICAL_QA matrix
+SHALLOW-UX-10,TestFlight,Process gate for dev toggle ON,Release docs,Internal only documented,Documented,PASS,N/A,MASTER_RELEASE docs

@@ -1,80 +1,75 @@
-# DIR DIVING — Master App Store & TestFlight Blockers (Current)
+# App Store / TestFlight Blockers — CURRENT
 
-**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md`  
-**Date:** 2026-06-30  
-**Branch:** `main` @ `451f8fb`  
-**Upstream audits:** 01–04, 06 @ `451f8fb`
-
-**Verdict:** **Internal TestFlight — CONDITIONAL (software).** **External TestFlight and App Store — BLOCKED (NOT READY).**
-
-This document lists blockers only. It does **not** grant legal approval or certification.
+**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.5.md`  
+**Baseline:** `main` @ `2c30412`  
+**Audit date:** 2026-07-01
 
 ---
 
-## Blocker summary
+## Internal TestFlight Blockers
 
-| Category | Open blockers | Blocks internal TF | Blocks external TF | Blocks App Store |
-|----------|--------------:|:------------------:|:------------------:|:----------------:|
-| Software P1 (compile/script) | **2** | Yes | Yes | Yes |
-| Software P1 (disclosure/metadata) | **2** | Disclosure | Partial | Yes |
-| Snorkeling field QA (CONS-048) | **12** | Disclosure | Yes | Yes |
-| Legal / marketing sign-off | **2** | No | Yes | Yes |
-| Physical Watch (incl. shallow/wet/CMA) | **38** | Disclosure only | Yes | Yes |
-| Physical iPhone / a11y | **16** | No | Partial | Yes |
-| Paired-device sync | **8** | Partial | Yes | Yes |
-| Water auto-open physical | **3** | No | Yes | Yes |
-| Hardware controls physical | **4** | No | Yes | Yes |
-| External algorithm validation | **4** | No | Yes | Yes |
-| App Store marketing assets | **1** | No | No | Yes |
-| **Total tracked** | **92** | — | — | — |
+| ID | Severity | Blocker | Status | Remediation |
+|---|---|---|---|---|
+| REL-P2-001 | P2 | Watch routing test drift (WFC-P2-005) — 13 failures | OPEN | Align WAO tests with post-Apnea `divingModeSelection` step |
+| REL-P2-002 | P2 | SnorkelingRouteProgressCalculator test failure | OPEN | Fix progress-at-start assertion |
+| REL-P1-001 | P1 | Physical QA disclosure required on TestFlight notes | OPEN | Add truthful pending-physical wording |
+| REL-P2-003 | P2 | Developer shallow FC toggle TestFlight exposure risk (SDG-008) | OPEN | Verify internal-only labeling in TF metadata |
+
+**Internal TestFlight software blockers:** **NONE at P0/P1 software level** — iOS 1655 PASS, builds PASS, CONS-046 PASS.
 
 ---
 
-## P0 — Must not ship with false claims
+## External TestFlight Blockers
 
-**P0 blockers: NONE** — no fake physical/external PASS in MASTER docs; prohibited-claims posture intact @ 451f8fb.
-
----
-
-## P1 — Internal TestFlight blockers (software)
-
-| ID | Blocker | Status @ 451f8fb | Exit criteria |
-|----|---------|------------------|---------------|
-| IOS-P1-001 | iOS Algorithm Tests compile failure | **OPEN** | Snorkeling test compile fixed; full suite green |
-| CONS-046 | Command integrity script drift | **OPEN** | `validate_commands_for_cursor_integrity.sh` PASS vs V2.2/V1.2 paths |
-| MASB-SW-01 | GF iOS→Watch import mismatch | **CLOSED** | CONS-002 @ 451f8fb |
-| MASB-SW-02..05 | Sync/ACK/tombstone/WAO gates | **CLOSED** | CONS-003..005, CONS-019 |
-| SDG-008 | Shallow FC TestFlight exposure labeling | **OPEN** | TF review notes + developer toggle disclosure |
-| MASTER-DEPTH-002 | Depth tier metadata runtime trust | **OPEN** | SecTask runtime verify CI check |
-| CONS-048 | Snorkeling 12 QA templates | **OPEN** | 12/12 signed field artifacts |
+| ID | Severity | Blocker | Status |
+|---|---|---|---|
+| WFC-P1-001 | P1 | External Bühlmann validation not executed | OPEN |
+| CONS-042 | P1 | Shallow/full depth wet QA 0% | OPEN |
+| WAO-PHY-001 | P1 | Water auto-open physical end-to-end | OPEN |
+| HWC-PHY-004 | P1 | Water Lock physical QA | OPEN |
+| CONS-048 | P1 | Snorkeling 12 field QA templates (0/12) | OPEN |
+| WFC-P2-001 | P2 | CMAltimeter physical CoreMotion samples | OPEN |
+| HWC-PHY-001..003 | P2 | Crown / Action Button physical | OPEN |
+| MASB-P-02 | P1 | Physical iPhone QA matrix | OPEN |
+| MASB-P-03 | P1 | Paired-device sync field QA | OPEN |
+| WFC-P2-005 | P2 | Watch test suite not fully green | OPEN |
 
 ---
 
-## P1 — Physical / external (NOT EXECUTED)
+## App Store Blockers
 
-All rows in `MASTER_PHYSICAL_DEVICE_QA_MATRIX`, `MASTER_WATER_AUTO_OPEN_PHYSICAL_QA_GATE`, `MASTER_WATCH_HARDWARE_CONTROLS_QA_GATE`, and external validation templates remain **PENDING**. Do not mark PASS without signed device artifacts.
+All external TestFlight blockers **plus:**
 
----
-
-## External TestFlight blockers
-
-- 0% physical QA (Watch, iPhone, paired, underwater)  
-- 0% external Bühlmann/Schreiner/Subsurface/CCR validation  
-- 12/12 Snorkeling field templates open (CONS-048)  
-- IOS-P1-001 unresolved  
-- Legal/marketing sign-off pending  
-
----
-
-## App Store blockers
-
-All external TF blockers plus:
-
-- ASC metadata and screenshots incomplete  
-- Full-depth entitlement not field-validated  
-- Accessibility manual QA not executed  
-- Incident/rollback drill not executed  
+| ID | Severity | Blocker | Status |
+|---|---|---|---|
+| CONS-044 | P1 | Legal counsel marketing sign-off | OPEN |
+| MASB-P-07 | P2 | App Store screenshots / metadata incomplete | OPEN |
+| MASB-P-10 | P2 | Full-depth entitlement not provisioned | OPEN |
+| MASB-P-11 | P2 | Manual accessibility QA | OPEN |
+| MASB-P-12 | P3 | Incident / rollback drill not executed | OPEN |
+| REL-P1-002 | P1 | EN13319 / ISO 6425 — no certification claim permitted | N/A (policy) |
 
 ---
 
-**Status:** OPEN @ `451f8fb` · 2026-06-30
+## TestFlight Metadata Truthfulness
+
+| Check | Status |
+|---|---|
+| No certified dive computer claim | **PASS** |
+| No physical QA passed claim | **PASS** |
+| Shallow-depth limitation disclosed | **PASS** |
+| Developer shallow testing labeled internal | **PASS** (verify TF notes) |
+| Apnea recovery not medical | **PASS** |
+| Planner reference-only | **PASS** |
+| CCR reference-only | **PASS** |
+
+---
+
+## Summary
+
+```text
+INTERNAL_TESTFLIGHT_BLOCKERS (software P0/P1): NONE
+INTERNAL_TESTFLIGHT_BLOCKERS (P2 polish): WFC-P2-005, Snorkeling progress test
+EXTERNAL_TESTFLIGHT_BLOCKERS: 10+ physical/external items
+APP_STORE_BLOCKERS: External blockers + legal + assets + full-depth entitlement
+```

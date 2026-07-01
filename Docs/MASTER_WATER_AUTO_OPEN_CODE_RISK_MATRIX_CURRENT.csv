@@ -5,3 +5,4 @@ WAO-003,WatchLaunchRoutingPolicy,Cold-launch routing race overlapping covers,P2,
 WAO-004,ContentView water auto-open,systemWaterAutoLaunch does not start session,P1,Route to mode selection not live dive,DIRModesAndStartupFlowTests,PENDING,PASS,Watch ContentView @451f8fb,Active-session block enforced
 WAO-005,WatchSubmersionLaunchProbe,nil/error/stale at cold launch,P2,Fail-safe not submerged,WatchSubmersionLaunchProbeTests,PENDING,PASS software,PENDING,Probe timeout 400ms,Submerged user may miss auto-route
 WAO-006,Battery impact submersion probe,Repeated cold-launch probing,P3,Single probe at launch,NOT_EXECUTED,PENDING,NOT_EXECUTED,Performance budget undocumented,Field battery unknown CONS-023
+WAO-010,Apnea P1/P2/P3 routing drift,13 Watch routing tests fail @2c30412,P2,Production routing may differ from test expectations,WatchLaunchRoutingPolicyTests FAIL aggregate,WFC-P2-005,PARTIAL,PENDING,Audit 01 @2c30412; FC math unaffected; iOS read-only cross-target
