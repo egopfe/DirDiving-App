@@ -14,3 +14,5 @@ ST-012,Global,iOS,Sync pending/failed,yes,yes,yes,yes,partial,yes,yes,n/a,n/a,ye
 ST-013,Diving,Watch,Briefing cards,yes,yes,n/a,yes,partial,yes,n/a,n/a,n/a,n/a,yes,n/a,yes,n/a,yes,n/a,partial,yes,,Reference-only stale states
 ST-014,Global,iOS,Settings mode switch,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,yes,yes,,No runtime mutation
 ST-015,Diving,Watch,Developer shallow toggles,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,partial,yes,MUIUX-P1-005,Footer warns not production depth
+ST-016,Apnea,iOS,Profile editor alarms/markers,yes,n/a,n/a,partial,no,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,partial,partial,MUIUX-P2-007,Alarms state not editable
+ST-017,Apnea,Watch,Live session P1/P2/P3,yes,yes,n/a,yes,partial,yes,n/a,n/a,n/a,n/a,yes,n/a,yes,n/a,yes,n/a,partial,yes,,@76f3703 training overlays

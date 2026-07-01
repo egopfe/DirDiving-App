@@ -1,52 +1,75 @@
 # DIR DIVING — Master Main Code / Sync / Security / Performance Audit (Current)
 
-**Command:** 04 — `04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.2`  
-**Date:** 2026-06-30  
+**Command:** 04 — `04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.5` (LAUNCH ORDER 04)  
+**Date:** 2026-07-01  
 **Branch:** `main`  
-**Commit:** `451f8fb` (`451f8fb644a85d8d205d53ef769e29ff9ed4f958`)  
-**Pass type:** Full read-only audit rerun @ orchestrator V1.3 baseline  
+**Commit:** `2c30412` (`2c30412e777e6ef40a688b9ac11215f32310764f`)  
+**Pass type:** Full read-only audit @ V1.5 with Apnea first-class scope  
 **Task type:** Audit-only — read-only; no production changes  
 **Xcode:** 26.6 (Build 17F113)
 
 **Merged source commands:** 5 (deep code), 8 (sync/persistence/schema), 9 (security/privacy/trust), 10 (performance/concurrency/battery), iOS performance optimization.
 
-**4A scope included:** Full Computer GF presets, shallow-depth entitlement resolution, water auto-open wiring, developer settings, sync/HMAC, concurrency, **Snorkeling P1/P2/P3 route/session sync**.
+**Upstream audits:** 01 Watch FC @ `2c30412` (0 P0 FC; WFC-P2-005 routing); 02 iOS @ `2c30412` (1655 tests PASS); 03 UI/UX @ `2c30412` (CONS-046 V1.5 PASS).
 
-**Not claimed:** Physical Watch/iPhone QA, paired-device field sync, underwater validation, Instruments profiling on hardware, penetration testing, App Store approval, external Bühlmann/CCR certification.
+**Not claimed:** Physical Watch/iPhone QA, paired-device field sync, underwater validation, Instruments profiling on hardware, penetration testing, App Store approval, external Bühlmann certification.
 
 ---
 
 ## A. Executive Summary
 
-This master audit re-evaluates the entire MAIN codebase (Watch + iOS) for Diving (Gauge + Full Computer), Apnea, and Snorkeling at commit **`451f8fb`**.
+This master audit re-evaluates the entire MAIN codebase (Watch + iOS) for Diving (Gauge + Full Computer), **Apnea**, and Snorkeling at commit **`2c30412`**, after Apnea P1/P2/P3 (`76f3703`) and CONS-046 V1.5 command-integrity fix (`6a0005b`).
 
-**Software architecture and activity isolation remain strong.** Activity-scoped logbooks, settings, sync payload keys, signed HMAC v3 envelopes, activity tombstones, cloud backup truthfulness, and Snorkeling route/session codecs are implemented with cross-decode rejection tests (where the iOS test target compiles).
+**Software architecture and activity isolation remain strong.** Activity-scoped logbooks, settings, sync payload keys, signed HMAC v3 envelopes, activity tombstones, cloud backup truthfulness, and Apnea/Snorkeling schema isolation are implemented with cross-decode rejection tests.
 
-**Cross-cutting remediations CONS-003–007, CONS-019, CONS-027 verified in code.** No P0 software safety bypass identified.
+**Cross-cutting remediations CONS-001, CONS-003–007, CONS-027, CONS-046, CONS-049 verified.** **No P0** software safety bypass identified. **Audit 01 FC math: 0 P0.**
 
-**Two software gates block full PASS:**
+**Software gates improved since @451f8fb:**
 
-1. **MAIN-P1-001:** `validate_commands_for_cursor_integrity.sh` references superseded command filenames (V2.1/V1.1) — exits **FAIL** @ 451f8fb (CONS-046).
-2. **MAIN-P2-001:** iOS Algorithm Tests target **compile failure** in `SnorkelingRouteProfileTests` blocks automated regression lane including Snorkeling sync tests.
+1. **CONS-046 / MAIN-P1-001:** `validate_commands_for_cursor_integrity.sh` **PASS** @ V1.5.
+2. **CONS-049 / MAIN-P2-001:** iOS Algorithm Tests **1655/1655 PASS** @ `2c30412`.
+3. **NEW MAIN-P2-003 (WFC-P2-005):** Watch Algorithm Tests **1139/1152** — 13 routing test failures after Apnea wave; **zero FC algorithm failures**.
 
 | Dimension | Score (0–100) | Notes |
 |-----------|---------------|-------|
-| Multi-activity architecture | **97** | Key routing + envelope guard PASS |
-| Sync / schema | **95** | SnorkelingRouteSyncCodec v1 PASS static; iOS test compile blocked |
+| Multi-activity architecture | **98** | Key routing + envelope guard PASS |
+| Sync / schema | **96** | Apnea isolation matrices complete |
 | Security (software) | **96** | HMAC static PASS; field QA pending |
 | Privacy | **98** | Manifests + export policies + cloud truthfulness |
 | Performance (software) | **89** | Watch timing PASS; device profiling pending |
-| iOS performance (software) | **85** | Background planner PASS; test gate blocked |
-| Test coverage (automated) | **88** | Watch subset PASS; iOS lane blocked by compile |
-| **Overall MAIN software readiness** | **91** | Physical QA not counted as passed |
+| iOS performance (software) | **88** | Full test lane green |
+| Test coverage (automated) | **94** | iOS 1655 PASS; Watch 13 routing failures |
+| **Overall MAIN software readiness** | **94** | Physical QA not counted as passed |
 
-**Build evidence (this pass):** iOS MAIN **BUILD SUCCEEDED**, Watch MAIN **BUILD SUCCEEDED**. Preflight isolation/secrets/l10n **PASS**. Watch remediation subset **8 tests PASS**. iOS remediation subset **BLOCKED** (compile). Command integrity script **FAIL**.
+**Build evidence (this pass):** iOS MAIN **BUILD SUCCEEDED**, Watch MAIN **BUILD SUCCEEDED**. Preflight isolation/secrets/l10n **PASS**. Command integrity **PASS**. iOS Algorithm Tests **1655 PASS** (68.3 s). Watch Algorithm Tests **1139/1152 PASS** (658 s).
 
 ---
 
-## B–D. Source Commands / Context / Scope
+## B. Source Commands Merged
 
-See merged commands list in command file. Product architecture:
+```text
+5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V3.0.md
+8-DIR_DIVING_SYNC_PERSISTENCE_SCHEMA_AUDIT_V3.0.md
+9-DIR_DIVING_SECURITY_PRIVACY_TRUST_AUDIT_V3.0.md
+10-DIR_DIVING_PERFORMANCE_CONCURRENCY_BATTERY_AUDIT_V3.0.md
+IOS_PERFORMANCE_OPTIMIZATION_AUDIT_COMMAND_V1.0.md
+```
+
+---
+
+## C. Latest Development Context
+
+| Item | Baseline |
+|------|----------|
+| Apnea P1/P2/P3 | `76f3703` — training compound; isolation tests PASS |
+| CONS-046 V1.5 | `6a0005b` — command integrity script aligned |
+| Software remediation | `7a429a7` — iOS test lane restored |
+| Docs baseline | `2c30412` |
+| Watch FC forensic | 0 P0; WFC-P1-001 external pending; WFC-P2-005 routing |
+
+---
+
+## D. Branch, Commit and Scope
 
 ```text
 DIR Diving
@@ -57,8 +80,8 @@ DIR Diving
 
 | Item | Value |
 |------|-------|
-| Branch | `main` (aligned with `origin/main`) |
-| Commit | `451f8fb` |
+| Branch | `main` (0/0 with `origin/main`) |
+| Commit | `2c30412` |
 | Watch target | DIRDiving Watch App |
 | iOS target | DIRDiving iOS |
 | Test targets | Watch Algorithm Tests, iOS Algorithm Tests |
@@ -72,116 +95,128 @@ DIR Diving
 | Check | Result |
 |-------|--------|
 | Branch is `main` | PASS |
-| Commit `451f8fb` | PASS |
+| Commit `2c30412` | PASS |
+| `xcodegen generate` | PASS |
 | `check_main_target_isolation.sh` | PASS |
 | `check_secrets.sh` | PASS |
 | `audit_localization.sh` | PASS |
-| `validate_commands_for_cursor_integrity.sh` | **FAIL** (stale paths) |
+| `validate_commands_for_cursor_integrity.sh` | **PASS** (V1.5) |
 | iOS MAIN build | BUILD SUCCEEDED |
 | Watch MAIN build | BUILD SUCCEEDED |
-| Watch algorithm remediation subset | 8 tests PASS |
-| iOS algorithm remediation subset | BLOCKED — compile fail |
+| iOS Algorithm Tests (iPhone 17 Pro) | **1655/1655 PASS** (68.3 s) |
+| Watch Algorithm Tests (Series 11 46mm) | **1139/1152 PASS** (658 s) — 13 routing failures |
+
+**Watch failing tests (non-FC):** `WatchWaterAutoOpenPolicyTests` (9), `WatchLaunchRoutingPolicyTests` (3), `SnorkelingRouteProgressCalculatorTests` (1).
 
 ---
 
-## F–G. Architecture and Activity Isolation
+## F. Target Membership and Architecture
 
-**Verdict: PASS (software).** Diving, Apnea, and Snorkeling stores, settings namespaces, and WC payload keys are separated. `ActivitySyncCrossDecodeRejectionTests` matrix covers six cross-route rejection paths. `IntegratedModesSequentialFlowTests` validates sequential activity flow without shared mutable bleed.
-
-Snorkeling additions @ 451f8fb:
-
-- Session sync: `SnorkelingSessionSyncCodec` v3 + `dirdiving_snorkeling_session_sync`
-- Route sync: `SnorkelingRouteSyncCodec` v1 + `snorkelingRoutePackage` userInfo transfer
-- Logbook/checkpoint files activity-scoped per `MASTER_BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv`
+**Verdict: PASS.** `project.yml` glob policies isolate experimental targets. Shared code in `Shared/` compiles to both platforms with activity guards. `FullComputerTargetMembershipTests` confirms FC engine on Watch.
 
 ---
 
-## H–K. Watch / iOS / Planner / Full Computer
+## G. Activity Isolation and Cross-Activity Risk
 
-**Watch:** DiveManager 1Hz FC tick with degraded-on-miss policy; ActionButtonIntents legal gate; simulation blocked on App Store via `TestFlightSimulationSafetyPolicy`. **Water auto-open** routes through predive/confirm — never live FC runtime. **DepthCapabilityPolicy** applied in `resolveAutomaticStep` for water routing (CONS-019 FIXED).
+**Verdict: PASS (software).** Diving, Apnea, and Snorkeling stores, settings namespaces, and WC payload keys are separated. `ActivitySyncCrossDecodeRejectionTests` covers six cross-route rejection paths. `IntegratedModesSequentialFlowTests` validates sequential activity flow.
 
-**iOS:** Planner background calculation via `PlannerBackgroundCalculation` + generation tokens. Logbook caps and lazy loading present. Cloud backup Diving-only opt-in via `CloudBackupCapability`.
+**Apnea isolation:** See `MASTER_MAIN_APNEA_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md`.
 
-**Full Computer GF:** Watch preset-only; frozen at predive confirm; iOS plan GF override with fail-closed invalid pairs — see GF matrix.
+---
+
+## H. Apple Watch Deep Code Analysis
+
+**Verdict: PASS (software).** DiveManager 1 Hz FC tick with degraded-on-miss; ActionButtonIntents legal gate; simulation blocked on App Store. Water auto-open routes through predive/confirm — never live FC runtime. DepthCapabilityPolicy in `resolveAutomaticStep`. Apnea runtime isolated from FC tissues.
+
+---
+
+## I. iOS Companion Deep Code Analysis
+
+**Verdict: PASS.** Planner background calculation via `PlannerBackgroundCalculation` + generation tokens. Logbook caps and lazy loading. Cloud backup Diving-only opt-in. Apnea iOS cloud stub truthful.
+
+---
+
+## J. Planner-Specific Deep Code Analysis
+
+**Verdict: PASS (software).** Bühlmann planner off main thread; CCR reference-only guards; GF preset parity with Watch (CONS-002 PASS). External validation pending.
+
+---
+
+## K. Full Computer Runtime Integration Risk
+
+**Verdict: PASS (software) per audit 01 cross-read.** GF frozen at predive; briefing cards reference-only; checkpoint local-only. See `MASTER_MAIN_ALGORITHMIC_SAFETY_PROTECTION_GATE_CURRENT.md`.
 
 ---
 
 ## L. Sync / Persistence / Schema
 
-**Verdict: PASS (software) / PARTIAL (automated evidence).**
-
-- v3 signed transport with `activityType` discriminator for Diving/Apnea/Snorkeling sessions
-- `SnorkelingRouteSyncCodec`: schema v1, SHA-256 checksum, TTL, route plan validation, capabilities bounds
-- Large payload file transfer helper for >512KB packages
-- Tombstones: signed per-activity keys; diving legacy UUID mirror bootstrap-only (P3)
-
-See `MASTER_SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv` and `MASTER_SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv`.
+**Verdict: PASS (software).** v3 signed transport with `activityType` discriminator. Apnea/Snorkeling codecs isolated. See matrices.
 
 ---
 
 ## M. Backup / Restore Isolation
 
-**Verdict: PASS.** Per-activity filenames, tombstone keys, and cloud opt-in controls documented in `MASTER_BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv`. Apnea/Snorkeling iOS cloud upload blocked with truthful UI stubs.
+**Verdict: PASS.** Per-activity filenames, tombstone keys, cloud opt-in controls in `MASTER_BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv`.
 
 ---
 
 ## N. Cloud / iCloud / KVS
 
-Diving opt-in only. Apnea Watch iCloud optional; iOS Apnea stub honest. Snorkeling local-only cloud policy. Two-device merge field QA **PENDING** (CONS-029).
+Diving opt-in only. Apnea Watch iCloud optional; iOS Apnea stub honest. Snorkeling local-only. Two-device merge field QA **PENDING** (CONS-029).
 
 ---
 
 ## O–P. Security / Privacy / Threat Model
 
-**Verdict: PASS (software).** HMAC-SHA256 authenticated sync, peer secret pinning, signed ACKs, path-sanitized briefing cards and photos, Privacy Manifests on both targets. Threat model in `MASTER_SECURITY_THREAT_MODEL_CURRENT.md`. No penetration test executed.
+**Verdict: PASS (software).** HMAC-SHA256, peer secret pinning, signed ACKs, path-sanitized briefing cards and photos, Privacy Manifests. Threat model in `MASTER_SECURITY_THREAT_MODEL_CURRENT.md`.
 
 ---
 
 ## Q–R. Import/Export / Image / Briefing Card Routing
 
-File import bounds (CSV 10MB/200k rows). Subsurface export single-pass. Companion photos validated (10MB/16MP). Briefing cards reference-only on Watch — no live runtime mutation.
+File import bounds (CSV 10MB/200k rows). Subsurface export single-pass. Companion photos validated (10MB/16MP). Briefing cards reference-only on Watch.
 
 ---
 
 ## S. App Intents / Action Button / Developer Sensor
 
-App Intents require legal acceptance for safety paths. Developer shallow Gauge/FC toggles default OFF; DEBUG/TestFlight visibility only. Simulation sensor not default in release builds.
+App Intents require legal acceptance. Developer shallow toggles default OFF; DEBUG/TestFlight visibility. Simulation sensor not default in release.
 
 ---
 
 ## T–W. Performance / iOS / Watch / Snorkeling Map
 
-Documented budgets in performance matrices. Watch FC solver budget 50ms; 1Hz tick DOCUMENTED_ACCEPTED_RISK. Snorkeling map downsampling to 4096 presentation points. Device Instruments profiling **PENDING** for logbook scroll, map FPS, long FC battery.
+Documented budgets in performance matrices. Watch FC solver budget 50ms; 1 Hz tick DOCUMENTED_ACCEPTED_RISK. Snorkeling map downsampling to 4096 points. Device profiling **PENDING**.
 
 ---
 
 ## X–Y. Logbook Scalability / Memory
 
-iOS dive logbook cap 40 sessions with lazy list. Tissue analytics LRU cache (32). PlannerStore deinit cancels tasks (CONS-027 FIXED).
+iOS dive logbook cap 40 sessions. Tissue analytics LRU cache (32). PlannerStore deinit cancels tasks (CONS-027 FIXED).
 
 ---
 
 ## Z. Concurrency / Stale Result Guards
 
-Generation tokens on planner and sync paths. iOS sync in-flight session release on errors (CONS-003 FIXED). Remaining P3: GPS confirmation Task lifecycle (MAIN-P3-001).
+Generation tokens on planner and sync paths. iOS sync in-flight release on errors (CONS-003 FIXED). P3: GPS confirmation Task (MAIN-P3-001).
 
 ---
 
 ## AA. Observability / Signposts
 
-`Shared/Performance/DIRPerformanceSignpost.swift` provides categorized signposts. Catalog in `MASTER_PERFORMANCE_SIGNPOST_CATALOG_CURRENT.md`. No CI wall-clock enforcement.
+`Shared/Performance/DIRPerformanceSignpost.swift` — 24 categories including Apnea. Catalog in `MASTER_PERFORMANCE_SIGNPOST_CATALOG_CURRENT.md`.
 
 ---
 
 ## AB. Test Coverage and Evidence
 
-See `MASTER_MAIN_REQUIREMENT_TEST_TRACEABILITY_CURRENT.csv`. **Blocker:** iOS test target compile failure prevents running Snorkeling route/sync regression suite until MAIN-P2-001 fixed.
+See `MASTER_MAIN_REQUIREMENT_TEST_TRACEABILITY_CURRENT.csv`. iOS full lane green. Watch routing tests blocked by WFC-P2-005.
 
 ---
 
 ## AC. Physical / Instruments / External QA Pending
 
-All physical Watch, iPhone, paired-device, underwater, Instruments, and external Bühlmann validation gates remain **PENDING** unless signed artifacts exist. Snorkeling 12-folder physical QA gate **PENDING** (CONS-048).
+Physical Watch, iPhone, paired-device, underwater, Instruments, external Bühlmann, Snorkeling 12-folder QA, Apnea wet QA — **PENDING** unless signed artifacts exist.
 
 ---
 
@@ -189,13 +224,14 @@ All physical Watch, iPhone, paired-device, underwater, Instruments, and external
 
 | ID | Sev | Status | Summary |
 |----|-----|--------|---------|
-| MAIN-P1-001 | P1 | OPEN | Command integrity script stale filenames |
-| MAIN-P2-001 | P2 | OPEN | iOS SnorkelingRouteProfileTests compile blocks test gate |
-| MAIN-P2-002 | P2 | PENDING_PHYSICAL | Snorkeling 12 QA templates not executed |
-| MAIN-PERF-001..004 | P2 | OPEN/PENDING | Device performance profiling gaps |
+| MAIN-P1-001 | P1 | VERIFIED | Command integrity — CONS-046 V1.5 PASS |
+| MAIN-P2-001 | P2 | VERIFIED | iOS test compile — CONS-049; 1655 PASS |
+| MAIN-P2-003 | P2 | OPEN | WFC-P2-005 — 13 Watch routing test failures |
+| MAIN-P2-002 | P2 | PENDING_PHYSICAL | Snorkeling 12 QA templates |
+| MAIN-PERF-001..004 | P2 | OPEN/PENDING | Device performance profiling |
 | MAIN-SEC-001 | P2 | PENDING_PHYSICAL | Paired sync security field QA |
-| MAIN-WAO-002 | P2 | OPEN | Submersion probe 400ms timeout — physical QA |
-| MAIN-PERF-006..007 | P1/P2 | VERIFIED | Sync in-flight + planner deinit remediated |
+| MAIN-WAO-002 | P2 | OPEN | Submersion probe 400ms — physical QA |
+| MAIN-PERF-006..007 | P1/P2 | VERIFIED | Sync in-flight + planner deinit |
 | MAIN-SYNC-002..003 | P1 | VERIFIED | Symmetric ACK + signed tombstones |
 | MAIN-DEPTH-001..002 | P1 | VERIFIED | Shallow dev toggles + compile authority |
 | MAIN-WAO-001 | P2 | VERIFIED | WAO DepthCapabilityPolicy gate |
@@ -204,21 +240,11 @@ Full traceability: `MASTER_MAIN_CODE_FINDING_TRACEABILITY_CURRENT.csv`.
 
 ---
 
-## AE. Readiness Matrix
+## AE–AG. Remediation Plans
 
-See final verdict block below.
+See `MASTER_MAIN_CODE_REMEDIATION_PLAN_CURRENT.md`, `MASTER_SECURITY_REMEDIATION_PLAN_CURRENT.md`.
 
----
-
-## AF–AG. Remediation Plans
-
-Prioritized plans in `MASTER_MAIN_CODE_REMEDIATION_PLAN_CURRENT.md` and `MASTER_SECURITY_REMEDIATION_PLAN_CURRENT.md`.
-
-**Immediate software batches:**
-
-1. Update `validate_commands_for_cursor_integrity.sh` to V2.2/V1.2/V2.3 paths (MAIN-P1-001)
-2. Repair `SnorkelingRouteProfileTests` / `SnorkelingDistanceCalculatorTests` fixtures (MAIN-P2-001)
-3. Execute physical QA matrices without fabricating evidence
+**Next software batch:** Align `WatchWaterAutoOpenPolicyTests` with post-Apnea `divingModeSelection` routing (MAIN-P2-003 / WFC-P2-005).
 
 ---
 
@@ -243,49 +269,49 @@ SIMULATION_RELEASE_SAFETY: PASS
 APP_INTENTS_SAFETY_GATE: PASS
 WATCH_IMAGE_CARD_PAYLOAD_ROUTING: PASS
 PLANNER_BRIEFING_CARDS_REFERENCE_ONLY_CODE: PASS
-IOS_STARTUP_PERFORMANCE_READINESS: 72
-IOS_SWIFTUI_RENDERING_READINESS: 78
-IOS_PLANNER_PERFORMANCE_READINESS: 88
-IOS_CHART_RENDERING_READINESS: 82
-IOS_LOGBOOK_SCALABILITY_READINESS: 80
-IOS_EXPORT_IMPORT_PERFORMANCE_READINESS: 85
-IOS_SYNC_PERFORMANCE_READINESS: 90
-IOS_MAP_ROUTE_RENDERING_READINESS: 75
-IOS_MEMORY_READINESS: 86
-IOS_CONCURRENCY_READINESS: 88
-IOS_BATTERY_POLICY_READINESS: 70
-WATCH_RUNTIME_PERFORMANCE_READINESS: 85
+IOS_STARTUP_PERFORMANCE_READINESS: 74
+IOS_SWIFTUI_RENDERING_READINESS: 80
+IOS_PLANNER_PERFORMANCE_READINESS: 90
+IOS_CHART_RENDERING_READINESS: 84
+IOS_LOGBOOK_SCALABILITY_READINESS: 82
+IOS_EXPORT_IMPORT_PERFORMANCE_READINESS: 86
+IOS_SYNC_PERFORMANCE_READINESS: 92
+IOS_MAP_ROUTE_RENDERING_READINESS: 76
+IOS_MEMORY_READINESS: 88
+IOS_CONCURRENCY_READINESS: 90
+IOS_BATTERY_POLICY_READINESS: 72
+WATCH_RUNTIME_PERFORMANCE_READINESS: 86
 WATCH_FULL_COMPUTER_TIMING_READINESS: 92
 GLOBAL_SECURITY_READINESS: 96
 GLOBAL_PRIVACY_READINESS: 98
-GLOBAL_SYNC_SCHEMA_READINESS: 95
-GLOBAL_PERFORMANCE_CONCURRENCY_BATTERY_READINESS: 87
-TEST_COVERAGE_READINESS: 88
-OVERALL_MAIN_CODE_READINESS: 91
+GLOBAL_SYNC_SCHEMA_READINESS: 96
+GLOBAL_PERFORMANCE_CONCURRENCY_BATTERY_READINESS: 88
+TEST_COVERAGE_READINESS: 94
+OVERALL_MAIN_CODE_READINESS: 94
 P0_FINDINGS: 0
-P1_FINDINGS: 1
-P2_FINDINGS: 9
+P1_FINDINGS: 0
+P2_FINDINGS: 8
 P3_FINDINGS: 7
 PHYSICAL_WATCH_QA: PENDING_PHYSICAL
 PHYSICAL_IOS_QA: PENDING_PHYSICAL
 PAIRED_DEVICE_QA: PENDING_PHYSICAL
 PHYSICAL_INSTRUMENTS_PROFILING: PENDING_INSTRUMENTS
 EXTERNAL_VALIDATION: PENDING_EXTERNAL_VALIDATION
-RELEASE_BLOCKERS: MAIN-P1-001, MAIN-P2-001
-MAIN_COMMAND_INTEGRITY: FAIL
+RELEASE_BLOCKERS: MAIN-P2-003, MAIN-P2-002, MAIN-SEC-001, CONS-042, WFC-P1-001
+MAIN_COMMAND_INTEGRITY: PASS
 MAIN_SYNC_SECURITY_REMEDIATION: PASS
 MAIN_DEPTH_CAPABILITY_REMEDIATION: PASS
-MAIN_SOFTWARE_READINESS_AFTER_REMEDIATION: 92
+MAIN_SOFTWARE_READINESS_AFTER_REMEDIATION: 96
 ```
 
 ---
 
 ## Required Final Questions (summary)
 
-1. **Architecture clean/isolated?** YES (software) — PASS  
+1. **Architecture clean/isolated?** YES — PASS  
 2. **Diving/Apnea/Snorkeling separated?** YES — PASS  
 3. **Sync payloads activity-discriminated?** YES — PASS  
-4. **Schemas versioned/migration-safe?** YES — PASS (SnorkelingRouteSyncCodec v1 fail-closed)  
+4. **Schemas versioned/migration-safe?** YES — PASS  
 5. **Backup/restore isolated?** YES — PASS  
 6. **WC authentication intact?** YES — PASS  
 7. **HMAC/nonce/ACK safe?** YES (software) — PASS; field QA pending  
@@ -294,18 +320,18 @@ MAIN_SOFTWARE_READINESS_AFTER_REMEDIATION: 92
 10. **Privacy flows truthful?** YES — PASS  
 11. **Simulation/dev release-safe?** YES — PASS  
 12. **App Intents respect gates?** YES — PASS  
-13. **iOS Planner performance-safe?** PARTIAL — background calc PASS; Instruments pending  
-14. **Heavy compute off main?** PARTIAL — planner PASS; map build monitor  
+13. **iOS Planner performance-safe?** PARTIAL — background PASS; Instruments pending  
+14. **Heavy compute off main?** YES — planner PASS  
 15. **Stale async rejected?** YES — generation guards PASS  
-16. **Charts/maps/logbooks bounded?** YES — caps/downsampling PASS  
-17. **Sync queue backpressured?** YES — flush policy PASS  
-18. **Caches bounded?** YES — LRU/caps PASS  
-19. **Tasks cancellable?** YES — planner deinit PASS  
-20. **Retain-cycle risks?** PARTIAL — MAIN-P3-001 GPS Task  
-21. **Performance budgets documented?** YES — matrices present  
-22. **Instruments complete?** NO — PENDING_INSTRUMENTS  
-23. **Blocks 100% main-code readiness?** MAIN-P1-001, MAIN-P2-001, physical QA pending  
-24. **Blocks 100% security readiness?** Paired-device field QA (MAIN-SEC-001)  
-25. **Blocks 100% performance readiness?** Device profiling gaps (MAIN-PERF-001..004)  
-26. **Blocks internal TestFlight?** MAIN-P1-001 script gate; MAIN-P2-001 test compile  
-27. **Blocks external TestFlight?** All physical/external QA templates NOT_EXECUTED
+16. **Charts/maps/logbooks bounded?** YES — PASS  
+17. **Sync queue backpressured?** YES — PASS  
+18. **Caches bounded?** YES — PASS  
+19. **Tasks cancellable?** YES — PASS  
+20. **Retain-cycle risks?** PARTIAL — MAIN-P3-001  
+21. **Performance budgets documented?** YES — PASS  
+22. **Instruments complete?** NO — PENDING  
+23. **Blocks 100% main-code readiness?** WFC-P2-005 routing tests; physical QA pending  
+24. **Blocks 100% security readiness?** Paired-device field QA  
+25. **Blocks 100% performance readiness?** Device profiling gaps  
+26. **Blocks internal TestFlight?** Watch routing test green + physical QA packs  
+27. **Blocks external TestFlight?** All physical/external QA NOT_EXECUTED

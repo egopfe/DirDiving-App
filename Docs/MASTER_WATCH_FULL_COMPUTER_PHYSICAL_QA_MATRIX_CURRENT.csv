@@ -24,5 +24,6 @@ PHYS-022,Multilevel wet,Controlled multilevel replay if possible,Deco tracks exp
 PHYS-023,Battery thermal,Battery/thermal under 1Hz FC,No missed tick storm,PENDING_PHYSICAL,Instruments,PENDING_PHYSICAL,
 PHYS-024,Water Lock,Water Lock interaction with FC,No tissue corruption,PENDING_PHYSICAL,Wet test,PENDING_PHYSICAL,CONS-042
 PHYS-025,Action Button,Action Button underwater router-only,No unsafe FC start,PENDING_PHYSICAL,Wet test,PENDING_PHYSICAL,WatchUnderwaterActionRouterTests software PASS
-PHYS-026,Digital Crown,Crown clamp underwater,no GF/env mutation,PENDING_PHYSICAL,Wet test,PENDING_PHYSICAL,WatchUnderwaterNavigationClampPolicyTests software PASS
-PHYS-027,Shallow entitlement,Shallow-signed FC blocked without dev toggle,~6m scope enforced,PENDING_PHYSICAL,Shallow wet matrix,PENDING_PHYSICAL,CONS-006/042 software PASS
+PHYS-026,Apnea P1/P2/P3,Apnea wet auto-detection field validation,Detection behaves as designed,PENDING_PHYSICAL,Field log,PENDING_PHYSICAL,Apnea @76f3703 software PASS only
+PHYS-027,Digital Crown,Crown clamp underwater,no GF/env mutation,PENDING_PHYSICAL,Wet test,PENDING_PHYSICAL,WatchUnderwaterNavigationClampPolicyTests software PASS
+PHYS-028,Shallow entitlement,Shallow-signed FC blocked without dev toggle,~6m scope enforced,PENDING_PHYSICAL,Shallow wet matrix,PENDING_PHYSICAL,CONS-006/042 software PASS

@@ -1,0 +1,18 @@
+Setting_ID,Label,Activity,Shared,Backing_Store,Visible_In_Diving,Visible_In_Apnea,Visible_In_Snorkeling,Visible_In_iOS,Visible_In_Watch,Can_Edit_During_Active_Session,Syncs_To_Watch,Runtime_Effect,Evidence,Pass,Notes
+dirdiving_ios_apnea_settings_v1,Apnea companion settings bundle,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Detection/recovery/targets,IOSApneaSettingsContent,PASS,Absent from Diving/Snorkeling scopes
+apnea.recovery.minimum_seconds,Minimum recovery time,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Recovery policy,IOSApneaCompanionTests,PASS,Not in Diving/Snorkeling
+apnea.recovery.default_seconds,Default recovery duration,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Session planning,IOSApneaCompanionTests,PASS,No medical guarantee copy
+apnea.detection.auto_enabled,Automatic session detection default,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Watch detection default,IOSActivitySettingsRoutingTests,PASS,Physical QA pending
+apnea.targets.depth_enabled,Depth target alarms,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Watch alarm defaults,IOSApneaSettingsForm,PASS,
+apnea.targets.time_enabled,Time target alarms,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Watch alarm defaults,IOSApneaSettingsForm,PASS,
+apnea.alarms.speed_ascent,Ascent speed alarm,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Watch runtime,manual,PASS,No MOD/PPO2 keys
+apnea.alarms.speed_descent,Descent speed alarm,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Watch runtime,manual,PASS,
+apnea.markers.enabled,Session markers,Apnea,no,IOSApneaSettingsStore,no,yes,no,yes,yes,yes,on_demand,Watch markers,manual,PASS,
+apnea.profiles.store,Apnea profiles CRUD,Apnea,no,IOSApneaProfileStore,no,yes,no,yes,yes,partial,yes,on_demand,Planner defaults,IOSApneaCompanionTests,PASS,Presets non-deletable
+apnea.equipment.store,Apnea equipment,Apnea,no,IOSApneaEquipmentStore,no,yes,no,yes,yes,yes,on_demand,Checklist/equipment,IOSApneaMapEquipmentExportTests,PASS,Separate from diving equipment
+apnea.buddy.safety,Buddy safety settings,Apnea,no,IOSApneaBuddySafetyStore,no,yes,no,yes,yes,yes,on_demand,Buddy checklist,ApneaChecklistTests,PASS,
+dirdiving.ios.apnea.fakeLogbook.enabled,Apnea demo logbook toggle,Apnea,no,IOSActivityDemoLogbookSettingsStore,no,yes,no,yes,no,no,yes,no,Demo sessions only,ApneaDemoLogbookPresentationTests,PASS,Default OFF; NOT DeveloperSettings
+apnea.cloud.capability,Apnea iCloud backup disclosure,Apnea,no,ApneaCloudCapability stub,no,yes,no,yes,no,no,yes,no,Honest stub UX,ApneaCloudBackupStubTruthfulnessTests,PASS,IOS-P3-002
+NEGATIVE.planner.gf,GF presets must NOT appear,Apnea,no,n/a,no,yes(no GF),no,yes,yes,n/a,n/a,n/a,Negative check,IOSActivitySettingsRoutingTests,PASS,Mandatory V1.5 negative
+NEGATIVE.gas.mod,Gas/MOD/PPO2 must NOT appear,Apnea,no,n/a,no,yes(no gas),no,yes,yes,n/a,n/a,n/a,Negative check,IOSActivitySettingsRoutingTests,PASS,Mandatory V1.5 negative
+NEGATIVE.snorkeling.gps,GPS route settings must NOT appear,Apnea,no,n/a,no,yes(no GPS),no,yes,yes,n/a,n/a,n/a,Negative check,IOSActivitySettingsRoutingTests,PASS,Mandatory V1.5 negative

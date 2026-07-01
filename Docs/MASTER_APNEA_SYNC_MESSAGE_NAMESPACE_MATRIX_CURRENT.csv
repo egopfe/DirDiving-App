@@ -1,0 +1,13 @@
+namespace_id,direction,mechanism,payload_key_or_transfer_type,ack_type,store_target,hmac,replay_cache,activity_envelope,test_reference,status,severity,notes
+NS-APNEA-SESSION-W2I,Watch→iOS,WC message/userInfo,dirdiving_apnea_session,dirdiving_apnea_session_import_ack,IOSApneaLogbookStore,yes,ApneaSessionSyncCodec replay cache,yes activity=apnea,ApneaSessionSyncTransportNegativeTests,PASS,,Primary Apnea session transport v3
+NS-APNEA-SESSION-I2W,iOS→Watch,WC message/userInfo,dirdiving_apnea_session,dirdiving_apnea_session_import_ack,ApneaLogbookStore,yes,same,yes,ApneaSyncWatchReceiverTests,PASS,,Bidirectional session sync
+NS-APNEA-PLAN,iOS→Watch,transferUserInfo,apneaSyncPlanPackage,apneaSyncPlanPackageAck,ApneaImportedPlanStore,yes,N/A,N/A,ApneaSyncCodecTests,PASS,,Isolated from fullComputerPlanPackage
+NS-APNEA-SNAPSHOT,iOS→Watch,applicationContext,dirdiving_apnea_plan_snapshot,N/A,ApneaImportedPlanStore,yes,N/A,N/A,ApneaSyncTransferSupport,PASS,,Revision + checksum keys
+NS-APNEA-TOMBSTONE,Both,applicationContext,dirdiving_deleted_apnea_session_tombstones,N/A,ApneaLogbookStore,yes signed,N/A,yes activity=apnea,ActivitySyncTombstoneTests,PASS,,Signed primary path
+NS-APNEA-KVS,Watch,iCloud KVS,dirdiving_watch_deleted_apnea_session_ids,N/A,ApneaLogbookStore,N/A,N/A,N/A,ActivitySyncTombstoneWatchTests,PASS,,Watch KVS tombstones
+NS-APNEA-REJECT-DIVE,Watch→iOS,WC userInfo,dirdiving_dive_session,N/A,Must NOT ingest Apnea,yes,N/A,yes diving,ActivitySyncCrossDecodeRejectionTests,PASS,,Mandatory cross-decode rejection
+NS-APNEA-REJECT-SNORKEL,Watch→iOS,WC userInfo,dirdiving_snorkeling_session_sync,N/A,Must NOT ingest Apnea,yes,N/A,yes snorkeling,ActivitySyncCrossDecodeRejectionTests,PASS,,Mandatory cross-decode rejection
+NS-APNEA-REJECT-FC-PLAN,iOS→Watch,transferUserInfo,fullComputerPlanPackage,N/A,Must NOT route to Apnea,yes,N/A,N/A,FullComputerNamespaceIsolationTests,PASS,,FC namespace isolated
+NS-APNEA-REJECT-BRIEF,iOS→Watch,file transfer,plannerBriefingCard,N/A,Must NOT route to Apnea,N/A,N/A,N/A,PlannerBriefingCardStoreTests,PASS,,Diving briefing only
+NS-APNEA-ACK-SYM,Both,WC message,userInfo import path,symmetric signed ack,Apnea logbook stores,yes,N/A,apnea,ApneaSyncAckNegativeTests,PASS,,CONS-004 pattern for Apnea path
+NS-APNEA-LEGACY,Watch→iOS,legacy keys,Apnea legacy codec v1-2,unsupportedVersion throw,Apnea only,partial,ApneaSyncCodecNegativePathTests,PASS,P3,Fail-closed on malformed

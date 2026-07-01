@@ -9,7 +9,7 @@ ALT-007,5000,N/A,Salt,Air,any,0,N/A,N/A,N/A,N/A,N/A,REJECT,REJECT,N/A,N/A,PASS,P
 ALT-008,0,1.01325,Salt,Nitrox32,30m 25min,1500,N/A,varies,N/A,N/A,N/A,Computed,Oracle,PENDING,PENDING,PASS,P4,OrchestratedAltitudeEnvironmentTests,
 ALT-009,1000,0.900,Salt,Trimix,40m 15min deco,1800,>0,slow,N/A,>0,stops,Computed,Oracle PARTIAL,PENDING,PENDING,PARTIAL,P2,ML-03 sea-level; altitude trimix NOT_EXECUTED,
 ALT-010,0,1.01325,Salt,Air,39→10m multilevel,3600, evolves,varies,0,>0,stops,PASS,Oracle PASS,≤3 min TTS,PENDING,PASS,P4,Audit15Air39MultilevelProfileTests,
-ALT-011,1000,0.900,Salt,Air,39→10m multilevel,3600,PENDING,PENDING,PENDING,PENDING,PENDING,NOT_EXECUTED,NOT_EXECUTED,N/A,N/A,NOT_EXECUTED,P2,WFC-P2-003,Altitude ML replay gap
+ALT-011,1000,0.900,Salt,Air,39→10m multilevel,3600,PENDING,PENDING,PENDING,PENDING,PENDING,NOT_EXECUTED,NOT_EXECUTED,N/A,N/A,NOT_EXECUTED,P2,WFC-P2-003,Altitude ML replay gap @2c30412 unchanged
 ALT-012,0,1.01325,Fresh,Air,20m 30min,1800,N/A,varies,N/A,N/A,N/A,Computed,Oracle freshwater density,PENDING,PENDING,PASS,P4,WaterDensityModel,
 ALT-013,0,1.01325,Salt,Air,checkpoint mid-deco,900,restored,same as pre,0,>0,stops,PASS,N/A,N/A,N/A,PASS,P3,FullComputerRecoveryCheckpointTests,
 ALT-014,-100,REJECT,Salt,Air,any,0,N/A,N/A,N/A,N/A,N/A,FAIL,FAIL,N/A,N/A,PASS,P4,Negative altitude rejected,
