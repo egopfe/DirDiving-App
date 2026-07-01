@@ -92,6 +92,7 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
         if !sessionArmed {
             armSession(at: wallClock)
         }
+        captureEntrySurfaceFix(at: wallClock)
         engine.startSession(at: wallClock)
         sessionStarted = true
         persistCheckpointSoon()
@@ -99,6 +100,7 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
     }
 
     func endSession(at wallClock: Date = Date()) {
+        captureExitSurfaceFix(at: wallClock)
         engine.endSession(at: wallClock)
         showSessionSummary = true
         stopSensors()
@@ -327,13 +329,16 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
     }
 
     private func handleGPSUpdate(point: GPSPoint?, speed: Double) {
+        ingestGPSPoint(point, speed: speed, wallClock: Date())
+    }
+
+    private func ingestGPSPoint(_ point: GPSPoint?, speed: Double, wallClock: Date) {
         guard let point else { return }
-        let now = Date()
         let depth = engine.snapshot.currentDepthMeters ?? 0
         let depthRaw = DepthMeasurementRaw(
             depthMeters: depth,
-            sensorTimestamp: now,
-            receivedAt: now,
+            sensorTimestamp: wallClock,
+            receivedAt: wallClock,
             temperatureCelsius: engine.snapshot.currentTemperatureCelsius
         )
         let gpsRaw = SnorkelingGPSRawFix(
@@ -341,15 +346,33 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
             longitude: point.longitude,
             horizontalAccuracyMeters: point.horizontalAccuracy,
             sensorTimestamp: point.timestamp,
-            receivedAt: now,
+            receivedAt: wallClock,
             reportedSpeedMetersPerSecond: speed,
             source: .live
         )
-        engine.ingest(depthRaw: depthRaw, gpsRaw: gpsRaw, wallClock: now)
+        engine.ingest(depthRaw: depthRaw, gpsRaw: gpsRaw, wallClock: wallClock)
         updateBattery()
         processHapticCues()
         persistCheckpointSoon()
         refreshPresentation()
+    }
+
+    private func captureEntrySurfaceFix(at wallClock: Date) {
+        guard let gpsManager else { return }
+        if let point = gpsManager.currentBestPoint() {
+            ingestGPSPoint(point, speed: gpsManager.lastSpeedMetersPerSecond, wallClock: wallClock)
+        }
+        gpsManager.captureBestEffortPoint(for: 6, stopUpdatesWhenComplete: false) { [weak self] point in
+            guard let self, let point else { return }
+            self.ingestGPSPoint(point, speed: self.gpsManager?.lastSpeedMetersPerSecond ?? 0, wallClock: Date())
+        }
+    }
+
+    private func captureExitSurfaceFix(at wallClock: Date) {
+        guard let gpsManager else { return }
+        if let point = gpsManager.currentBestPoint() {
+            ingestGPSPoint(point, speed: gpsManager.lastSpeedMetersPerSecond, wallClock: wallClock)
+        }
     }
 
     private func handleHeadingUpdate(_ heading: Double) {

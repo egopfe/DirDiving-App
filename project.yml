@@ -179,6 +179,8 @@ targets:
       - Utils/MissionModeRuntimeProfile.swift
       - Utils/DiveDepthMeasurementIngestion.swift
       - Utils/GPSFallbackPolicy.swift
+      - Utils/WatchSurfaceLocationBridge.swift
+      - Services/WatchSurfaceLocationService.swift
       - Utils/WatchLocationPermissionState.swift
       - Utils/WatchFirstLaunchLocationPermissionPolicy.swift
       - Services/DiveManager.swift
