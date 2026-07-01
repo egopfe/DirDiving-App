@@ -21,6 +21,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     let plannerBriefingTransfer: PlannerBriefingWatchTransferService
     let divePlanPackageTransfer: DivePlanPackageWatchTransferService
     let demoLogbookSettings: IOSActivityDemoLogbookSettingsStore
+    let logbookVisibilitySettings: IOSActivityLogbookVisibilitySettingsStore
 
     private var apneaBundle: IOSApneaStoreBundle?
     private var snorkelingBundle: IOSSnorkelingStoreBundle?
@@ -53,11 +54,31 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
         plannerBriefingTransfer = PlannerBriefingWatchTransferService()
         divePlanPackageTransfer = DivePlanPackageWatchTransferService()
         demoLogbookSettings = IOSActivityDemoLogbookSettingsStore()
+        logbookVisibilitySettings = IOSActivityLogbookVisibilitySettingsStore()
 
         forwardNestedStoreChanges(from: legalAcceptance)
         forwardNestedStoreChanges(from: companionActivity)
         forwardNestedStoreChanges(from: sharedSettings)
         forwardNestedStoreChanges(from: demoLogbookSettings)
+        forwardNestedStoreChanges(from: logbookVisibilitySettings)
+    }
+
+    /// Ensures logbook stores needed for read-only aggregated presentation are loaded.
+    /// Does not change selected activity mode or activate Watch runtime beyond existing sync wiring.
+    func ensureStoresForUnifiedLogbook() {
+        _ = logStore
+        _ = apneaLogbookStoreForPresentation()
+        _ = snorkelingLogbookStoreForPresentation()
+    }
+
+    func apneaLogbookStoreForPresentation() -> IOSApneaLogbookStore {
+        if let bundle = apneaBundle { return bundle.logbookStore }
+        return lazyApneaLogbookForSync()
+    }
+
+    func snorkelingLogbookStoreForPresentation() -> IOSSnorkelingLogbookStore {
+        if let bundle = snorkelingBundle { return bundle.logbookStore }
+        return lazySnorkelingLogbookForSync()
     }
 
     func ensureApneaSettingsStore() -> IOSApneaSettingsStore {
@@ -153,6 +174,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
             .environmentObject(companionSettingsScope)
             .environmentObject(sharedSettings)
             .environmentObject(demoLogbookSettings)
+            .environmentObject(logbookVisibilitySettings)
     }
 
     @ViewBuilder

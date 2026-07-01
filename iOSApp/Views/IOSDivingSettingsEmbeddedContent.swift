@@ -188,6 +188,7 @@ struct IOSDivingSettingsEmbeddedContent: View {
                             .accessibilityHint(DIRIOSLocalizer.string("more.icloud.sync_now.a11y.hint"))
                             .accessibilityIdentifier("more.icloud.sync_now")
                         }
+                        IOSActivityLogbookVisibilitySettingsSection(activity: .diving)
                         DIRCard(DIRIOSLocalizer.string("more.section.reviewer"), icon: "books.vertical", accent: DIRTheme.yellow) {
                             Toggle(isOn: Binding(
                                 get: { logStore.includeDemoLogbook },

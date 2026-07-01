@@ -1,7 +1,21 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-01  
-**Branch consigliato:** `main` = `origin/main` @ `dfbceec`
+**Branch consigliato:** `main` = `origin/main` @ `d32ad96`
+
+---
+
+## Aggiornamento indice 2026-07-01 — iOS unified activity logbook view @ `d32ad96`
+
+Per-activity toggle “Show all activities in logbook” (default OFF); presentation-only aggregated Diving + Snorkeling + Apnea timeline; no store merge; 22 new iOS tests PASS.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`IOS_UNIFIED_ACTIVITY_LOGBOOK_IMPLEMENTATION_REPORT_CURRENT.md`](IOS_UNIFIED_ACTIVITY_LOGBOOK_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Feature** | [`IOS_UNIFIED_ACTIVITY_LOGBOOK_VIEW.md`](IOS_UNIFIED_ACTIVITY_LOGBOOK_VIEW.md) |
+| **Settings** | [`IOS_ACTIVITY_LOGBOOK_VISIBILITY_SETTINGS.md`](IOS_ACTIVITY_LOGBOOK_VISIBILITY_SETTINGS.md) |
+| **Policy** | [`IOS_UNIFIED_LOGBOOK_NO_CONTAMINATION_POLICY.md`](IOS_UNIFIED_LOGBOOK_NO_CONTAMINATION_POLICY.md) |
+| **Verdict** | **IOS_UNIFIED_ACTIVITY_LOGBOOK_VIEW_READY** · **PRESENTATION_ONLY_CONFIRMED** · **MANUAL_UI_QA_PENDING** |
 
 ---
 

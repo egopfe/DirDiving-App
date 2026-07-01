@@ -122,6 +122,8 @@ struct IOSSnorkelingSettingsContent: View {
                 IOSCompanionSettingsFootnoteText(text: DIRIOSLocalizer.string("settings.snorkeling.fake_logbook.description"))
             }
 
+            IOSActivityLogbookVisibilitySettingsSection(activity: .snorkeling)
+
             DIRCard(nil, icon: nil, accent: DIRTheme.orange) {
                 IOSCompanionSettingsResetButton(
                     title: DIRIOSLocalizer.string("snorkeling.ios.settings.reset"),
