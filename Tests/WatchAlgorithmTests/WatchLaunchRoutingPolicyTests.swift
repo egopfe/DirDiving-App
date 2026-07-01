@@ -6,9 +6,16 @@ final class WatchLaunchRoutingPolicyTests: XCTestCase {
     override func setUp() {
         super.setUp()
         #if DEBUG
-        DIRStartupSelectionPolicy.resetForTests()
-        WatchWaterAutoOpenPolicy.resetForTests()
+        WatchRoutingTestSupport.resetRoutingTestEnvironment()
+        WatchRoutingTestSupport.configureShallowEntitlementRoutingForTests()
         #endif
+    }
+
+    override func tearDown() {
+        #if DEBUG
+        WatchRoutingTestSupport.resetRoutingTestEnvironment()
+        #endif
+        super.tearDown()
     }
 
     func testColdLaunchDoesNotUseWaterAutoOpenWhenModeDisabled() {

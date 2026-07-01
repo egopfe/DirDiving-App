@@ -19,4 +19,4 @@ Quick links:
 
 **Localization:** run `./Scripts/audit_localization.sh` for EN/IT parity gate. See [`Docs/DIR_DIVING_LOCALIZATION_AUDIT_CURRENT.md`](Docs/DIR_DIVING_LOCALIZATION_AUDIT_CURRENT.md).
 
-**Release baseline (`main`):** `origin/main` @ **`bf03fb0`** — MAIN deep-code software readiness 100%, deep-code audit V3.0, iOS/UI/UX/Watch math gates. See [`Docs/INDEX.md`](Docs/INDEX.md) and [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md). Run `xcodegen generate` before opening `DIRDiving.xcodeproj`.
+**Release baseline (`main`):** `origin/main` @ **`0d3a26b`** — orchestrator V1.5 audit @ `2c30412`: **PARTIAL** overall · **INTERNAL_TESTFLIGHT_SOFTWARE_READY** (conditional) · **EXTERNAL_TESTFLIGHT NOT READY** · **APP_STORE NOT READY** · **PHYSICAL_QA_PENDING**. See [`Docs/INDEX.md`](Docs/INDEX.md) and [`Docs/MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](Docs/MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md). Run `xcodegen generate` before opening `DIRDiving.xcodeproj`.

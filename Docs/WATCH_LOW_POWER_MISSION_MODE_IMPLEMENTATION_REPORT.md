@@ -1,5 +1,7 @@
 # Watch MAIN — Low Power / Mission Mode Implementation Audit
 
+> **LEGACY / SUPERSEDED (2026-07-01):** Historical audit @ `4875b56`. Release readiness claims below were **demoted** per orchestrator V1.5 @ `2c30412`. Current truth: **INTERNAL_TESTFLIGHT_SOFTWARE_READY (conditional)** · **EXTERNAL_TESTFLIGHT NOT READY** · **APP_STORE NOT READY** · **PHYSICAL_QA_PENDING**. See [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md).
+
 **Date:** 2026-05-29  
 **Branch:** `main` @ `4875b56`  
 **Target:** Apple Watch MAIN only (`DIRDiving Watch App`)  
@@ -20,8 +22,8 @@
 | Functional power savings | **Limited and UI-focused** — disables some SwiftUI animations and decorative shadows on **Live** and **Compass** only. Does **not** change GPS/depth sampling, haptics, brightness, Always-On, WatchConnectivity, or logging. `uiRefreshInterval` exists in profile but is **unused** (same value for standard and mission). |
 | Battery alarm | **Separate feature** — low-battery warning/blink in `DiveManager` + `AlarmSettingsView`; not Mission Mode. |
 | Classification | **2 — Implemented but not fully exposed in Settings** (with **4**-like gap on draft restore and **3**-like limited runtime effect) |
-| TestFlight ready (if Mission Mode is advertised)? | **Conditional yes** — feature exists and matches release checklist toggle; manual control and draft-restore gap should be documented in release notes or fixed before strong marketing of “power saving.” |
-| App Store ready? | **Conditional yes** — add explicit copy that Mission Mode ≠ Apple system Low Power Mode (recommended wording in §G); no false system-LPM claims found in code. |
+| TestFlight ready (if Mission Mode is advertised)? | **INTERNAL software only (conditional)** — feature exists; **physical QA PENDING**; not external TestFlight/App Store ready per master audit @ `2c30412`. |
+| App Store ready? | **NO** — external TestFlight and App Store **NOT READY**; physical/legal gates pending; Mission Mode ≠ Apple system Low Power Mode (see §G). |
 
 **Bottom line:** The user’s expectation is correct: **Mission Mode already exists in code** with auto-enable Settings, lifecycle hooks, and a live bolt indicator. It is **not** Apple’s system Low Power Mode. Settings **partially** expose configuration (auto on dive start only). **Manual** activation/deactivation during a dive is **not** implemented.
 
@@ -296,8 +298,8 @@ Supporting notes:
 | Is it exposed in Settings? | **Partially** — auto-enable on dive start only. |
 | Can the user enable automatic activation during dive? | **Yes** — via Settings toggle (default OFF). |
 | Is it safe and truthful? | **Safe** — does not alter dive math, sampling, or safety alerts per code and docs. **Truthfulness** — good in technical docs; Settings should add Apple LPM disclaimer. |
-| TestFlight ready? | **Yes with caveats** — document draft-restore gap; avoid calling it system Low Power Mode. |
-| App Store ready? | **Yes with copy review** — implement P0 disclaimer before marketing as “low power.” |
+| TestFlight ready? | **Internal software only (conditional)** — document draft-restore gap; avoid calling it system Low Power Mode; **physical QA PENDING**. |
+| App Store ready? | **NO** — external release **NOT READY**; implement P0 disclaimer before any marketing as “low power.” |
 | What blocks 100% readiness? | Manual control, draft-restore activation, explicit Settings/legal copy, tests, limited actual battery impact, unused `uiRefreshInterval`. |
 
 ---

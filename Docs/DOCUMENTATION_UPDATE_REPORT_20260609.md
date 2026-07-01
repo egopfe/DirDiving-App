@@ -1,5 +1,7 @@
 # Documentation Update Report — 2026-06-09
 
+> **LEGACY / SUPERSEDED (2026-07-01):** Historical pass @ `0569903`. The “Not claimed” list below was corrected per CONS-053 — **CCR external validation is PENDING**, not complete. See [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md).
+
 **Pass:** Git documentation alignment (Command 6)  
 **Baseline:** `main` @ `0569903`  
 **Type:** Docs-only — no runtime changes
@@ -27,8 +29,8 @@
 
 `xcodegen generate` + Watch/iOS `xcodebuild` run in this pass — see alignment report section T.
 
-## Not claimed
+## Not claimed (updated 2026-07-01 — CONS-053 alignment)
 
 - Physical QA PASS
 - External TestFlight / App Store readiness
-- CCR external validation complete
+- CCR external validation complete — **PENDING** (see `CCR_REBREATHER_VALIDATION_EVIDENCE`); was incorrectly listed here historically
