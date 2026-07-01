@@ -1,7 +1,21 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-01  
-**Branch consigliato:** `main` = `origin/main` @ `cc0efc6`
+**Branch consigliato:** `main` = `origin/main` @ `48f8af2`
+
+---
+
+## Aggiornamento indice 2026-07-01 — Audit 07 post-remediation @ `48f8af2`
+
+Audit 07 V1.5 complete: software gates **100%**; iOS **1655/1655** + Watch **1152/1152** PASS; physical/external/legal **PENDING**.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`MASTER_POST_REMEDIATION_CODE_READINESS_AUDIT_CURRENT.md`](MASTER_POST_REMEDIATION_CODE_READINESS_AUDIT_CURRENT.md) |
+| **Verdict** | [`MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md`](MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md) |
+| **Algorithmic safety** | [`MASTER_POST_REMEDIATION_ALGORITHMIC_SAFETY_VERIFICATION_CURRENT.md`](MASTER_POST_REMEDIATION_ALGORITHMIC_SAFETY_VERIFICATION_CURRENT.md) |
+| **Apnea verification** | [`MASTER_POST_REMEDIATION_APNEA_VERIFICATION_CURRENT.md`](MASTER_POST_REMEDIATION_APNEA_VERIFICATION_CURRENT.md) |
+| **Status** | **AUDIT_07 PASS** · **INTERNAL_TF_SOFTWARE_READY** · **PHYSICAL_QA_PENDING** |
 
 ---
 
