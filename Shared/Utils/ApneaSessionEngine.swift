@@ -165,6 +165,11 @@ struct ApneaSessionEngine {
         refreshSnapshot(wallClock: wallClock, uptime: uptime)
     }
 
+    mutating func appendSurfaceGPSPoint(_ point: ApneaSurfaceGPSPoint) {
+        session.surfaceGPSPoints.append(point)
+        refreshSnapshot(wallClock: Date())
+    }
+
     mutating func endSession(at wallClock: Date = Date()) {
         endSessionRequested = true
         runMachine(feedAccepted: false, acceptedDepth: snapshot.currentDepthMeters, verticalSpeed: 0, wallClock: wallClock, tickOnly: true)

@@ -116,7 +116,42 @@ struct IOSApneaSessionDetailView: View {
                 metricTile(DIRIOSLocalizer.string("apnea.ios.dashboard.total_time"), summary.durationText)
                 metricTile(DIRIOSLocalizer.string("apnea.ios.dashboard.total_recovery"), summary.recoveryText)
             }
+            sessionLocationCard
         }
+    }
+
+    private var sessionLocationCard: some View {
+        DIRCard(DIRIOSLocalizer.string("apnea.logbook.gps.title"), icon: "location.fill", accent: DIRTheme.cyan) {
+            let points = session.surfaceGPSPoints
+            detailRow(
+                DIRIOSLocalizer.string("apnea.logbook.gps.surface_points"),
+                points.isEmpty ? "0" : "\(points.count)"
+            )
+            if points.isEmpty || session.warnings.contains(.gpsUnavailable) {
+                Text(DIRIOSLocalizer.string("gps.status.unavailable"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+            } else {
+                let availability = ActivityGPSLogbookPresentation.apneaStartEndAvailability(points: points)
+                detailRow(
+                    DIRIOSLocalizer.string("gps.entry"),
+                    DIRIOSLocalizer.string(availability.start)
+                )
+                detailRow(
+                    DIRIOSLocalizer.string("gps.exit"),
+                    DIRIOSLocalizer.string(availability.end)
+                )
+            }
+        }
+    }
+
+    private func detailRow(_ title: String, _ value: String) -> some View {
+        HStack {
+            Text(title).foregroundStyle(DIRTheme.muted)
+            Spacer()
+            Text(value).foregroundStyle(.white)
+        }
+        .font(.subheadline)
     }
 
     private var divesSection: some View {
