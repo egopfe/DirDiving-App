@@ -53,12 +53,14 @@ Warnings do not block transfer but must be visible in UI and export text.
 
 1. Map  
 2. Route points  
-3. **Route safety check**  
-4. Profiles  
-5. Return alert  
-6. Checklist  
-7. Send to Watch  
-8. Export / share  
+3. Route name + profile  
+4. Route type, profile kind, return alert, checklist, return-to-entry preview, estimates  
+5. **Route safety check** (immediately before Watch transfer)  
+6. Watch transfer status  
+7. Export / share  
+8. Send to Watch / Save plan  
+
+Safety check must appear **after** name and profile inputs so incomplete-state messaging reflects fields the user can still edit above the send action.
 
 ## Safety copy
 
