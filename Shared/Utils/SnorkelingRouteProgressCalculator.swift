@@ -25,6 +25,14 @@ enum SnorkelingRouteProgressCalculator {
                 start: start,
                 end: end
             )
+            let distToSegmentStart = SnorkelingDomainSupport.distanceMeters(
+                from: (current.latitude, current.longitude),
+                to: (start.latitude, start.longitude)
+            )
+            if index > 0, projection <= 0, distToSegmentStart > 0 {
+                traversed += segmentLength
+                continue
+            }
             let clamped = min(max(0, projection), segmentLength)
             bestProgress = max(bestProgress, (traversed + clamped) / total)
             traversed += segmentLength
@@ -61,6 +69,8 @@ enum SnorkelingRouteProgressCalculator {
             to: (end.latitude, end.longitude)
         )
         if toEnd > segmentLength + toCurrent { return 0 }
+        // Before segment start along the polyline (e.g. at route entry before later legs).
+        if toEnd > segmentLength, toCurrent > 0 { return 0 }
         return min(segmentLength, toCurrent)
     }
 }
