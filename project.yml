@@ -533,6 +533,16 @@ targets:
       - iOSApp/Models/IOSLogbookDisplayModels.swift
       - iOSApp/Models/IOSUnifiedLogbookEntry.swift
       - iOSApp/Utils/IOSUnifiedLogbookPresentationBuilder.swift
+      - iOSApp/Models/DivingImportModels.swift
+      - iOSApp/Services/DivingImportFormatDetector.swift
+      - iOSApp/Services/DivingImportDeduplicator.swift
+      - iOSApp/Services/DivingCSVImportParser.swift
+      - iOSApp/Services/DivingImportParserRegistry.swift
+      - iOSApp/Services/SubsurfaceXMLImportParser.swift
+      - iOSApp/Services/UDDFImportParser.swift
+      - iOSApp/Utils/DivingImportUnitParser.swift
+      - iOSApp/Services/SubsurfaceExportService.swift
+      - iOSApp/Services/DiveImportService.swift
       - iOSApp/Services/IOSApneaSettingsStore.swift
       - iOSApp/Services/SharedIOSSettingsStore.swift
       - iOSApp/Services/IOSSnorkelingSettingsStore.swift
