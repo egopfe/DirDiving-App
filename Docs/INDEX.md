@@ -1,11 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ `6a0005b`
+**Branch consigliato:** `main` = `origin/main` @ `ad1c836`
+
+## Aggiornamento indice 2026-07-01 — Apnea P1/P2/P3 verification @ `ad1c836`
+
+Apnea test gate verified: 21 iOS + 25 Watch algorithm tests PASS; P1/P2/P3 INTERNAL_READY.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [APNEA_IOS_WATCH_P1_P2_P3_IMPLEMENTATION_REPORT_CURRENT.md](APNEA_IOS_WATCH_P1_P2_P3_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Verdict** | **APNEA_P1_P2_P3_INTERNAL_READY** · **46/46 APNEA TESTS PASS** · **PHYSICAL_QA_PENDING** |
 
 ---
 
-## Aggiornamento indice 2026-06-17 — CONS-046 V1.5 integrity script @ `6a0005b`
+## Aggiornamento indice 2026-06-17 — CONS-046 V1.5 integrity script @ `ad1c836`
 
 ## Aggiornamento indice 2026-06-17 — Apnea P1/P2/P3 @ `76f3703`
 
