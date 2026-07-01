@@ -2136,6 +2136,7 @@
 "apnea.ios.planner.recovery" = "Recommended recovery";
 "apnea.ios.planner.notes" = "Notes";
 "apnea.ios.planner.validation" = "Validation";
+"apnea.ios.planner.readiness" = "Session readiness";
 "apnea.ios.planner.send_watch" = "SEND TO WATCH";
 "apnea.ios.planner.validation_failed" = "Fix validation issues before sending.";
 "apnea.ios.planner.estimate_format" = "Underwater %@ · Recovery %@ · Policy %@";

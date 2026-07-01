@@ -30,6 +30,22 @@ struct IOSApneaSessionPlannerView: View {
                     }
                 }
 
+                Section(DIRIOSLocalizer.string("apnea.ios.profiles.title")) {
+                    Picker(DIRIOSLocalizer.string("apnea.ios.profiles.title"), selection: Binding(
+                        get: { plannerStore.draftPlan.profileID ?? profileStore.allProfiles().first?.id },
+                        set: { profileID in
+                            guard let profileID,
+                                  let profile = profileStore.profile(id: profileID) else { return }
+                            plannerStore.applyProfile(profile)
+                        }
+                    )) {
+                        ForEach(profileStore.allProfiles()) { profile in
+                            Text(profile.isPreset ? DIRIOSLocalizer.string(profile.displayName) : profile.displayName)
+                                .tag(Optional(profile.id))
+                        }
+                    }
+                }
+
                 Section(DIRIOSLocalizer.string("apnea.ios.planner.series")) {
                     ForEach(plannerStore.draftPlan.entries.sorted { $0.orderIndex < $1.orderIndex }) { entry in
                         VStack(alignment: .leading, spacing: 4) {
@@ -70,8 +86,12 @@ struct IOSApneaSessionPlannerView: View {
                     ), axis: .vertical)
                 }
 
-                if !plannerStore.validationIssues.isEmpty {
-                    Section(DIRIOSLocalizer.string("apnea.ios.planner.validation")) {
+                Section(DIRIOSLocalizer.string("apnea.ios.planner.readiness")) {
+                    if plannerStore.validationIssues.isEmpty {
+                        Text(DIRIOSLocalizer.string("apnea.session_check.ready"))
+                            .foregroundStyle(DIRTheme.green)
+                            .font(.headline.weight(.semibold))
+                    } else {
                         ForEach(plannerStore.validationIssues, id: \.self) { issue in
                             Text(validationText(for: issue))
                                 .foregroundStyle(DIRTheme.orange)
