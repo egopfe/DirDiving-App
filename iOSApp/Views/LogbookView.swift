@@ -152,7 +152,7 @@ struct LogbookView: View {
         }
         .dirCompanionTabRoot()
         .sheet(isPresented: $showImportCenter) {
-            DivingImportCenterView()
+            DivingImportExportCenterView()
         }
         .task {
             await logStore.loadIfNeeded()
@@ -182,12 +182,12 @@ struct LogbookView: View {
                     Button {
                         showImportCenter = true
                     } label: {
-                        Image(systemName: "square.and.arrow.down")
+                        Image(systemName: "square.and.arrow.down.on.square")
                             .font(.title3.weight(.medium))
                             .foregroundStyle(DIRTheme.cyan)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(Text(DIRIOSLocalizer.string("diving.import.center.title")))
+                    .accessibilityLabel(Text(DIRIOSLocalizer.string("diving.import_export.center.title")))
                 }
             }
             Text(DIRIOSLocalizer.string("logbook.header.subtitle"))

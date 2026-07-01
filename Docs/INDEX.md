@@ -1,11 +1,24 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-01  
-**Branch consigliato:** `main` = `origin/main` @ `a79e1ff`
+**Branch consigliato:** `main` = `origin/main` @ `32234d1`
 
 ---
 
-## Aggiornamento indice 2026-07-01 — Diving Import Center P1+P2
+## Aggiornamento indice 2026-07-01 — Diving Import / Export Center remediation
+
+Import + Export Center: CSV/XML/UDDF export from Detail and Center; Import tab preserved; 31 tests PASS.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`DIVING_IMPORT_EXPORT_CENTER_IMPLEMENTATION_REPORT_CURRENT.md`](DIVING_IMPORT_EXPORT_CENTER_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Audit** | [`DIVING_IMPORT_EXPORT_CENTER_REMEDIATION_AUDIT_CURRENT.md`](DIVING_IMPORT_EXPORT_CENTER_REMEDIATION_AUDIT_CURRENT.md) |
+| **Export policy** | [`DIVING_EXPORT_CSV_XML_UDDF_POLICY.md`](DIVING_EXPORT_CSV_XML_UDDF_POLICY.md) |
+| **Verdict** | **DIVING_IMPORT_EXPORT_CENTER_REMEDIATION_READY** · **CSV_EXPORT_REGRESSION_PROTECTED** · **MANUAL_UI_QA_PENDING** |
+
+---
+
+## Aggiornamento indice 2026-07-01 — Diving Import Center P1+P2 @ `a79e1ff`
 
 File-based Diving logbook Import Center: CSV preview/dedup, Subsurface XML, UDDF; selective import; 18 import tests PASS; Watch build OK.
 

@@ -22,7 +22,8 @@ struct DiveDetailView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @State private var session: DiveSession
     @State private var tab: DiveDetailTab = .summary
-    @State private var csvURL: URL?
+    @State private var selectedExportFormat: DivingExportFormat = .csv
+    @State private var exportURL: URL?
     @State private var exportErrorMessage: String?
     @State private var showManualEditor = false
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
@@ -535,57 +536,79 @@ struct DiveDetailView: View {
     }
 
     private var exportBlock: some View {
-        HStack {
-            Button {
-                guard session.hasDepthProfile else {
-                    csvURL = nil
-                    exportErrorMessage = DIRIOSLocalizer.string("detail.export.no_profile")
-                    return
+        VStack(alignment: .leading, spacing: 10) {
+            Text(DIRIOSLocalizer.string("diving.export.title"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.white)
+
+            Picker(DIRIOSLocalizer.string("diving.export.format"), selection: $selectedExportFormat) {
+                ForEach(DivingExportFormat.allCases) { format in
+                    Text(DIRIOSLocalizer.string(format.localizationKey)).tag(format)
                 }
-                switch SubsurfaceExportService.writeCSV(for: session) {
-                case .success(let url):
-                    csvURL = url
-                    exportErrorMessage = nil
-                case .failure(let error):
-                    csvURL = nil
-                    exportErrorMessage = error.localizedDescription
-                }
-            } label: {
-                Text(DIRIOSLocalizer.string("detail.export.generate_csv"))
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(DIRTheme.cyan)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
             }
-            Spacer()
-            if let csvURL {
-                ShareLink(
-                    item: csvURL,
-                    preview: SharePreview(
-                        DIRIOSLocalizer.string("detail.export.share_csv"),
-                        icon: Image(systemName: "tablecells")
-                    )
-                ) {
-                    Text(DIRIOSLocalizer.string("detail.export.share_csv"))
+            .pickerStyle(.segmented)
+
+            Text(DIRIOSLocalizer.string("diving.export.disclaimer"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack {
+                Button {
+                    generateDetailExport()
+                } label: {
+                    Text(DIRIOSLocalizer.string("detail.export.generate"))
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
-                        .padding(.horizontal, 18)
+                        .padding(.horizontal, 14)
                         .padding(.vertical, 10)
                         .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                 }
-            } else if let exportErrorMessage {
-                Text(exportErrorMessage)
-                    .font(.caption2)
-                    .foregroundStyle(DIRTheme.orange)
-                    .multilineTextAlignment(.trailing)
-            } else {
-                Text(DIRIOSLocalizer.string("detail.export.csv_not_generated"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                if let exportURL {
+                    ShareLink(
+                        item: exportURL,
+                        preview: SharePreview(
+                            DIRIOSLocalizer.string("detail.export.share"),
+                            icon: Image(systemName: "square.and.arrow.up")
+                        )
+                    ) {
+                        Text(DIRIOSLocalizer.string("detail.export.share"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(DIRTheme.cyan)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 10)
+                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+                    }
+                } else if let exportErrorMessage {
+                    Text(exportErrorMessage)
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.orange)
+                        .multilineTextAlignment(.trailing)
+                } else {
+                    Text(DIRIOSLocalizer.string("detail.export.not_generated"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(DIRTheme.muted)
+                }
             }
         }
         .padding(.top, 4)
+    }
+
+    private func generateDetailExport() {
+        guard session.hasDepthProfile else {
+            exportURL = nil
+            exportErrorMessage = DIRIOSLocalizer.string("detail.export.no_profile")
+            return
+        }
+        switch DivingExportCoordinator.export(sessions: [session], format: selectedExportFormat) {
+        case .success(let report):
+            exportURL = report.url
+            exportErrorMessage = nil
+        case .failure(let error):
+            exportURL = nil
+            exportErrorMessage = error.localizedDescription
+        }
     }
 
     @ViewBuilder
