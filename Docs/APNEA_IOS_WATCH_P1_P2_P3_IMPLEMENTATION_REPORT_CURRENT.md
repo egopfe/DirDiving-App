@@ -1,7 +1,7 @@
 # Apnea iOS + Watch P1/P2/P3 — Implementation Report (Current)
 
 **Branch:** `main`  
-**Baseline commit:** `8871f98` (update at release)  
+**Baseline commit:** `67589e7`  
 **Scope:** Apnea companion (iOS), Apnea Watch runtime, shared models — per `commands_for_cursor/DIR_DIVING_APNEA_IOS_WATCH_P1_P2_P3_CURSOR_COMMAND.md`
 
 **Disclaimer:** Training and logging aid only. Not medical. Not safety-critical.
@@ -12,9 +12,9 @@
 
 | Tier | Status | Notes |
 |------|--------|-------|
-| P1 | In progress / internal ready | Profiles, session check, recovery timer, haptic, layout, data quality, fake logbook |
-| P2 | In progress | Checklist, statistics, recovery ratio, Watch summary, sensor quality, reps |
-| P3 | In progress | Export, training tables, recovery analysis, personal best, coaching layout |
+| P1 | **INTERNAL_READY** | Profiles, session check, recovery timer, haptic, layout, data quality, fake logbook |
+| P2 | **INTERNAL_READY** | Checklist, statistics, recovery ratio, Watch summary, sensor quality, reps |
+| P3 | **INTERNAL_READY** | Export, training tables, recovery analysis, personal best, coaching layout |
 
 ---
 
@@ -93,12 +93,26 @@ Existing: `ApneaRecoveryPolicy.swift`, `ApneaDataQuality.swift` (per-sample).
 
 **iOS:** `Tests/iOSAlgorithmTests/FakeApneaLogbookProviderTests.swift`, `IOSApneaCompanionTests.swift`, sync/logbook tests
 
-**Execution:** Run before release:
+**Execution @ `67589e7` (2026-07-01):**
+
+| Suite | Result |
+|-------|--------|
+| iOS Apnea P1/P2/P3 tests (8 suites) | **21/21 PASS** |
+| Watch Apnea P1/P2/P3 tests (7 suites) | **25/25 PASS** |
 
 ```bash
 xcodegen generate
-xcodebuild -scheme "DIRDiving Watch Algorithm Tests" -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' test
-xcodebuild -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 15' test
+xcodebuild -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test \
+  -only-testing:ApneaProfileTests -only-testing:ApneaRecoveryTargetCalculatorTests \
+  -only-testing:ApneaSessionCheckEvaluatorTests -only-testing:ApneaChecklistTests \
+  -only-testing:ApneaDataQualityEvaluatorTests -only-testing:ApneaStatisticsCalculatorTests \
+  -only-testing:ApneaExportPayloadBuilderTests -only-testing:ApneaTrainingTableBuilderTests \
+  -only-testing:FakeApneaLogbookProviderTests
+xcodebuild -scheme "DIRDiving Watch Algorithm Tests" -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' test \
+  -only-testing:ApneaWatchRecoveryRuntimeTests -only-testing:ApneaWatchHapticLatchTests \
+  -only-testing:ApneaWatchProfileRuntimeLayoutTests -only-testing:ApneaWatchSensorQualityTests \
+  -only-testing:ApneaWatchSessionSummaryTests -only-testing:ApneaTrainingStepRuntimeEvaluatorTests \
+  -only-testing:ApneaRecoveryPolicyLifecycleTests
 ```
 
 ---
