@@ -41,6 +41,7 @@ struct IOSSnorkelingSessionDetailView: View {
                     dipsSection
                     photosSection
                     markersSection
+                    gpsTrackSection
                     runtimeSummarySection
                     equipmentSection
                     buddySection
@@ -312,6 +313,35 @@ struct IOSSnorkelingSessionDetailView: View {
                             .foregroundStyle(DIRTheme.muted)
                     }
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var gpsTrackSection: some View {
+        let counts = ActivityGPSLogbookPresentation.snorkelTrackCounts(session.trackPoints)
+        DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.gps.title"), icon: "location.fill", accent: DIRTheme.cyan) {
+            detailRow(
+                DIRIOSLocalizer.string("gps.track_points"),
+                "\(session.trackPoints.count)"
+            )
+            detailRow(
+                DIRIOSLocalizer.string("gps.measured_points"),
+                "\(counts.measured)"
+            )
+            detailRow(
+                DIRIOSLocalizer.string("gps.stale_points"),
+                "\(counts.stale)"
+            )
+            detailRow(
+                DIRIOSLocalizer.string("gps.unavailable_points"),
+                "\(counts.unavailable)"
+            )
+            if let entry = session.entryPoint {
+                detailRow(
+                    DIRIOSLocalizer.string("gps.entry"),
+                    entry.latitude != nil ? DIRIOSLocalizer.string("gps.status.available") : DIRIOSLocalizer.string("gps.status.unavailable")
+                )
             }
         }
     }

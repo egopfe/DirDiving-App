@@ -22,6 +22,7 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
     private var firedHapticEventIDs: Set<UUID> = []
     private var missionModeEnabled = false
     private var hapticsEnabled = true
+    private let surfaceLocation = WatchSurfaceLocationService()
 
     private let importedPlan: ApneaImportedPlanStore
     private let checkpointFileName = "apnea_watch_session_checkpoint.json"
@@ -53,9 +54,14 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
         refreshPresentation()
     }
 
+    func attachSurfaceLocation(gps: GPSManager) {
+        surfaceLocation.attach(gpsManager: gps)
+    }
+
     func armSession(at wallClock: Date = Date()) {
         applyImportedPlanConfiguration()
         engine.armSession(at: wallClock)
+        captureStartSurfaceGPS()
         operationalState = .initial
         previousAcceptedDepthMeters = nil
         dismissedOverlayEventIDs.removeAll()
@@ -63,6 +69,7 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
         operationalOverlay = nil
         showSessionSummary = false
         startDepthSensor()
+        surfaceLocation.startSurfaceUpdates()
         startBackgroundLoops()
         refreshPresentation()
         persistCheckpointSoon()
@@ -95,7 +102,9 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
 
     func endSession() {
         engine.endSession()
+        captureEndSurfaceGPS()
         stopDepthSensor()
+        surfaceLocation.stopSurfaceUpdates()
         stopBackgroundLoops()
         clearCheckpoint()
         refreshPresentation()
@@ -110,11 +119,15 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
     }
 
     func saveCompletedSession(to logbook: ApneaLogbookStore) {
+        captureEndSurfaceGPS()
         var session = engine.snapshot.session
         if session.state != .completed {
             session.state = .completed
         }
         session.statistics = session.refreshedStatistics()
+        if session.surfaceGPSPoints.isEmpty, !session.warnings.contains(.gpsUnavailable) {
+            session.warnings.append(.gpsUnavailable)
+        }
         if isSensorDegraded, !session.warnings.contains(.dataQualityDegraded) {
             session.warnings.append(.dataQualityDegraded)
         }
@@ -395,6 +408,36 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
     private func refreshPresentation() {
         lifecyclePhase = engine.snapshot.phase
         presentationInput = buildPresentationInput()
+    }
+
+    private func captureStartSurfaceGPS() {
+        if let fix = surfaceLocation.lastKnownSurfaceFix() {
+            appendSurfaceFix(fix)
+        }
+        surfaceLocation.captureOneShot(for: 6, stopUpdatesWhenComplete: false) { [weak self] fix in
+            guard let self, let fix else { return }
+            self.appendSurfaceFix(fix)
+        }
+    }
+
+    private func captureEndSurfaceGPS() {
+        if let fix = surfaceLocation.lastKnownSurfaceFix() {
+            appendSurfaceFix(fix, allowDuplicateNearExisting: true)
+        }
+    }
+
+    private func appendSurfaceFix(_ fix: WatchSurfaceLocationFix, allowDuplicateNearExisting: Bool = false) {
+        guard fix.source == .measured || fix.source == .stale else { return }
+        let point = WatchSurfaceLocationBridge.apneaSurfacePoint(from: fix)
+        guard SnorkelingDomainSupport.isValidCoordinate(latitude: point.latitude, longitude: point.longitude) else { return }
+        if !allowDuplicateNearExisting,
+           engine.snapshot.session.surfaceGPSPoints.contains(where: {
+               abs($0.latitude - point.latitude) < 0.00001 && abs($0.longitude - point.longitude) < 0.00001
+           }) {
+            return
+        }
+        engine.appendSurfaceGPSPoint(point)
+        refreshPresentation()
     }
 
     private func buildPresentationInput() -> ApneaWatchPresentationInput {
