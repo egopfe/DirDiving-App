@@ -1,7 +1,21 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-01  
-**Branch consigliato:** `main` = `origin/main` @ `d32ad96`
+**Branch consigliato:** `main` = `origin/main` @ (post import-center commit)
+
+---
+
+## Aggiornamento indice 2026-07-01 — Diving Import Center P1+P2
+
+File-based Diving logbook Import Center: CSV preview/dedup, Subsurface XML, UDDF; selective import; 18 import tests PASS; Watch build OK.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`DIVING_IMPORT_CENTER_IMPLEMENTATION_REPORT_CURRENT.md`](DIVING_IMPORT_CENTER_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Audit** | [`DIVING_IMPORT_CENTER_AUDIT_CURRENT.md`](DIVING_IMPORT_CENTER_AUDIT_CURRENT.md) |
+| **Plan** | [`DIVING_IMPORT_CENTER_P1_P2_IMPLEMENTATION_PLAN.md`](DIVING_IMPORT_CENTER_P1_P2_IMPLEMENTATION_PLAN.md) |
+| **Policies** | CSV · [Subsurface XML](DIVING_IMPORT_CENTER_SUBSURFACE_XML_POLICY.md) · [UDDF](DIVING_IMPORT_CENTER_UDDF_POLICY.md) · [Dedup](DIVING_IMPORT_CENTER_DEDUPLICATION_POLICY.md) |
+| **Verdict** | **DIVING_IMPORT_CENTER_P1_READY** · **DIVING_IMPORT_CENTER_P2_READY** · **CSV_IMPORT_REGRESSION_PROTECTED** · **MANUAL_UI_QA_PENDING** |
 
 ---
 
