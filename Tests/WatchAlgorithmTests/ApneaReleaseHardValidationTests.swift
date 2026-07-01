@@ -124,6 +124,8 @@ final class ApneaReleaseHardValidationTests: XCTestCase {
             activeAlarmCount: 0,
             configuredAlarmLabels: [],
             buddyReminderEnabled: true,
+            checklistCompletedCount: 0,
+            checklistTotalCount: 0,
             sensorDegraded: sensorDegraded,
             hapticsEnabled: true,
             missionModeEnabled: false,

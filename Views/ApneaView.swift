@@ -140,6 +140,7 @@ struct ApneaView: View {
 
                 metricRow(label: String(localized: "apnea.ready.sensor"), value: ui.sensorLabel, valueColor: input.sensorDegraded ? DiveUI.red : DiveUI.green)
                 metricRow(label: String(localized: "apnea.ready.buddy"), value: input.buddyReminderEnabled ? String(localized: "apnea.buddy.on") : String(localized: "apnea.buddy.off"), valueColor: DiveUI.yellow)
+                metricRow(label: String(localized: "apnea.watch.precheck"), value: ui.precheckLabel, valueColor: DiveUI.cyan)
 
                 if input.sensorDegraded {
                     DiveCommandButton(String(localized: "apnea.manual.fallback"), systemImage: "hand.tap.fill", color: DiveUI.yellow) {

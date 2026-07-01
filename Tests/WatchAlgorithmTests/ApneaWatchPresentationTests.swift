@@ -163,6 +163,8 @@ final class ApneaWatchPresentationTests: XCTestCase {
             activeAlarmCount: activeAlarmCount,
             configuredAlarmLabels: configuredAlarmLabels,
             buddyReminderEnabled: true,
+            checklistCompletedCount: 0,
+            checklistTotalCount: 0,
             sensorDegraded: sensorDegraded,
             hapticsEnabled: true,
             missionModeEnabled: false,
