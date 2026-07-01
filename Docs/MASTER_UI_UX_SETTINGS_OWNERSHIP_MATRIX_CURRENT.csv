@@ -9,7 +9,7 @@ SET-007,Gauge TTV settings,Diving,Gauge,no,Watch,Diving Settings,AscentRateSetti
 SET-008,Apnea session detection,Apnea,All,no,Both,Apnea Settings,IOSApneaSettingsStore,no,yes,no,yes,yes,no,partial,Apnea runtime,yes,yes,yes,IOSApneaSettingsContent,yes,
 SET-009,Apnea recovery/targets,Apnea,All,no,Both,Apnea Settings,IOSApneaSettingsStore,no,yes,no,yes,yes,no,partial,Apnea runtime,yes,yes,yes,ApneaRecoveryPolicyLifecycleTests,yes,
 SET-010,Apnea alarms/markers,Apnea,All,no,Both,Apnea Settings,IOSApneaSettingsStore,no,yes,no,yes,yes,no,partial,Apnea alarms,yes,yes,yes,WatchActivitySettingsOwnershipTests,yes,
-SET-011,Snorkeling GPS/route,Apnea,All,no,Both,Snorkeling Settings,IOSSnorkelingSettingsStore,no,no,yes,yes,yes,no,partial,Snorkeling nav,yes,yes,yes,IOSSnorkelingSettingsStoreTests,yes,
+SET-011,Snorkeling GPS/route,Snorkeling,All,no,Both,Snorkeling Settings,IOSSnorkelingSettingsStore,no,no,yes,yes,yes,no,partial,Snorkeling nav,yes,yes,yes,IOSSnorkelingSettingsStoreTests,yes,
 SET-012,Snorkeling return to entry,Snorkeling,All,no,Both,Snorkeling Settings,IOSSnorkelingSettingsStore,no,no,yes,yes,yes,no,partial,Return alert,yes,yes,yes,SnorkelingReturnAlertRuntimeTests,yes,
 SET-013,Snorkeling privacy/photos,Snorkeling,All,no,iOS,Snorkeling Settings,IOSSnorkelingSettingsStore,no,no,yes,yes,no,no,no,Privacy,yes,yes,yes,IOSSnorkelingSettingsContent,yes,
 SET-014,Water auto-open,Global,All,no,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,yes,yes,yes,no,yes,no,no,Launch routing only,yes,yes,yes,WatchWaterAutoOpenPolicyTests,yes,Does not start dive

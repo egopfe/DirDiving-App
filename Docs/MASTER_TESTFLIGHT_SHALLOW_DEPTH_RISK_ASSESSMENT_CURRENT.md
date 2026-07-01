@@ -1,68 +1,74 @@
-# DIR DIVING — TestFlight Shallow Depth Risk Assessment (Current)
+# TestFlight Shallow Depth Risk Assessment — CURRENT
 
-**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md` §2A.3  
-**Date:** 2026-06-30  
-**Branch:** `main`  
-**Commit:** `451f8fb`  
-**Upstream audits:** 01–04, 06 @ `451f8fb`
-
-**Not claimed:** Full-depth entitlement validated, shallow wet QA passed, certified decompression on shallow builds, Apple system auto-launch listing verified, App Store approval.
+**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.5.md` §2A.3  
+**Baseline:** `main` @ `2c30412`  
+**Audit date:** 2026-07-01
 
 ---
 
-## Executive summary
+## A. Executive Summary
 
-At `451f8fb`, shallow-depth signing remains default. **Production Full Computer is fail-closed** unless full-depth entitlement or developer shallow FC toggle (default OFF). Post-remediation: GF import parity closed (CONS-002), sync/depth/WAO software gates closed. **All shallow wet and system-listing evidence is PENDING_PHYSICAL.** **New regressions:** IOS-P1-001 (iOS test compile), CONS-046 (integrity script FAIL).
+Shallow-depth entitlement signing is **internally aligned** for TestFlight. **Full-depth capability is unavailable** unless separately provisioned. Developer shallow Gauge/FC testing toggles are **hidden from public users** (default OFF, dev unlock). **No App Store or TestFlight metadata may claim certified decompression guidance from shallow developer testing.**
 
-| Risk tier | Count | Release impact |
-|-----------|------:|----------------|
-| P0 (false claim / safety bypass) | **0** | None identified |
-| P1 (internal TestFlight) | **4** | IOS-P1-001, CONS-046, shallow FC exposure labeling, metadata trust |
-| P2 (external TestFlight) | **6** | Wet QA, system listing, WAO physical, hardware controls, Snorkeling field |
-| P3 | **1** | Modal sequencing partial sim evidence |
-| P4 | **4** | Documentation / positive controls |
-
-**Internal TestFlight shallow-depth posture:** **CONDITIONAL** — allowed with truthful TestFlight notes, developer toggles default OFF, fix IOS-P1-001, no public marketing of shallow FC as certified guidance.
-
-**External TestFlight / App Store:** **NOT READY** until physical shallow-depth and full-depth entitlement evidence exists.
+**TestFlight shallow-depth risk: CONDITIONAL** — acceptable for **internal** TestFlight with truthful disclosure; **not acceptable** for external/public claims without wet QA (CONS-042).
 
 ---
 
-## Capability posture @ 451f8fb
+## B. Entitlement Configuration
 
-| Item | Software status | Physical status |
-|------|-----------------|-----------------|
-| Shallow-depth entitlement signed | **SOFTWARE_READY** | PENDING_PHYSICAL |
-| Full-depth entitlement (alternate) | Documented archive path | PENDING_PHYSICAL |
-| `WKSupportsAutomaticDepthLaunch` | **true** in Info.plist | System listing NOT_EXECUTED |
-| Production FC without dev toggle | **Blocked** on shallow-only | N/A |
-| Developer shallow toggles | **Default OFF**; TestFlight gated | PENDING_PHYSICAL |
-| Developer shallow hidden from App Store | **PASS** (software) | N/A |
-| No certified-deco shallow claim in copy | **PASS** | N/A |
-| Shallow wet Gauge QA | NOT_EXECUTED | PENDING (SDG-010) |
-| Shallow wet FC internal QA | NOT_EXECUTED | PENDING (SDG-011) |
-| WAO respects depth capability | **PASS** (CONS-019) | PENDING_PHYSICAL |
+| Item | Value @2c30412 | Status |
+|---|---|---|
+| Default Watch entitlements | `Config/DIRDiving.WithShallowDepth.entitlements` | Aligned |
+| Shallow capability key | `com.apple.developer.submerged-shallow-depth-and-pressure` | Present |
+| Full-depth alternate | `Config/DIRDiving.WithWaterSubmersion.entitlements` | Documented, not default |
+| `DIRDepthEntitlementTier` | `shallow` in App/Info.plist | Aligned |
+| `WKSupportsAutomaticDepthLaunch` | **true** | Software PASS; physical listing PENDING |
+| `WKBackgroundModes` | `underwater-depth` | Present |
+| Runtime depth authority | DepthCapabilityPolicy + CONS-007 | PASS |
 
 ---
 
-## TestFlight disclosure requirements
+## C. Developer Shallow Testing Gates
 
-Internal TestFlight review notes must include:
-
-- Shallow-depth ~6 m limitation on default signing  
-- Full Computer is experimental / non-certified  
-- Developer shallow toggles are internal QA only  
-- Physical validation pending for depth sensor, CMAltimeter, WAO, hardware controls  
-- Snorkeling navigation not field-verified (CONS-048)  
-
----
-
-## Risk matrix reference
-
-- [`MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX_CURRENT.csv`](MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX_CURRENT.csv)  
-- [`MASTER_WATER_AUTO_OPEN_PHYSICAL_QA_GATE_CURRENT.csv`](MASTER_WATER_AUTO_OPEN_PHYSICAL_QA_GATE_CURRENT.csv)  
-- [`MASTER_WATCH_HARDWARE_CONTROLS_QA_GATE_CURRENT.csv`](MASTER_WATCH_HARDWARE_CONTROLS_QA_GATE_CURRENT.csv)  
+| Gate | Software | Public Exposure Risk |
+|---|---|---|
+| Developer shallow Gauge toggle | PASS — default OFF | **LOW** if TF notes label internal |
+| Developer shallow FC toggle | PASS — default OFF | **MEDIUM** (SDG-008) — FC deco in shallow bath |
+| TestFlight/internal flags labeled | PASS — DeveloperSettings | Verify TF what-to-test |
+| App Store screenshots expose dev toggles | **PASS** — not in public UI | Monitor ASC assets |
+| Claim shallow testing = certified deco | **PASS** — no such claim | Maintain |
 
 ---
 
-**Status:** OPEN @ `451f8fb` · 2026-06-30
+## D. Physical / Wet Risks
+
+| Risk | Severity | Mitigation |
+|---|---|---|
+| Shallow ~6m limit not field-verified | P1 | Execute CONS-042 wet QA before external TF |
+| WAO routes FC predive in shallow build | P2 | Software PASS; physical WAO PENDING |
+| GF presets in shallow FC dev session | P2 | Copy: user conservatism, not validation |
+| System Auto-Launch listing unverified | P2 | Truthful Settings limitation copy present |
+
+---
+
+## E. TestFlight Recommendations
+
+**Internal TestFlight:**
+- **ALLOW** with what-to-test disclosure: shallow-depth limited; not certified dive computer; physical QA pending; developer shallow FC is internal QA only.
+- Include WFC-P2-005 known routing test drift in release notes (non-FC).
+
+**External TestFlight:**
+- **BLOCK** until CONS-042 shallow wet QA + CMAltimeter physical + WAO physical complete.
+
+---
+
+## F. Verdict
+
+```text
+SHALLOW_DEPTH_TESTFLIGHT_INTERNAL: CONDITIONAL (disclosure required)
+SHALLOW_DEPTH_TESTFLIGHT_EXTERNAL: NOT_READY
+SHALLOW_DEPTH_APP_STORE: NOT_READY
+FULL_DEPTH_ENTITLEMENT: NOT_AVAILABLE (default signing)
+```
+
+Matrix: [`MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX_CURRENT.csv`](MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX_CURRENT.csv)

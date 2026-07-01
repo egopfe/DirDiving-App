@@ -1,96 +1,120 @@
-# DIR DIVING — Master Readiness to 100% Plan (Current)
+# Readiness to 100 Plan — CURRENT
 
-**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md`  
-**Date:** 2026-06-30  
-**Branch:** `main` @ `451f8fb`  
-**Current overall release readiness:** **62%**  
-**Software-actionable readiness:** **88%** (regressed from 100% due to IOS-P1-001 + CONS-046)  
-**Target:** **100% evidence + compliance readiness** (physical, external, legal, ASC)
+**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.5.md` §13  
+**Baseline:** `main` @ `2c30412`  
+**Audit date:** 2026-07-01
 
 ---
 
-## Readiness layers
+## Current Scores
 
-| Layer | Current | Target | Gap | Status class |
-|-------|--------:|-------:|----:|--------------|
-| Automated unit/integration (Watch) | **95%** | 100% | 5% | PARTIAL — 353/355 @ audit 01 |
-| Automated unit/integration (iOS) | **0%** | 100% | 100% | **BLOCKED** — IOS-P1-001 |
-| Command integrity automation | **0%** | 100% | 100% | **FAIL** — CONS-046 |
-| Simulator validation scripts | **95%** | 100% | 5% | PARTIAL — script drift |
-| Claims / legal software posture | **98%** | 100% | 2% | SOFTWARE_READY |
-| Privacy manifest / engineering disclosure | **100%** | 100% | 0% | SOFTWARE_READY |
-| Shallow depth software gate | **100%** | 100% | 0% | SOFTWARE_READY |
-| Water auto-open software gate | **100%** | 100% | 0% | SOFTWARE_READY |
-| Hardware controls software gate | **100%** | 100% | 0% | SOFTWARE_READY |
-| GF preset software gate | **100%** | 100% | 0% | SOFTWARE_READY |
-| Snorkeling software (route/sync) | **92%** | 100% | 8% | SOFTWARE_READY |
-| Snorkeling field QA (12 templates) | **0%** | 100% | 100% | PENDING_PHYSICAL (CONS-048) |
-| Physical Watch evidence | **0%** | 100% | 100% | PENDING_PHYSICAL |
-| Physical iPhone evidence | **0%** | 100% | 100% | PENDING_PHYSICAL |
-| Paired-device evidence | **0%** | 100% | 100% | PENDING_PHYSICAL |
-| CMAltimeter physical gate | **0%** | 100% | 100% | PENDING_PHYSICAL |
-| Shallow wet / WAO / HW physical | **0%** | 100% | 100% | PENDING_PHYSICAL |
-| External reference validation | **0%** | 100% | 100% | PENDING_EXTERNAL_VALIDATION |
-| App Store / legal sign-off | **35%** | 100% | 65% | PENDING_LEGAL_REVIEW |
+| Dimension | Score | Target 100 Blocker |
+|---|---:|---|
+| Software QA evidence | 94 | WFC-P2-005 Watch routing tests |
+| Physical QA | 0 | All field matrices |
+| External validation | 0 | WFC-P1-001 |
+| Claims compliance (software) | 96 | Legal review |
+| Release readiness (overall) | 72 | Physical + external + legal |
+
+**Policy:** Software-ready may reach **100** for code/tests/docs truthfulness. Release-ready **cannot** reach 100 until physical, external, and legal gates close.
 
 ---
 
-## P0 — Before any safety-critical TestFlight (must be zero)
+## P0 — Before Any Safety-Critical TestFlight
 
-**P0 open items: 0** — no false physical/external claims; no unsupported certification claims in software.
+| Item | Status | Action |
+|---|---|---|
+| Unsupported certification claims | **PASS** | Maintain |
+| False physical QA claims | **PASS** | Maintain |
+| False external validation claims | **PASS** | Maintain |
+| Missing safety-critical test evidence (FC) | **PASS** | 0 P0 FC @ audit 01 |
+| Missing entitlement for required feature | **PASS** | Shallow signing aligned |
+| Missing privacy manifest | **PASS** | Static review complete |
 
----
-
-## P1 — Before internal TestFlight
-
-| ID | Work item | Status @ 451f8fb | Action |
-|----|-----------|------------------|--------|
-| P1-01 | iOS Algorithm Tests compile+run | **FAIL** | Fix IOS-P1-001 Snorkeling compile |
-| P1-02 | Command integrity script | **FAIL** | Fix CONS-046 paths to V2.2/V1.2/V2.3 |
-| P1-03 | GF iOS→Watch preset mismatch | **CLOSED** | CONS-002 @ 451f8fb |
-| P1-04 | MAIN sync P1 findings | **CLOSED** | CONS-003..005 |
-| P1-05 | Shallow FC TF labeling | **OPEN** | SDG-008 disclosure in TF notes |
-| P1-06 | Depth tier metadata CI check | **OPEN** | MASTER-DEPTH-002 |
-| P1-07 | Basic physical install smoke | **PENDING_PHYSICAL** | Ultra + iPhone install log |
-| P1-08 | Paired sync smoke | **PENDING_PHYSICAL** | One row of WATCH_IOS_SYNC matrix |
-| P1-09 | Snorkeling 12 QA templates | **PENDING_PHYSICAL** | CONS-048 Batch-8 |
-
-**Internal TestFlight software lane: CONDITIONAL** — fix P1-01/P1-02; disclose all physical gaps.
+**P0 open:** **NONE**
 
 ---
 
-## P2 — Before external TestFlight
+## P1 — Before Internal TestFlight
 
-All physical matrices (38 Watch + 16 iPhone + 8 paired + WAO + HW + shallow wet + 12 Snorkeling), external validation (4 campaigns), App Store assets — **NOT EXECUTED**.
+| Item | Status @2c30412 | Action |
+|---|---|---|
+| iOS automated test lane | **CLOSED** | 1655 PASS |
+| Command integrity script | **CLOSED** | CONS-046 V1.5 PASS |
+| Watch FC dry-run evidence | **PASS** | Software fail-closed |
+| Settings/Logbook ownership | **PASS** | Isolation tests |
+| Privacy policy alignment | **PASS** | Manifests + strings |
+| TestFlight metadata wording | **PASS** | Verify TF notes for shallow dev |
+| Basic physical install | **PENDING** | Execute PDQ-W-001 |
+| Paired sync smoke | **PENDING** | Execute PDQ-W-016 |
+
+**Internal TestFlight software: READY @2c30412**
+
+---
+
+## P2 — Before External TestFlight
+
+| Item | Status | Action |
+|---|---|---|
+| Watch test suite fully green | **OPEN** | Fix WFC-P2-005 + Snorkeling progress |
+| Full physical matrix | **OPEN** | Batch-8 execution |
+| CMAltimeter physical | **OPEN** | WATCH_CMALTIMETER_PHYSICAL |
+| WAO / Water Lock / Crown / AB physical | **OPEN** | HWC + WAO gates |
+| Shallow wet Gauge/FC | **OPEN** | CONS-042 |
+| Snorkeling 12 field QA | **OPEN** | CONS-048 |
+| External Bühlmann campaign | **OPEN** | WFC-P1-001 |
+| Instruments profiling | **OPEN** | Physical devices |
+| App Store metadata draft | **OPEN** | Marketing pack |
 
 ---
 
 ## P3 — Before App Store
 
-Legal counsel, accessibility manual QA, localization spot check, incident drill — **PENDING**.
+| Item | Status | Action |
+|---|---|---|
+| Final legal review | **OPEN** | CONS-044 |
+| Accessibility manual QA | **OPEN** | VoiceOver field |
+| Localization manual QA | **OPEN** | Native speaker review |
+| Final release notes | **OPEN** | ASC submission |
+| Incident/rollback drill | **OPEN** | Execute drill |
+| Full-depth entitlement | **OPEN** | Apple provisioning if claimed |
 
 ---
 
-## Validation evidence @ 451f8fb
+## Workstreams
 
-```bash
-./Scripts/validate_commands_for_cursor_integrity.sh   # FAIL (CONS-046)
-xcodebuild test -scheme "DIRDiving iOS Algorithm Tests"  # BUILD FAILED (IOS-P1-001)
-xcodebuild build -scheme "DIRDiving iOS"               # BUILD SUCCEEDED
-xcodebuild build -scheme "DIRDiving Watch App"         # BUILD SUCCEEDED
-```
+### Stream A — Software to 100 (est. 1–3 days)
+
+1. Update `WatchWaterAutoOpenPolicyTests` for post-Apnea `divingModeSelection` routing
+2. Update `WatchLaunchRoutingPolicyTests` FC predive expectations
+3. Fix `SnorkelingRouteProgressCalculatorTests/testProgressAtStartIsNearZero`
+4. Re-run Watch suite → target 1152/1152
+
+### Stream B — Physical QA Batch-8 (est. 2–4 weeks)
+
+Execute templates in `Docs/QA_EVIDENCE/` — CMAltimeter, WAO, shallow wet, paired sync, Apnea wet, Snorkeling 12.
+
+### Stream C — External Validation (est. 2–6 weeks)
+
+Execute Bühlmann external plan; optional Subsurface round-trip.
+
+### Stream D — Legal / App Store (est. 2–4 weeks)
+
+Counsel review, screenshots, ASC metadata, full-depth entitlement decision.
 
 ---
 
-## Critical path to 100%
+## Milestones
 
-1. Fix IOS-P1-001 (Snorkeling test compile)  
-2. Fix CONS-046 (integrity script paths)  
-3. Execute CONS-048 Snorkeling Batch-8 (12 field templates)  
-4. Execute legacy physical campaigns (Ultra, CMAltimeter, WAO, HW, paired sync)  
-5. Execute external Bühlmann/Subsurface/CCR validation  
-6. Legal counsel + ASC metadata + incident drill  
+| Milestone | Criteria | ETA class |
+|---|---|---|
+| Software 100% | 1152/1152 Watch + 1655 iOS + scripts PASS | Days |
+| Internal TF field-ready | Stream A + basic install smoke | 1 week |
+| External TF candidate | Streams B partial + external plan start | 4–6 weeks |
+| App Store candidate | All streams complete | 8–12 weeks |
 
 ---
 
-**Status:** OPEN @ `451f8fb` · 2026-06-30
+## Non-Regression Rule
+
+Any remediation touching FC math, timing, gases, GF, decompression, pressure/depth, checkpoint/restore, or schedule generation **must rerun audits 01, 03, 04, 05, 07** before claiming readiness improvement.

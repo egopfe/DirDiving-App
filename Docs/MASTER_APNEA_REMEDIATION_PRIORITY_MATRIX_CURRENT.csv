@@ -1,0 +1,13 @@
+Rank,Apnea_Finding_ID,Severity,Priority,Recommended_Batch,Recommended_Command,Dependency_Level,Safety_Critical,Release_Blocker,Quick_Win,High_Regression_Risk,Needs_Physical_QA,Needs_External_Validation,Reason_For_Rank,Acceptance_Gate,Notes
+1,APNEA-012,P1,P1,Batch-8,R10,0,No,Yes,No,Low,Yes,No,Physical wet QA blocks Apnea field claims,Signed APNEA wet QA artifacts,0% executed
+2,APNEA-003,P2,P2,Batch-8,R10,1,No,Yes,No,Low,Yes,No,Auto-detection cannot be claimed verified without field evidence,Apnea auto-detection field matrix PASS,Software PASS
+3,APNEA-002,P2,P2,Batch-6,R09,0,No,No,Yes,Medium,No,No,WAO test drift shared with WFC-P2-005; not FC safety,WatchWaterAutoOpenPolicyTests PASS,Part of CONS-050
+4,APNEA-004,P2,P2,Batch-6,R09,0,No,No,Yes,Medium,No,No,Subset of WFC-P2-005,testPreferredApneaResolvesToReady PASS,MAIN-APNEA-002
+5,APNEA-011,P2,P2,Batch-6,R09,2,No,No,Yes,Low,No,No,UI polish only; after routing tests green,UI review,Non-blocking
+6,APNEA-001,P3,P3,Batch-3,R05,3,No,No,No,Low,No,No,Documented accepted risk; cloud optional,ApneaCloudBackupStubTruthfulnessTests,CONS-039
+7,APNEA-005,n/a,n/a,n/a,n/a,0,No,No,n/a,No,No,No,Verified isolation — maintain,ApneaArchitectureIsolationTests,No remediation
+8,APNEA-006,n/a,n/a,n/a,n/a,0,No,No,n/a,No,No,No,Verified copy — maintain,UI truthfulness audit,No remediation
+9,APNEA-007,n/a,n/a,n/a,n/a,1,No,No,n/a,Low,Yes,No,Policy verified; physical WAO pending,WAO physical QA pack,Truthfulness PASS
+10,APNEA-008,n/a,n/a,n/a,n/a,0,No,No,n/a,No,Yes,No,Sync isolation verified; paired QA pending,Paired Apnea sync QA,Software PASS
+11,APNEA-009,n/a,n/a,n/a,n/a,0,No,No,n/a,No,No,No,Ownership verified — maintain,Settings/Logbook ownership tests,No remediation
+12,APNEA-010,n/a,n/a,n/a,n/a,0,No,No,n/a,No,Yes,No,P1/P2/P3 software delivered @ 76f3703,Apnea feature tests PASS,INTERNAL_READY

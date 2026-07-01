@@ -1,80 +1,81 @@
-# Master Readiness Roadmap — 7 / 14 / 30 Days
+# Readiness Roadmap — 7 / 14 / 30 Days — CURRENT
 
-**Baseline:** `main` @ `451f8fb` (Snorkeling @ `dbe5d8b`; remediation @ `5d757cc`)  
-**Orchestrator:** V1.3 · **Date anchor:** 2026-06-30  
-**Overall consolidated readiness:** **~65%** (software remediations closed; physical **0%**; iOS test gate regression)  
-**Verdict:** PARTIAL · Internal TestFlight software **CONDITIONAL** · External TF / App Store **NOT READY**
-
----
-
-## Starting point (@ 451f8fb)
-
-- Command 10 software remediation **COMPLETE** @ `5d757cc`
-- Snorkeling P1/P2/P3 software **DELIVERED** @ `dbe5d8b` — reflected in audits 01–06 @ 451f8fb
-- Domain audits **01–06 COMPLETE** @ `451f8fb` — **CONS-047 CLOSED**
-- Audit **07 + orchestrator 00 COMPLETE** @ `451f8fb`
-- **CONS-046 OPEN** — `validate_commands_for_cursor_integrity.sh` FAIL (script drift)
-- **CONS-049 OPEN** — iOS Algorithm Tests BUILD FAILED (IOS-P1-001)
-- **CONS-048 PENDING_PHYSICAL** — 12 Snorkeling QA templates
-- P0 open=0 · P1 open software=2 · Physical/external **0%** executed
+**Anchor date:** 2026-07-01  
+**Baseline:** `main` @ `2c30412`  
+**Overall verdict:** PARTIAL
 
 ---
 
-## 7-day plan (from 2026-06-30)
+## 7-day plan
 
-| Day | Focus | Deliverable | Findings |
-|-----|-------|-------------|----------|
-| 1 | **Test fix batch** | Snorkeling test compile — disambiguate `distanceMeters`; unify planner draft types | CONS-049 |
-| 1–2 | **Script fix batch** | Update `validate_commands_for_cursor_integrity.sh` to V2.2/V1.2/V2.3 | CONS-046 |
-| 2–3 | **Audit reruns 02, 05, 07** | Refresh after test fix | CONS-049 |
-| 3–5 | **Snorkeling physical QA start** | First open-water / paired-device artifacts | CONS-048 |
-| 5–7 | **Legacy physical QA planning** | Ultra depth, WAO, shallow sessions | CONS-010..013, CONS-021..022, CONS-042 |
+**Goal:** Close remaining **software** gaps; establish non-regression gates; repair **P0 documentation** contradictions.
 
-**7-day target readiness:** **~72%** — iOS tests green; script gate PASS; Snorkeling physical **~10%**
+| Day | Action | Findings | Gate |
+|-----|--------|----------|------|
+| 1–2 | R09: Align WAO routing tests (CONS-050) + Snorkeling progress (CONS-051) | WFC-P2-005 | G-009 1152/1152 Watch PASS |
+| 2 | Rerun audits 01; 03; 04; 05 @ HEAD | — | Upstream coherence |
+| 3 | Repair P0 legacy claim docs (CONS-053) | DOC-P0-001; DOC-P0-002 | G-025 no P0 contradictions |
+| 4 | Refresh INDEX/README baseline to 2c30412 (CONS-054) | INDEX ad1c836 drift | G-025 |
+| 5 | Verify all Batch-0 gates G-001..G-009 | CONS-046; CONS-049 | CI green |
+| 6–7 | Scaffold physical QA packs (templates → assigned owners) | CONS-048; CONS-010 | No false PASS marks |
+
+**Out of scope for 7 days:** UI polish (P3/P4), external Bühlmann campaign execution, App Store legal sign-off.
 
 ---
 
 ## 14-day plan
 
-| Week | Focus | Deliverable |
-|------|-------|-------------|
-| 1 | Test + script fixes; Snorkeling QA kickoff | CONS-049/046 closed; 2+ Snorkeling signed artifacts |
-| 2 | Diving physical campaigns (Ultra, shallow, WAO, HW) | CONS-010, CONS-021, CONS-022, CONS-042 partial |
+**Goal:** Reduce **P1 physical scaffolding**; prepare **internal TestFlight evidence** with honest disclosure.
 
-**14-day target:** Internal TestFlight software **READY**; physical **~25%**; External TF still **NOT READY**
+| Week | Action | Findings |
+|------|--------|----------|
+| 1 | Complete 7-day software + doc truth plan | CONS-050; CONS-053; CONS-054 |
+| 2a | Execute paired-device sync QA pilot (CONS-011) | Paired Watch+iPhone |
+| 2b | Begin Watch FC shallow wet QA planning (CONS-042) | Safe test setup |
+| 2c | Begin WAO preferred-destination wet QA (CONS-021) | Water Lock setup |
+| 2d | Start Snorkeling open-water QA (first 4/12 CONS-048) | Field GPS |
+| 2e | Apnea wet auto-detection pilot (APNEA-PHY-001) | Apnea boundary |
+| 2f | Manual accessibility session (CONS-012) | VoiceOver notes |
+
+**Target @ day 14:** Internal TestFlight build with **READY** software + **signed partial physical evidence** (not 100%).
 
 ---
 
 ## 30-day plan
 
-| Week | Focus | Deliverable |
-|------|-------|-------------|
-| 1–2 | Software gates + Snorkeling field QA | CONS-048 ≥50% |
-| 2–3 | **Batch 8 external** | Bühlmann (CONS-009); GF (CONS-043); Subsurface (CONS-030) |
-| 3–4 | Paired sync + a11y + PDF | CONS-011, CONS-012, CONS-013 |
-| 4 | **Batch 9 release** | PDF/legal (CONS-013, CONS-044); re-run 00 + 07 |
+**Goal:** **External TestFlight / professional beta readiness** trajectory — not App Store certification.
 
-**30-day target:** External TestFlight **CONDITIONAL** (physical ≥40%); App Store **NOT READY** until legal signed
+| Week | Action | Findings |
+|------|--------|----------|
+| 3 | Complete Snorkeling 12/12 field QA (CONS-048) | SNORKELING_* |
+| 3 | Watch FC wet depth + CMAltimeter (CONS-010) | Physical FC |
+| 3 | Underwater Crown/AB Water Lock (CONS-022) | HW matrix |
+| 4 | External Bühlmann spot-check campaign start (CONS-009) | Third-party reviewer |
+| 4 | GF preset external comparison (CONS-043) | GF narrative |
+| 4 | Legal/marketing review scheduling (CONS-044) | Counsel |
+| 4 | Pixel-diff baseline capture (CONS-032) | 59 mockups |
+| 4 | Subsurface CSV round-trip (CONS-030) | Desktop validation |
 
----
-
-## Milestone checklist
-
-| Milestone | Status | Finding |
-|-----------|--------|---------|
-| Command V1.2/V2.2/V2.3 upgrade | **DONE** @ bb204f5 | CONS-046 script fix pending |
-| Software remediation Command 10 | **DONE** @ 5d757cc | — |
-| Snorkeling P1/P2/P3 software | **DONE** @ dbe5d8b | — |
-| Domain audits 01–06 refresh | **DONE** @ 451f8fb | CONS-047 closed |
-| iOS full test suite green | **BLOCKED** | CONS-049 |
-| GF external spot-check | Day 20–25 | CONS-043 |
-| App Store legal sign-off | Day 25–30 | CONS-044 |
+**Target @ day 30:** External TestFlight **CONDITIONAL** — physical evidence >50%; external validation in progress; App Store still **NOT READY**.
 
 ---
 
-## Blockers that must not slip
+## Readiness trajectory
 
-- **CONS-049** — blocks trustworthy automated iOS regression
-- **CONS-046** — blocks CI/orchestrator preflight
-- **CONS-048** — blocks Snorkeling external claims
-- **Physical 0%** — blocks External TF and App Store regardless of software PASS
+| Milestone | Target date | Expected status |
+|-----------|-------------|-----------------|
+| Watch CI fully green | Day 2 | 1152/1152 |
+| P0 docs repaired | Day 3 | CONS-053 closed |
+| Internal TF software | Day 5 | **READY** (disclosure) |
+| First physical artifacts | Day 14 | Partial signed packs |
+| External TF candidate | Day 30 | **CONDITIONAL** |
+| App Store | Day 30+ | **NOT READY** (legal + external) |
+
+---
+
+## Explicit non-goals (30 days)
+
+- No certification or EN13319 compliance claims
+- No "100% release readiness" without audit 07 post-remediation
+- No Command 10/11 re-execution from orchestrator 00
+- No conversion of simulator evidence to physical PASS

@@ -21,3 +21,6 @@ NAV-019,Diving,All,iOS,Planner tab,Planner modes,Always,PlannerView,yes,yes,None
 NAV-020,Diving,All,Watch,Settings,Water auto-open,Settings route,WatchWaterAutoOpenSettingsView,yes,yes,Apply blocked if session,no,no,no,n/a,yes,yes,,
 NAV-021,Diving,All,Watch,App Intent,Underwater primary action,Shortcut assigned,ExecuteUnderwaterPrimaryActionIntent,yes,yes,Legal not accepted,no,no,no,Shortcuts,yes,yes,MUIUX-P1-002,Physical AB pending
 NAV-022,Diving,All,Watch,Developer,Shallow testing toggles,Dev unlock,DeveloperSettingsView,yes,yes,Release builds gated,no,no,no,n/a,yes,yes,MUIUX-P1-005,Not public surface
+NAV-023,Apnea,All,iOS,Profiles,Alarms/markers editor,Profile edit,IOSApneaProfileEditorView,partial,no,Model only,no,yes,no,n/a,yes,partial,MUIUX-P2-007,Unreachable alarms UI
+NAV-024,Apnea,All,Watch,Apnea root,Localized title,Always,ApneaView,yes,yes,None,no,no,no,n/a,yes,partial,MUIUX-P2-006,Hardcoded EN title
+NAV-025,Apnea/Snorkeling,All,Watch,Surface tab,Compass/User Images,Non-diving activity,WatchActivityPagePolicy,yes,yes,Underwater clamped,no,no,no,n/a,yes,partial,MUIUX-P2-008,Diving-centric surface pages

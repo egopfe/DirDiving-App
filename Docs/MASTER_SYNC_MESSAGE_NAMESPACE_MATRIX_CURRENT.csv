@@ -12,7 +12,7 @@ NS-SNORKEL-ROUTE,iOS→Watch,transferUserInfo,snorkelingRoutePackage,snorkelingR
 NS-PLANNER-BRIEF,iOS→Watch,WCSession file,plannerBriefingManifest / plannerBriefingCard,plannerBriefingAck,PlannerBriefingCardStore,hash+size,N/A,N/A,PlannerBriefingCardStoreTests,PASS,,Reference-only cards; path sanitized
 NS-COMPANION-PHOTO,iOS→Watch,WCSession file,photoFileName + photoID metadata,companionPhotoAck,UserImageStore,signed mgmt requests,N/A,N/A,CompanionPhotoTransferPipelineTests,PASS,,File transfer not userInfo envelope
 NS-TOMBSTONE-DIVE,Both,applicationContext,dirdiving_deleted_diving_session_tombstones,N/A,DiveLogStore,yes signed,N/A,yes activity=diving,ActivitySyncTombstoneTests,PASS,,Signed path primary
-NS-TOMBSTONE-DIVE-LEGACY,Both,applicationContext,dirdiving_deleted_session_ids,N/A,DiveLogStore,no,N/A,N/A,ActivitySyncTombstoneTests,PASS,P3,Bootstrap/pairing mirror only; signed path primary @ 451f8fb CONS-005
+NS-TOMBSTONE-DIVE-LEGACY,Both,applicationContext,dirdiving_deleted_session_ids,N/A,DiveLogStore,no,N/A,N/A,ActivitySyncTombstoneTests,PASS,P3,Bootstrap/pairing mirror only; signed path primary @ 2c30412 CONS-005
 NS-TOMBSTONE-APNEA,Both,applicationContext,dirdiving_deleted_apnea_session_tombstones,N/A,ApneaLogbookStore,yes signed,N/A,yes activity=apnea,ActivitySyncTombstoneTests,PASS,,SYNC-P1-001 remediated
 NS-TOMBSTONE-SNORKEL,Both,applicationContext,dirdiving_deleted_snorkeling_session_tombstones,N/A,SnorkelingLogbookStore,yes signed,N/A,yes activity=snorkeling,ActivitySyncTombstoneTests,PASS,,SYNC-P2-003 remediated
 NS-TRUST,Both,applicationContext,dirdiving_watch_sync_secret,N/A,N/A,N/A,N/A,N/A,WatchSyncPeerSecretPinningIOSTests,PASS,P3,TOFU via WatchSyncAuth; bootstrap TTL

@@ -1,70 +1,66 @@
-# DIR DIVING — Master Release Post-Remediation Readiness Audit (Current)
+# Release Post-Remediation Readiness Audit — CURRENT
 
-**Command:** 05 §2B — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md`  
-**Date:** 2026-06-30  
-**Branch:** `main` @ `451f8fb`  
-**Type:** Post-remediation release readiness verification — audit-only
-
----
-
-## Executive Summary
-
-Post-remediation consolidated software findings **CONS-002 through CONS-008** remain **verified in code** at `451f8fb`. Internal TestFlight **software/package posture is largely truthful** — no fake physical or external validation claims detected in MASTER audit outputs.
-
-**Regressions at HEAD block full software PASS:**
-
-| ID | Issue | Impact |
-|----|-------|--------|
-| IOS-P1-001 | iOS Algorithm Tests compile failure | Automated regression lane blocked |
-| CONS-046 | Command integrity script FAIL | Audit preflight untrustworthy |
-
-**Physical/external gates correctly preserved at 0% executed** — including 12 Snorkeling QA templates (CONS-048).
+**Command:** 05 §2B — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.5.md`  
+**Baseline:** `main` @ `2c30412`  
+**Audit date:** 2026-07-01  
+**Prior baseline:** `451f8fb`
 
 ---
 
-## Post-Remediation Software Gates
+## A. Executive Summary
 
-| Gate | Status @ 451f8fb |
-|------|------------------|
-| CONS-002 GF preset parity | **PASS** |
-| CONS-003 sync ACK cleanup | **PASS** |
-| CONS-004 symmetric diveImportAck | **PASS** |
-| CONS-005 tombstone HMAC | **PASS** |
-| CONS-006 shallow dev toggle exposure | **PASS** (default OFF) |
-| CONS-007 depth capability authority | **PASS** |
-| CONS-008 independent oracle | **PASS** |
-| CONS-019 WAO depth gate | **PASS** |
-| CONS-046 script integrity | **FAIL** |
-| CONS-048 Snorkeling physical QA | **PENDING_PHYSICAL** (12/12) |
-| IOS-P1-001 iOS test compile | **FAIL** |
+Post-remediation release verification confirms software remediation **truthfully improved internal TestFlight software readiness** without falsely closing physical, external, or legal gates.
 
----
+| Dimension | @451f8fb | @2c30412 |
+|---|---|---|
+| iOS Algorithm Tests | BUILD FAILED (IOS-P1-001) | **1655/1655 PASS** |
+| Command integrity | FAIL (CONS-046) | **PASS** (V1.5) |
+| Watch Algorithm Tests | 353/355 (2 FC failures) | **1139/1152** (0 FC failures; 13 routing) |
+| Physical QA executed | 0% | **0%** (preserved) |
+| External validation | 0% | **0%** (preserved) |
+| Internal TF software | CONDITIONAL | **READY** |
+| External TF / App Store | NOT READY | **NOT READY** |
 
-## Claim Gate Verification (§2B)
-
-| Claim gate | Result |
-|------------|--------|
-| No fake physical evidence claims | **PASS** |
-| No fake external validation claims | **PASS** |
-| No unsupported certification claims | **PASS** |
-| No unsupported full-depth entitlement claims | **PASS** |
-| No shallow testing as production decompression guidance | **PASS** |
-| No Water Lock / AB / Crown / Auto-Launch physical QA passed | **PASS** (correctly pending) |
-| Internal TestFlight software readiness truthful | **CONDITIONAL** — IOS-P1-001 + CONS-046 open |
-| External TestFlight / App Store remain gated | **PASS** (correctly NOT_READY) |
+**NO_FAKE_PHYSICAL_EXTERNAL_CLAIMS: PASS**
 
 ---
 
-## Verdict
+## B. Remediation Items Verified
+
+| ID | Status @2c30412 | Evidence |
+|---|---|---|
+| IOS-P1-001 / CONS-049 | **CLOSED** | 1655 iOS tests PASS |
+| CONS-046 V1.5 | **CLOSED** | validate_commands_for_cursor_integrity.sh PASS |
+| CONS-002 GF parity | **PASS** | DivePlanPackageBuilderTests |
+| CONS-003–005 sync/security | **PASS** | Signed ACK + tombstone tests |
+| CONS-007 depth authority | **PASS** | DepthCapabilityTests |
+| CONS-008 independent oracle | **PASS** | Audit15 suites |
+| WFC-P2-005 routing drift | **NEW OPEN** | 13 Watch test failures post-Apnea |
+
+---
+
+## C. Gates Preserved (Not Falsely Closed)
+
+All rows in [`MASTER_PHYSICAL_EXTERNAL_GATE_PRESERVATION_MATRIX_CURRENT.csv`](MASTER_PHYSICAL_EXTERNAL_GATE_PRESERVATION_MATRIX_CURRENT.csv) confirm physical, external, and legal gates remain **PENDING** with **no fake closure**.
+
+---
+
+## D. Final Verdict Additions (§2B)
 
 ```text
-INTERNAL_TESTFLIGHT_SOFTWARE_READY_AFTER_REMEDIATION: CONDITIONAL
+INTERNAL_TESTFLIGHT_SOFTWARE_READY_AFTER_REMEDIATION: READY
 EXTERNAL_TESTFLIGHT_WITH_PHYSICAL_GATES: NOT_READY
 APP_STORE_WITH_LEGAL_PHYSICAL_EXTERNAL_GATES: NOT_READY
 NO_FAKE_PHYSICAL_EXTERNAL_CLAIMS: PASS
-RELEASE_SOFTWARE_READINESS_AFTER_REMEDIATION: 88
+RELEASE_SOFTWARE_READINESS_AFTER_REMEDIATION: 82
 ```
 
 ---
 
-**Status:** COMPLETE @ `451f8fb` · 2026-06-30
+## E. Recommended Next Steps
+
+1. Align `WatchWaterAutoOpenPolicyTests` / `WatchLaunchRoutingPolicyTests` with post-Apnea `divingModeSelection` routing (WFC-P2-005).
+2. Fix `SnorkelingRouteProgressCalculatorTests/testProgressAtStartIsNearZero`.
+3. Execute physical QA Batch-8 (CMAltimeter, WAO, shallow wet, paired sync).
+4. Launch external Bühlmann validation campaign (WFC-P1-001).
+5. Legal/marketing review for App Store metadata (CONS-044).
