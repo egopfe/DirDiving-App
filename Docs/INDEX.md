@@ -5,7 +5,7 @@
 
 ---
 
-## Aggiornamento indice 2026-07-01 — Audit 07 post-remediation @ `48f8af2`
+## Aggiornamento indice 2026-07-01 — Audit 07 post-remediation @ `dfbceec`
 
 Audit 07 V1.5 complete: software gates **100%**; iOS **1655/1655** + Watch **1152/1152** PASS; physical/external/legal **PENDING**.
 
