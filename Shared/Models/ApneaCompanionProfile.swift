@@ -31,6 +31,7 @@ struct ApneaCompanionProfile: Identifiable, Codable, Hashable, Sendable {
     var updatedAt: Date
     /// Structured profile kind for P1/P2/P3 companion profiles (optional for legacy presets).
     var profileKind: ApneaProfileKind?
+    var maxRepetitions: Int?
 
     init(
         id: UUID = UUID(),
@@ -46,7 +47,8 @@ struct ApneaCompanionProfile: Identifiable, Codable, Hashable, Sendable {
         notes: String? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date(),
-        profileKind: ApneaProfileKind? = nil
+        profileKind: ApneaProfileKind? = nil,
+        maxRepetitions: Int? = nil
     ) {
         self.id = id
         self.schemaVersion = schemaVersion
@@ -62,6 +64,7 @@ struct ApneaCompanionProfile: Identifiable, Codable, Hashable, Sendable {
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.profileKind = profileKind
+        self.maxRepetitions = maxRepetitions
     }
 
     func editableCopy(newID: UUID = UUID()) -> ApneaCompanionProfile {
@@ -75,7 +78,9 @@ struct ApneaCompanionProfile: Identifiable, Codable, Hashable, Sendable {
             targetDurationSeconds: targetDurationSeconds,
             alarms: alarms,
             markers: markers,
-            notes: notes
+            notes: notes,
+            profileKind: profileKind,
+            maxRepetitions: maxRepetitions
         )
     }
 }
