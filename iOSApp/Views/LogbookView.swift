@@ -13,6 +13,7 @@ struct LogbookView: View {
     @Environment(\.locale) private var locale
     @State private var search = ""
     @State private var showManualDiveEditor = false
+    @State private var showImportCenter = false
     @State private var pendingDeleteID: UUID?
 
     private var showsUnifiedLogbook: Bool {
@@ -150,6 +151,9 @@ struct LogbookView: View {
             }
         }
         .dirCompanionTabRoot()
+        .sheet(isPresented: $showImportCenter) {
+            DivingImportCenterView()
+        }
         .task {
             await logStore.loadIfNeeded()
         }
@@ -174,6 +178,17 @@ struct LogbookView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text(DIRIOSLocalizer.string("manual_dive.add.title")))
+                if !showsUnifiedLogbook {
+                    Button {
+                        showImportCenter = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                            .font(.title3.weight(.medium))
+                            .foregroundStyle(DIRTheme.cyan)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text(DIRIOSLocalizer.string("diving.import.center.title")))
+                }
             }
             Text(DIRIOSLocalizer.string("logbook.header.subtitle"))
                 .font(.callout)
