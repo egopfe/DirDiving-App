@@ -3,7 +3,7 @@
 **Date:** 2026-07-01  
 **Branch:** `main`  
 **Baseline commit:** `4c27b2c` (pre-import-center)  
-**Implementation commit:** (see git log after push)
+**Implementation commit:** `a79e1ff`
 
 ---
 
