@@ -2134,6 +2134,7 @@
 "apnea.ios.planner.recovery" = "Recupero consigliato";
 "apnea.ios.planner.notes" = "Note";
 "apnea.ios.planner.validation" = "Validazione";
+"apnea.ios.planner.readiness" = "Controllo sessione";
 "apnea.ios.planner.send_watch" = "INVIA AL WATCH";
 "apnea.ios.planner.validation_failed" = "Correggi la validazione prima dell'invio.";
 "apnea.ios.planner.estimate_format" = "Sub %@ · Recupero %@ · Policy %@";
