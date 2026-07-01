@@ -8,10 +8,16 @@ private struct LogbookMonthSection: Identifiable {
 
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+    @EnvironmentObject private var coordinator: IOSCompanionStoreCoordinator
+    @EnvironmentObject private var logbookVisibility: IOSActivityLogbookVisibilitySettingsStore
     @Environment(\.locale) private var locale
     @State private var search = ""
     @State private var showManualDiveEditor = false
     @State private var pendingDeleteID: UUID?
+
+    private var showsUnifiedLogbook: Bool {
+        logbookVisibility.showAllActivitiesInDivingLogbook
+    }
 
     private var filtered: [DiveSession] {
         guard !search.isEmpty else { return logStore.sessions }
@@ -63,6 +69,9 @@ struct LogbookView: View {
                 ScrollView(showsIndicators: false) {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         header
+                        if showsUnifiedLogbook {
+                            IOSUnifiedLogbookListView(hostActivity: .diving)
+                        } else {
                         if hasMixedDemoAndRealDives {
                             mixedDemoBanner
                         }
@@ -106,6 +115,7 @@ struct LogbookView: View {
                                     }
                                 }
                             }
+                        }
                         }
                     }
                     .padding(.horizontal, 16)
