@@ -1,54 +1,59 @@
-# Master Consolidated Audit and Non-Regressive Remediation Plan — Current
+# Master Consolidated Audit and Non-Regressive Remediation Plan — CURRENT
 
-**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.3.md`  
-**Execution date:** 2026-06-30  
+**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.5.md`  
+**Execution date:** 2026-07-01  
 **Repository:** `egopfe/DirDiving-App`  
 **Branch:** `main`  
-**Execution HEAD:** `451f8fb` (orchestrator V1.3 full audit rerun; Snorkeling P1/P2/P3 @ `dbe5d8b`; command upgrade @ `bb204f5`; remediation @ `5d757cc`)  
-**Execution mode:** Read-only orchestration — no production code modified
+**Execution HEAD:** `2c30412`  
+**Execution mode:** Read-only orchestration — no production code modified  
+**Upstream audits:** 01–06 COMPLETE @ `2c30412` (all verdict **PARTIAL**)  
+**Excluded:** Audit 07; Command 10/11 remediation (not launched by orchestrator 00)
+
+**Recent development integrated:** Apnea P1/P2/P3 @ `76f3703` · software remediation 100% @ `8871f98`/`7a429a7` · CONS-046 V1.5 @ `6a0005b`
 
 ---
 
 ## A. Executive Summary
 
-Orchestrator **V1.3** full audit sequence executed @ **`451f8fb`**. All domain audits **01–06 rerun** at HEAD; post-remediation verification **07** refreshed. Consolidates findings after **Command 10 software remediation** (@ `5d757cc`), **Snorkeling P1/P2/P3** (@ `dbe5d8b`), and **2026-06-30 comprehensive audit wave**.
+Orchestrator **V1.5** consolidation @ **`2c30412`** after verified upstream audits **01–06**. All domain audits report **0 P0 Full Computer safety defects**. Software remediation closed **CONS-046**, **IOS-P1-001**, and **CONS-049** (1655 iOS tests PASS; command integrity PASS). **Open software gate:** **CONS-050 / WFC-P2-005** (13 Watch routing test failures; 0 FC failures). **Open algorithmic external gate:** **WFC-P1-001 / CONS-009**. **Physical/external/legal gates: 0% executed** — honestly preserved.
 
-**Overall verdict: PARTIAL.** **Software-actionable remediations CONS-001..045 remain closed.** **Open software gates:** CONS-046 (script drift), **IOS-P1-001 / CONS-049** (iOS Algorithm Tests compile failure @ HEAD). **Physical/external:** CONS-048 (12 Snorkeling QA), CONS-010/021/022/042 and aggregate physical matrices — **0% executed**.
+**Overall verdict: PARTIAL**
 
 | Dimension | Score | Class |
 |-----------|------:|-------|
-| Watch FC software | **94%** | SOFTWARE_READY — 0 P0 @ 451f8fb |
-| iOS companion software | **88%** | PARTIAL — test gate regression IOS-P1-001 |
-| UI/UX software | **100%** | SOFTWARE_READY |
-| Main code / sync / security | **91%** | SOFTWARE_READY — CONS-046 script FAIL |
-| Release / QA / legal software | **68%** | Mixed — iOS tests blocked |
-| Documentation alignment | **68%** | PARTIAL — README baseline stale |
-| Snorkeling P1/P2/P3 software | **92%** | SOFTWARE_READY — field QA pending |
-| Physical QA | **0%** | PENDING_PHYSICAL (+ 12 Snorkeling templates) |
+| Watch FC software | **94%** | SOFTWARE_READY — 0 P0 FC @ 2c30412 |
+| iOS companion software | **98%** | SOFTWARE_READY — 1655/1655 PASS |
+| UI/UX software | **98%** | SOFTWARE_READY — physical gates pending |
+| Main code / sync / security | **94%** | SOFTWARE_READY — WFC-P2-005 partial Watch CI |
+| Release / QA / legal software | **82%** | INTERNAL_TF software READY |
+| Documentation alignment | **72%** | PARTIAL — 2 P0 legacy docs; INDEX stale |
+| Apnea software (P1/P2/P3) | **95%** | INTERNAL_READY — wet QA pending |
+| Snorkeling software | **92%** | SOFTWARE_READY — CONS-048 field QA pending |
+| Physical QA | **0%** | PENDING_PHYSICAL |
 | External validation | **0%** | PENDING_EXTERNAL_VALIDATION |
-| **Overall consolidated release readiness** | **~65%** | PARTIAL |
+| **Overall consolidated release readiness** | **68%** | PARTIAL |
 
-**Release posture:** Internal TestFlight **CONDITIONAL** (fix IOS-P1-001 + CONS-046) · External TestFlight **NOT READY** · App Store **NOT READY**
+**Release posture:** Internal TestFlight software **READY** (conditional on physical/external disclosure) · External TestFlight **NOT READY** · App Store **NOT READY**
 
-**Recommended next:** Fix IOS-P1-001 Snorkeling test compile → fix `validate_commands_for_cursor_integrity.sh` (CONS-046) → physical QA Batch-8.
+**Recommended next:** R09 — align WFC-P2-005 Watch routing tests (not Command 10/11).
 
 ---
 
 ## B. Source Audit Inputs and Completeness
 
-| Audit | Command | Body @ 451f8fb | Output @ 451f8fb | Completeness |
-|-------|---------|----------------|------------------|--------------|
-| **01** Watch FC Forensic | V2.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
-| **02** iOS Deep | V1.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
-| **03** UI/UX Deep | V2.3 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
-| **04** Main/Sync/Security | V1.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
-| **05** Release/QA/Legal | V1.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
-| **06** Documentation | V1.2 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
-| **07** Post-remediation | V1.0 | **ALIGNED** | **CURRENT** 2026-06-30 | **COMPLETE** |
+| Audit | Command | HEAD | Outputs | Verdict |
+|-------|---------|------|---------|---------|
+| **01** Watch FC Forensic | V1.5 | `2c30412` | 12/12 COMPLETE | **PARTIAL** — 0 P0 FC; WFC-P1-001; WFC-P2-005 |
+| **02** iOS Deep | V1.5 | `2c30412` | 8/8 COMPLETE | **PARTIAL** — 1655 PASS; 0 P0/P1 |
+| **03** UI/UX Deep | V1.5 | `2c30412` | 13/13 COMPLETE | **PARTIAL** — 98% software |
+| **04** Main/Sync/Security | V1.5 | `2c30412` | 14/14 COMPLETE | **PARTIAL** — MAIN-P2-003=WFC-P2-005 |
+| **05** Release/QA/Legal | V1.5 | `2c30412` | 10/10 COMPLETE | **PARTIAL** — INTERNAL_TF software READY |
+| **06** Documentation | V1.5 | `2c30412` | 6/6 COMPLETE | **PARTIAL** — 72%; 2 P0 legacy docs |
 
-**CONS-047 STALE upstream:** **VERIFIED FIXED** — audits 01–06 refreshed @ 451f8fb.  
-**CONS-046 script drift:** **OPEN** — integrity script still references V2.1/V1.1.  
-**CONS-049 (new):** iOS Algorithm Tests compile failure @ 451f8fb (IOS-P1-001).
+**CONS-047:** **VERIFIED CLOSED** — audits 01–06 refreshed @ `2c30412`.  
+**CONS-046 / CONS-049 / IOS-P1-001:** **FIXED** @ `2c30412`.
+
+See `MASTER_ORCHESTRATOR_UPSTREAM_OUTPUT_COMPLETENESS_MATRIX_CURRENT.csv`.
 
 ---
 
@@ -56,15 +61,14 @@ Orchestrator **V1.3** full audit sequence executed @ **`451f8fb`**. All domain a
 
 | Field | Value |
 |-------|-------|
-| Branch | `main` ✓ @ `451f8fb` |
-| Snorkeling P1/P2/P3 | `dbe5d8b`–`70cf0d9` |
-| Command upgrade | `bb204f5` |
-| Remediation commit | `5d757cc` (Command 10) |
-| Full audit rerun | **2026-06-30** @ `451f8fb` |
-| iOS + Watch build | **SUCCEEDED** @ 451f8fb |
-| iOS Algorithm Tests | **BUILD FAILED** (IOS-P1-001) |
-| Watch Algorithm Tests | **NOT_EXECUTED** this session |
-| `commands_for_cursor/` | Present; **01–07 ALIGNED**; script gate **FAIL** |
+| Branch | `main` ✓ @ `2c30412` |
+| Apnea P1/P2/P3 | `76f3703` |
+| CONS-046 V1.5 | `6a0005b` |
+| Software remediation | `7a429a7` / `8871f98` |
+| iOS build + tests | **BUILD SUCCEEDED** · **1655/1655 PASS** |
+| Watch build + tests | **BUILD SUCCEEDED** · **1139/1152 PASS** (13 non-FC) |
+| Command integrity | **PASS** @ V1.5 |
+| `commands_for_cursor/` | Present; 01–06 V1.5 aligned |
 
 ---
 
@@ -72,101 +76,106 @@ Orchestrator **V1.3** full audit sequence executed @ **`451f8fb`**. All domain a
 
 | Lane | Status | Evidence |
 |------|--------|----------|
-| Software-actionable findings (pre-Snorkeling) | **100% closed** | Command 10 @ 5d757cc; verified @ 451f8fb |
-| Snorkeling P1/P2/P3 software | **DELIVERED** | Audits 02/03/04/05 @ 451f8fb |
-| Domain audits 01–06 | **CURRENT** | CONS-047 closed |
-| iOS automated regression | **BLOCKED** | IOS-P1-001 / CONS-049 |
-| Internal TestFlight (software) | **CONDITIONAL** | Fix test compile + CONS-046 |
-| External TestFlight | **NOT READY** | Physical QA 0%; 12 Snorkeling templates |
-| App Store | **NOT READY** | + legal/marketing (CONS-044) |
-| Physical QA execution | **0%** | CONS-048 |
-| Command integrity automation | **FAIL** | CONS-046 |
+| FC algorithmic P0 safety | **PASS** | Audit 01: 0 P0; all FC tests PASS |
+| iOS automated regression | **PASS** | 1655/1655 @ `2c30412` |
+| Watch automated regression | **PARTIAL** | 1139/1152; WFC-P2-005 |
+| Internal TestFlight (software) | **READY** | Conditional on disclosure |
+| External TestFlight | **NOT READY** | Physical 0%; WFC-P1-001 |
+| App Store | **NOT READY** | + legal + P0 legacy docs |
+| Apnea first-class | **INTERNAL_READY** | Isolation PASS; wet QA pending |
+| Physical QA execution | **0%** | CONS-045 meta |
 
-**Snorkeling P1/P2/P3 wave — consolidated status @ dbe5d8b:**
+**June 2026 wave — SOFTWARE_READY / PENDING_PHYSICAL preserved:**
 
-| Feature area | SOFTWARE_READY | PENDING_PHYSICAL / STALE_AUDIT |
-|--------------|:--------------:|-------------------------------|
-| Route safety check + validation | **PASS** | Field open-water validation |
-| iOS route planner P1/P2/P3 sections | **PASS** | Field open-water validation |
-| Watch runtime evaluator (GPS, off-route, return) | **PASS** | 12 QA templates PENDING |
-| Route sync iOS→Watch | **PASS** | Paired-device field QA |
-| Cross-activity isolation | **PASS** (tests) | SNORKELING_NO_CROSS_ACTIVITY_REGRESSION pending |
-| Shared helpers (distance, bearing, GPS quality) | **PASS** | Logbook GPS quality field QA |
-
-**June 2026 wave (pre-Snorkeling) — status unchanged from prior consolidation @ 0126699** — WAO, Crown, GF, shallow, sync fixes remain SOFTWARE_READY with physical gates PENDING.
+| Feature area | SOFTWARE_READY | PENDING_PHYSICAL |
+|--------------|:--------------:|------------------|
+| Water auto-open routing | PASS (policy) | CONS-021 wet QA |
+| Digital Crown underwater clamp | PASS | CONS-022 Water Lock |
+| Action Button router-only | PASS | CONS-022 |
+| GF presets + iOS interop | PASS (CONS-002) | CONS-043 external |
+| Shallow dev toggles | PASS (CONS-006/007) | CONS-042 wet |
+| Apnea P1/P2/P3 | PASS @ 76f3703 | APNEA-PHY-001 |
+| Snorkeling P1/P2/P3 | PASS | CONS-048 12 QA |
 
 ---
 
 ## E. Release Blocker Overview
 
-| Gate | Status | Top blockers |
-|------|--------|--------------|
-| Command integrity script | **BLOCKED** | CONS-046 |
-| iOS automated regression | **BLOCKED** | CONS-049 (IOS-P1-001) |
-| Internal TestFlight (software) | **CONDITIONAL** | Fix CONS-046 + CONS-049 |
-| Internal TestFlight (full) | **NOT READY** | Physical QA not started |
-| External TestFlight | **NOT READY** | Physical 0%; Snorkeling QA; CONS-009 external |
-| App Store | **NOT READY** | External TF + CONS-044 legal |
+See `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`.
+
+- **Internal TF software blockers:** 0 P0/P1 (CONS-046/049 closed)
+- **Internal TF conditional:** honest physical/external disclosure required
+- **External TF:** 10 P1 physical/external gates + WFC-P2-005 P2
+- **App Store:** + CONS-044 legal + CONS-053 P0 docs
 
 ---
 
 ## F. Consolidated Finding Register Summary
 
-**49 consolidated findings** (CONS-001..049). See `MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`.
+| Severity | Open | Fixed/Verified | Notes |
+|----------|-----:|---------------:|-------|
+| **P0 (FC safety)** | **0** | — | Algorithmic gate PASS |
+| **P0 (documentation)** | **2** | — | CONS-053 legacy claim docs |
+| **P1 open** | **10** | 7 fixed | Physical/external/legal pending |
+| **P2 open** | **12** | — | Includes CONS-050 WFC-P2-005 |
+| **P3 open** | **6** | — | UX/maintainability |
+| **P4 open** | **4** | — | Polish |
 
-| Severity | Open software | Pending physical/external/legal | Notes |
-|----------|--------------:|--------------------------------:|-------|
-| **P0** | **0** | 0 | CONS-001 FIXED |
-| **P1** | **2** | **10** | CONS-046, CONS-049 OPEN; evidence 009–013, 021–022, 042, 044, 048 PENDING |
-| **P2** | **0** | **13** | 015 partial; field QA open; CONS-047 VERIFIED |
-| **P3** | **6** | 0 | 028, 035–037, 040–041 |
-| **P4** | 0 | 1 accepted | CONS-039 |
-
-**Wave @ 451f8fb:** CONS-047 **CLOSED** (audits refreshed); **CONS-049 NEW** (iOS test compile); CONS-046 **OPEN**; CONS-048 **PENDING_PHYSICAL**.
+Full register: `MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`  
+Apnea register: `MASTER_APNEA_CONSOLIDATED_AUDIT_FINDINGS_CURRENT.csv`
 
 ---
 
 ## G. Deduplication Method and Results
 
-**17 multi-source duplicate groups** in `MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv` (unchanged from @ 0126699). Snorkeling physical QA tracked as CONS-048 meta-finding; overlaps CONS-026, CONS-031 without deduplication (different root causes: map FPS vs route safety field validation).
+**Rule:** Merge only same root cause (§4.2).
+
+**Primary dedup @ 2c30412:**
+
+| Group | Consolidated ID | Sources merged |
+|-------|-----------------|----------------|
+| **DG-WAO-003** | **CONS-050** | WFC-P2-005 (01) · MUIUX-P2-005 (03) · MAIN-P2-003 (04) · MAIN-APNEA-002 (04) · REL partial (05) |
+| **DG-EXT-001** | **CONS-009** | WFC-P1-001 (01) · IOS-P2-001 (02) · MASB-E-01 (05) |
+| **DG-TEST-001** | **CONS-049** | IOS-P1-001 (02) · MAIN-P2-001 (04) — **FIXED** |
+| **DG-DOC-003** | **CONS-046** | Script drift — **FIXED** |
+| **DG-DOC-004** | **CONS-053** | 2 P0 legacy claim documents |
+| **DG-SNORK-002** | **CONS-051** | WFC-P2-006 · REL-P2-002 |
+
+**22 duplicate groups** documented in `MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv`.
 
 ---
 
 ## H. Severity Escalations and Rationale
 
-| Finding | Escalation | Rationale | Status |
-|---------|------------|-----------|--------|
-| CONS-046 | **P1** (new) | Automated integrity gate FAIL after command upgrade | **OPEN** |
-| CONS-047 | **P2** | Domain audits untrustworthy for Snorkeling release scope | **VERIFIED** @ 451f8fb |
-| CONS-048 | **P1** (physical) | 12 open-water QA templates block Snorkeling external claims | **PENDING_PHYSICAL** |
-| CONS-049 | **P1** (new) | iOS Algorithm Tests compile failure blocks regression gate | **OPEN** |
+| Finding | Escalation | Rationale |
+|---------|------------|-----------|
+| CONS-053 | Legacy docs → **P0** | False App Store / CCR external claims contradict audit PARTIAL |
+| CONS-050 | Cross-audit P2 → release visibility | 4 audits cite same routing test drift |
+| INDEX SOFTWARE_READY 100% | Doc contradiction | vs audits 01–05 all PARTIAL @ 2c30412 |
 
-Prior escalations (CONS-001..022, CONS-042) unchanged.
+**2 severity escalations** (documentation P0). No FC safety severity downgrade.
 
 ---
 
 ## I. Cross-Audit Conflicts
 
-| Conflict | Resolution |
-|----------|------------|
-| Command filenames V2.2/V1.2 vs script V2.1/V1.1 | **CONS-046 OPEN** — bodies aligned; script not updated |
-| Snorkeling SOFTWARE_READY vs audit 02/03 @ 451f8fb | **Resolved** — audits current; physical still PENDING |
-| iOS builds PASS vs iOS tests FAIL | **No conflict** — CONS-049 test-infra regression only |
-| Water auto-open SOFTWARE_READY vs PENDING_PHYSICAL | **No conflict** — both preserved |
+| Conflict | Audits | Resolution |
+|----------|--------|------------|
+| INDEX claims SOFTWARE_READY 100% vs audits PARTIAL | 06 vs 01–05 | **OPEN** — reconcile in Batch-9 (CONS-054) |
+| WAO tests FAIL vs production policy may be correct | 01 vs 03 | **DOCUMENTED** — CONS-050; align tests or policy |
+| Command 10 vs 11 remediation filename | 06 vs disk | **PARTIAL** — INDEX cites Command 10; disk is 11 |
 
-**CROSS_AUDIT_CONFLICTS (technical): 0** · **COMMAND_INTEGRITY_CONFLICTS: 1** (CONS-046)
+**1 material cross-audit conflict** (INDEX overstatement). **0 FC math conflicts.**
 
 ---
 
 ## J. Root-Cause Clusters
 
-1. **Evidence execution gap** — physical 0%, external 0%, +12 Snorkeling QA (CONS-048, CONS-045)
-2. **Automated test regression** — iOS Algorithm Tests compile failure (CONS-049)
-3. **Command tooling drift** — validate script superseded paths (CONS-046)
-4. **Release/legal packaging** — counsel, PDF (CONS-013, CONS-044)
-5. **June 2026 wave physical gates** — WAO, Crown, shallow (CONS-021, CONS-022, CONS-042)
-
-**Closed clusters (do not regress):** GF parity, sync reliability, depth gating, WAO policy gate, planner lifecycle, Snorkeling shared helpers (software).
+1. **External validation gap** — CONS-009 / WFC-P1-001 (no third-party Bühlmann)
+2. **Physical evidence gap** — CONS-010/021/022/042/048; APNEA-PHY-001 (0% executed)
+3. **WAO routing test harness drift** — CONS-050 / WFC-P2-005 (post-Apnea @76f3703)
+4. **Documentation truthfulness** — CONS-053/054 (legacy claims + stale INDEX)
+5. **Legal/release external** — CONS-044 (counsel pending)
 
 ---
 
@@ -174,43 +183,64 @@ Prior escalations (CONS-001..022, CONS-042) unchanged.
 
 See `MASTER_FINDING_DEPENDENCY_GRAPH_CURRENT.md`.
 
-**Critical path @ 451f8fb:** CONS-049 iOS test fix → CONS-046 script fix → CONS-048 Snorkeling physical QA → legacy physical campaigns → external validation → legal release.
+- CONS-009 blocks external/App Store algorithm claims
+- Physical cluster blocks external TF field claims
+- CONS-050 blocks Watch CI fully green (not FC safety)
+- CONS-053 must precede marketing/legal refresh
 
 ---
 
 ## L. Remediation Priority Matrix
 
-See `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`.
+Top 5 ranks — full matrix: `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`
 
-**New rank order @ 451f8fb:**  
-1. CONS-049 iOS Snorkeling test compile fix  
-2. CONS-046 script fix  
-3. CONS-048 Snorkeling physical QA  
-4. Legacy physical/external campaigns (CONS-010..013, CONS-021..022, CONS-042)  
-5. Legal/docs (CONS-044, CONS-034 partial)
-
----
-
-## M. Non-Regressive Batch Plan (V1.3)
-
-| Batch | Name | Status @ 451f8fb | Primary remaining |
-|-------|------|------------------|-------------------|
-| **0** | Baseline protection | **PARTIAL** | iOS tests FAIL (CONS-049); builds PASS |
-| **1–7** | Software remediation | **COMPLETE** | Field QA remains |
-| **Snorkeling** | P1/P2/P3 software | **COMPLETE** @ dbe5d8b | CONS-048 physical |
-| **Script** | Command integrity | **OPEN** | CONS-046 |
-| **Rerun** | Domain audits 01–06 | **COMPLETE** | CONS-047 closed |
-| **8** | Tests / QA / evidence | **ACTIVE** | All physical/external + Snorkeling 12 |
-| **9** | Release / legal / docs | **PARTIAL** | CONS-044; Command 10 file missing |
+| Rank | ID | Severity | Batch | Reason |
+|------|-----|----------|-------|--------|
+| 1 | CONS-053 | P0 | 9 | False legacy release claims |
+| 2 | CONS-009 | P1 | 8 | External Bühlmann gate |
+| 3 | CONS-050 | P2 | 6 | Watch CI 1139/1152 |
+| 4 | CONS-048 | P1 | 8 | Snorkeling 0/12 field QA |
+| 5 | CONS-010 | P1 | 8 | Physical FC wet QA |
 
 ---
 
-## N–W. Batch Summaries
+## M. Non-Regressive Batch Plan
 
-**Batch 0–7:** COMPLETE @ 5d757cc (unchanged from V1.2).  
-**Snorkeling wave:** Route safety, Watch runtime, 14 test files @ dbe5d8b — SOFTWARE_READY; physical PENDING (CONS-048).  
-**Batch 8:** ACTIVE — primary release path including Snorkeling open-water QA.  
-**Batch 9:** PARTIAL — command docs need 06 rerun after bb204f5 upgrade.
+| Batch | Status @ 2c30412 | Next action |
+|-------|------------------|-------------|
+| **0** Baseline | **COMPLETE** | CONS-046/049 closed |
+| **1** Watch FC safety | **COMPLETE** (software) | CONS-015 altitude oracle extension |
+| **2** Sync/persistence | **COMPLETE** | Maintain gates |
+| **3** Activity architecture | **MOSTLY COMPLETE** | CONS-028/039 P3 |
+| **4** iOS Planner | **COMPLETE** (software) | CONS-041 tissue replay P3 |
+| **5** Performance | **COMPLETE** (simulator) | Field profiling Batch-8 |
+| **6** UI/UX / WAO tests | **ACTIVE** | **CONS-050 R09** |
+| **7** Security/platform | **COMPLETE** (static) | Field paired QA |
+| **8** Tests/QA/evidence | **ACTIVE** | Physical campaigns 0% |
+| **9** Release/legal/docs | **ACTIVE** | CONS-053/054 |
+
+---
+
+## N. Batch 0 — Baseline Protection
+
+**Status: COMPLETE @ 2c30412**
+
+- `main` @ `2c30412` clean for orchestrator pass
+- iOS 1655/1655 PASS; Watch 1139/1152
+- `validate_commands_for_cursor_integrity.sh` PASS (CONS-046)
+- Target isolation / secrets / l10n PASS
+
+---
+
+## O–W. Batch Summaries (1–9)
+
+**Batches 1–5, 7:** Prior remediations CONS-002..008, CONS-027 verified @ `2c30412`. No open P0 FC defects.
+
+**Batch 6 (ACTIVE):** CONS-050 WFC-P2-005 — 13 Watch routing failures after Apnea wave; CONS-051 Snorkeling progress; CONS-012 a11y manual pending.
+
+**Batch 8 (ACTIVE):** All physical/external matrices 0% — CONS-009, CONS-010, CONS-021, CONS-022, CONS-042, CONS-048, APNEA-PHY-001.
+
+**Batch 9 (ACTIVE):** CONS-053 P0 legacy docs; CONS-054 INDEX/README; CONS-044 legal.
 
 ---
 
@@ -218,53 +248,52 @@ See `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`.
 
 See `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`.
 
-**Next:** CONS-049 test fix → CONS-046 script fix → CONS-048 physical QA.
+**Next command:** **R09 — WAO routing test alignment (CONS-050)**  
+**Do not launch:** Command 07, Command 10/11 from orchestrator 00.
 
 ---
 
 ## Y. Audit Rerun Plan
 
-See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`.
-
-**01–06: COMPLETE** @ 451f8fb (CONS-047 closed). **07 + 00: COMPLETE** @ 451f8fb.
+See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`. After R09: rerun **01, 03, 04, 05**.
 
 ---
 
 ## Z. Non-Regression Gate Matrix
 
-See `MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv`. Command permutation gate: bodies **PASS**; script **FAIL** (CONS-046).
+See `MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv` — 29 gates including G-009 Watch tests (PARTIAL @ 2c30412).
 
 ---
 
 ## AA. Physical / External QA Register
 
-See `MASTER_UNRESOLVED_PHYSICAL_EXTERNAL_QA_REGISTER_CURRENT.csv` — **43 rows** (31 prior + 12 Snorkeling); **0% execution**.
+See `MASTER_UNRESOLVED_PHYSICAL_EXTERNAL_QA_REGISTER_CURRENT.csv` — **22 rows**; **0% execution**.
 
 ---
 
 ## AB. Release Blocker Burndown
 
-See `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`. Phase A (software) COMPLETE. Active: script fix, audit reruns, physical campaigns.
+See `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`. Phase A software **COMPLETE**; Phase B WFC-P2-005 **ACTIVE**.
 
 ---
 
 ## AC. Do-Not-Touch Policies
 
-See `MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.md` — 28 policies active.
+See `MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.md` — 28 policies.
 
 ---
 
 ## AD. Readiness Roadmap 7 / 14 / 30 Days
 
-See `MASTER_READINESS_ROADMAP_7_14_30_DAYS_CURRENT.md`. Anchor date **2026-06-30**.
+See `MASTER_READINESS_ROADMAP_7_14_30_DAYS_CURRENT.md`. Anchor **2026-07-01**.
 
 ---
 
-## AE. Remediation Output Consumption (0D)
+## AE. Algorithmic Safety Priority Gate
 
-See `MASTER_REMEDIATION_OUTPUT_CONSUMPTION_MATRIX_CURRENT.csv` and `MASTER_AUDIT_COMMAND_INTEGRITY_STATUS_CURRENT.csv`.
+See `MASTER_ALGORITHMIC_SAFETY_PRIORITY_GATE_CURRENT.md`.
 
-Audit **07** consumes Command 10 remediation outputs + consolidated registers. This orchestrator refresh @ 451f8fb closes CONS-047 and adds CONS-049 test regression tracking.
+**0 P0 FC defects** — no false release clearance permitted while **WFC-P1-001** open for external claims.
 
 ---
 
@@ -287,52 +316,89 @@ RELEASE_BLOCKER_BURNDOWN_CREATED: PASS
 PHYSICAL_EXTERNAL_QA_REGISTER_CREATED: PASS
 DO_NOT_TOUCH_POLICY_REGISTER_CREATED: PASS
 READINESS_ROADMAP_CREATED: PASS
-AUDIT_COMMAND_INTEGRITY_STATUS_CREATED: PASS
-REMEDIATION_OUTPUT_CONSUMPTION_MATRIX_CREATED: PASS
-CONSOLIDATED_P0_FINDINGS: 0
-CONSOLIDATED_P1_FINDINGS: 12
-CONSOLIDATED_P2_FINDINGS: 14
-CONSOLIDATED_P3_FINDINGS: 7
-CONSOLIDATED_P4_FINDINGS: 0
-DUPLICATE_GROUPS_FOUND: 18
-SEVERITY_ESCALATIONS: 4
-CROSS_AUDIT_CONFLICTS: 0
-COMMAND_INTEGRITY_CONFLICTS: 1
-INTERNAL_TESTFLIGHT_BLOCKERS: 2
+CONSOLIDATED_P0_FINDINGS: 2
+CONSOLIDATED_P1_FINDINGS: 10
+CONSOLIDATED_P2_FINDINGS: 12
+CONSOLIDATED_P3_FINDINGS: 6
+CONSOLIDATED_P4_FINDINGS: 4
+DUPLICATE_GROUPS_FOUND: 22
+SEVERITY_ESCALATIONS: 2
+CROSS_AUDIT_CONFLICTS: 1
+INTERNAL_TESTFLIGHT_BLOCKERS: 0
 EXTERNAL_TESTFLIGHT_BLOCKERS: 10
 APP_STORE_BLOCKERS: 12
-PHYSICAL_QA_BLOCKERS: 16
+PHYSICAL_QA_BLOCKERS: 14
 EXTERNAL_VALIDATION_BLOCKERS: 5
-OVERALL_CONSOLIDATED_READINESS: 65
-REMEDIATION_EXECUTION_READINESS: CONDITIONAL
-INTERNAL_TESTFLIGHT_READINESS: CONDITIONAL
+OVERALL_CONSOLIDATED_READINESS: 68
+REMEDIATION_EXECUTION_READINESS: READY
+INTERNAL_TESTFLIGHT_READINESS: READY
 EXTERNAL_TESTFLIGHT_READINESS: NOT_READY
 APP_STORE_READINESS: NOT_READY
-FIRST_REMEDIATION_BATCH: Fix IOS-P1-001 Snorkeling test compile (CONS-049) then script fix (CONS-046)
-NEXT_CURSOR_COMMAND_TO_RUN: Fix Snorkeling test compile then validate_commands_for_cursor_integrity.sh
+FIRST_REMEDIATION_BATCH: Batch-6 — UI/UX truthfulness and WAO routing test alignment (CONS-050)
+NEXT_CURSOR_COMMAND_TO_RUN: R09 — WAO routing test alignment (WFC-P2-005)
+ORCHESTRATOR_STRICT_SEQUENTIAL_EXECUTION: PASS
+SUBCOMMAND_01_COMPLETED_BEFORE_02_STARTED: PASS
+SUBCOMMAND_02_COMPLETED_BEFORE_03_STARTED: PASS
+SUBCOMMAND_03_COMPLETED_BEFORE_04_STARTED: PASS
+SUBCOMMAND_04_COMPLETED_BEFORE_05_STARTED: PASS
+SUBCOMMAND_05_COMPLETED_BEFORE_06_STARTED: PASS
+ALL_01_TO_06_OUTPUTS_VERIFIED_BEFORE_CONSOLIDATION: PASS
+COMMAND_07_EXCLUDED_FROM_PRE_REMEDIATION_ORCHESTRATOR: PASS
+COMMAND_10_NOT_EXECUTED_BY_ORCHESTRATOR: PASS
+UNIFIED_CONSOLIDATED_REPORT_CREATED_AFTER_ALL_AUDITS: PASS
 ```
+
+**Note:** `CONSOLIDATED_P0_FINDINGS: 2` = documentation P0 (CONS-053). **FC safety P0 = 0.**
 
 ### Final questions (§21 summary)
 
 | # | Answer |
 |---|--------|
-| 1 | Six upstream groups found — **YES** (66 files present) |
-| 2 | Stale: **NONE** — 01–06 current @ 451f8fb (CONS-047 closed) |
-| 3 | Technical conflicts: **0**; command script conflict: **1** (CONS-046) |
-| 4–7 | Active: P0=0 · P1 open software=2 · P1 pending gates=10 · P2=14 · P3=7 · P4=0 |
-| 8 | 18 duplicate groups |
-| 9 | 4 escalations (CONS-046..049) |
-| 10 | Internal TF blockers: **2** (CONS-046 script + CONS-049 tests) |
-| 11 | External TF blockers: **10 P1 physical/external/legal** |
-| 12 | App Store blockers: **12** |
-| 13–14 | 15 physical · 5 external validation pending |
-| 15 | First batch: **CONS-049 test fix + CONS-046 script** |
-| 19 | Rerun **02/05/07** after CONS-049 fix; physical QA Batch-8 next |
-| 26 | Remediation execution: **CONDITIONAL** |
-| 27 | Internal TF software: **CONDITIONAL** |
-| 28–29 | External TF / App Store: **NOT READY** |
-| 30 | **Fix iOS test compile; fix integrity script; Snorkeling physical QA** |
+| 1 | Six upstream groups found — **YES** (66 files verified) |
+| 2 | Stale upstream — **NONE** @ 2c30412 (CONS-047 closed) |
+| 3 | Conflicts — **1** (INDEX vs PARTIAL audits); FC math **0** |
+| 4 | P0 — **2** (doc); FC P0 **0** |
+| 5 | P1 open — **10** |
+| 6 | P2 open — **12** |
+| 7 | P3/P4 — **6** / **4** |
+| 8 | Duplicates — **22 groups**; key: WFC-P2-005 → CONS-050 |
+| 9 | Escalations — **2** (CONS-053 P0 docs) |
+| 10 | Internal TF blockers — **0** software P0/P1 |
+| 11 | External TF blockers — **10** |
+| 12 | App Store blockers — **12** |
+| 13 | Physical QA — **14** areas |
+| 14 | External validation — **5** areas |
+| 15 | First batch — **Batch-6** (CONS-050) |
+| 16 | Before UI polish — CONS-050; CONS-053; physical gates |
+| 17 | Before docs — technical truth (WFC-P2-005; physical status) |
+| 18 | Before release claims — CONS-009; physical QA; CONS-044 |
+| 19 | After Batch-6 — rerun 01, 03, 04, 05 |
+| 20 | Safest order — R09 → doc P0 repair → physical Batch-8 → external → legal |
+| 21 | Do-not-touch — BühlmannCore; FC timing; HMAC; activity stores |
+| 22 | Top blockers — see Top 10 below |
+| 23–25 | 7/14/30-day plans in roadmap doc |
+| 26 | Remediation execution — **READY** |
+| 27 | Internal TF — **READY** (conditional disclosure) |
+| 28–29 | External TF / App Store — **NOT READY** |
+| 30 | **R09 — WAO routing test alignment** |
 
 ---
 
-**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 451f8fb · Orchestrator V1.3 · 2026-06-30**
+## Top 10 Consolidated Blockers to 100% Readiness
+
+| # | ID | Severity | Blocks | Class |
+|---|-----|----------|--------|-------|
+| 1 | CONS-009 / WFC-P1-001 | P1 | External TF; App Store algo claims | PENDING_EXTERNAL |
+| 2 | CONS-010 | P1 | Physical FC release claims | PENDING_PHYSICAL |
+| 3 | CONS-048 | P1 | Snorkeling field navigation claims | PENDING_PHYSICAL |
+| 4 | CONS-042 | P1 | Shallow/full depth wet claims | PENDING_PHYSICAL |
+| 5 | CONS-021 | P1 | Water auto-open field claims | PENDING_PHYSICAL |
+| 6 | CONS-022 | P1 | Underwater hardware claims | PENDING_PHYSICAL |
+| 7 | CONS-044 | P1 | App Store legal gate | PENDING_LEGAL |
+| 8 | CONS-053 | P0 | Documentation truthfulness | OPEN doc |
+| 9 | CONS-050 / WFC-P2-005 | P2 | 1152/1152 Watch CI green | OPEN software |
+| 10 | CONS-011 | P1 | Paired sync field trust | PENDING_PHYSICAL |
+
+---
+
+**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 2c30412 · Orchestrator V1.5 · 2026-07-01**

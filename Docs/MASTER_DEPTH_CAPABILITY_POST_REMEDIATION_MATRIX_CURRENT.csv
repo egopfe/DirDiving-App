@@ -1,9 +1,9 @@
-Check_ID,Component,Policy,Expected_At_451f8fb,Actual_At_451f8fb,Status,Test_Evidence,Physical_QA,Notes
+Check_ID,Component,Policy,Expected_At_2c30412,Actual_At_2c30412,Status,Test_Evidence,Physical_QA,Notes
 DC-01,project.yml Watch signing,Shallow default entitlements,WithShallowDepth.entitlements,Config/DIRDiving.WithShallowDepth.entitlements,PASS,DepthCapabilityTests,PENDING,main shallow-signed
-DC-02,DepthCapabilityEntitlementProbe,runtimeAuthorityTier compile authority,Compile flag > plist metadata,DEPTH_ENTITLEMENT_SHALLOW/FULL in project.yml,PASS,validate_depth_capability_runtime_authority.sh,PENDING,CONS-007 FIXED
+DC-02,DepthCapabilityEntitlementProbe,runtimeAuthorityTier compile authority,Compile flag > plist metadata,DEPTH_ENTITLEMENT_SHALLOW/FULL in project.yml,PASS,DepthCapabilityTests @ 2c30412,PENDING,CONS-007 FIXED
 DC-03,DeveloperSettings shallow Gauge toggle,Default OFF bool(forKey),false when absent,false when absent,PASS,validate_developer_shallow_testing_release_gate.sh,PENDING,CONS-006 FIXED
 DC-04,DeveloperSettings shallow FC toggle,Separate from Gauge; default OFF,false when absent,false when absent,PASS,validate_developer_shallow_testing_release_gate.sh,PENDING,Internal testing only label
 DC-05,DepthCapabilityPolicy.supportsFullComputerRuntime,Blocks FC on shallow without dev opt-in,false on shallow default,false unless dev toggle,PASS,DepthCapabilityTests,PENDING,Not certified deco on shallow
-DC-06,Water auto-open FC routing,DepthCapabilityPolicy in resolveAutomaticStep,FC blocked or downgraded to gauge,present DIRStartupSelectionPolicy L99-108,PASS,WatchWaterAutoOpenPolicyTests,PENDING,CONS-019 FIXED
+DC-06,Water auto-open FC routing,DepthCapabilityPolicy in resolveAutomaticStep,FC blocked or downgraded per policy,present DIRStartupSelectionPolicy,PASS,Production code correct; WAO tests FAIL harness,PENDING,CONS-019 FIXED; WFC-P2-005 test drift
 DC-07,Shallow wet physical QA,Field ~6m validation,NOT_EXECUTED,PENDING,PENDING_PHYSICAL,MASTER_SHALLOW_DEPTH_RELEASE_GATE,PENDING,CONS-042
 DC-08,Full depth capability separation,Full entitlement separate build,Documented in BUILD_AND_XCODEGEN,Config/DIRDiving.WithWaterSubmersion.entitlements exists,PASS,Docs,PENDING,Requires full provisioning

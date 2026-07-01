@@ -1,0 +1,15 @@
+Claim_ID,Surface,Platform,Copy_Key,Claim_Text_Summary,Supported_By_Code,Physical_Evidence,Pass,Finding_ID,Notes
+COPY-001,WatchWaterAutoOpenSettingsView,Watch,settings.water_auto_open.explanation,Routes only; does not start dive,yes,NOT_EXECUTED,PASS,,
+COPY-002,WatchWaterAutoOpenSettingsView,Watch,settings.water_auto_open.cold_launch_limitation,Probe timeout disclosed,yes,NOT_EXECUTED,PASS,,
+COPY-003,WatchWaterAutoOpenSettingsView,Watch,settings.water_auto_open.system_limitation,No guaranteed system auto-launch,yes,PENDING_PHYSICAL,PASS,,
+COPY-004,WatchWaterAutoOpenSettingsView,Watch,settings.water_auto_open.full_computer_warning,FC requires predive confirmation,yes,NOT_EXECUTED,PASS,,
+COPY-005,WatchWaterAutoOpenSettingsView,Watch,settings.water_auto_open.system_setup.body,Manual system listing steps,yes,PENDING_PHYSICAL,PASS,,Does not claim entitlement exists
+COPY-006,DeveloperSettingsView,Watch,developer.shallow_depth,Dev-only shallow testing,yes,PENDING_PHYSICAL,PASS,MUIUX-P1-005,Default OFF
+COPY-007,ActionButtonHelpView,Watch,action_button.shortcut_required,Shortcut assignment required,yes,PENDING_PHYSICAL,PASS,,
+COPY-008,PlannerView,iOS,planner.disclaimer,Reference planning not live authority,yes,n/a,PASS,,
+COPY-009,CCRPlannerView,iOS,ccr.reference_only,Not CCR controller,yes,n/a,PASS,,
+COPY-010,FullComputerGradientFactorsInfoView,Watch,fc.gf.info,GF affect decompression model,yes,n/a,PASS,,
+COPY-011,IOSCompanionSettingsModeSwitcher,iOS,settings.scope.hint,Mode switch display-only,yes,n/a,PASS,,
+COPY-012,Apnea recovery UI,Both,apnea.recovery.no_medical,No medical guarantee,yes,n/a,PASS,,
+COPY-013,Planner GFPreset,iOS,planner.gf.aggressive,Aggressive label,yes,n/a,PARTIAL,MUIUX-P2-009,Watch uses Moderate
+COPY-014,BriefingCardInventory,Watch,briefing.reference_only,Pre-dive reference card,yes,n/a,PASS,,

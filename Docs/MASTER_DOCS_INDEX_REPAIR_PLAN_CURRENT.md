@@ -1,9 +1,9 @@
 # Master Docs Index Repair Plan — Current
 
-**Audit:** Command 06 — Documentation / Repository Alignment **V1.2**  
+**Audit:** Command 06 — Documentation / Repository Alignment **V1.5**  
 **Target:** `Docs/INDEX.md` (primary index; `Docs/README.md` secondary)  
-**Baseline:** `main` @ `451f8fb`  
-**Date:** 2026-06-30
+**Baseline:** `main` @ `2c30412`  
+**Date:** 2026-07-01
 
 Do **not** edit INDEX in this audit pass. Below are exact planned additions and fixes.
 
@@ -14,31 +14,35 @@ Do **not** edit INDEX in this audit pass. Below are exact planned additions and 
 Replace top header:
 
 ```markdown
-**Aggiornato:** 2026-06-30  
-**Branch consigliato:** `main` = `origin/main` @ `451f8fb`
+**Aggiornato:** 2026-07-01  
+**Branch consigliato:** `main` = `origin/main` @ `2c30412`
 ```
 
 ---
 
-## 2. Command 06 V1.2 INDEX block (P1 — add after orchestrator block)
+## 2. Command 06 V1.5 INDEX block (P1 — add after orchestrator block)
 
 ```markdown
-## Aggiornamento indice 2026-06-30 — Documentation / Repository Alignment Audit V1.2 (Command 06)
+## Aggiornamento indice 2026-07-01 — Documentation / Repository Alignment Audit V1.5 (Command 06)
 
-Post-remediation read-only rerun @ `451f8fb`: command bodies 01–07 **ALIGNED**; integrity script **FAIL** (CONS-046); README baseline **FAIL**; feature matrix **PARTIAL**.
+Read-only rerun @ `2c30412` after audits 01–05 V1.5: command bodies 01–07 **ALIGNED @ V1.5**; integrity script **PASS** (CONS-046 CLOSED); README baseline **FAIL**; INDEX **PARTIAL**; feature matrix **PARTIAL**; 2× P0 legacy claim docs remain.
 
 | Campo | Valore |
 |-------|--------|
-| **Command** | `06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md` |
+| **Command** | `06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.5.md` |
 | **Report** | [`MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md`](MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md) |
 | **Truthfulness matrix** | [`MASTER_DOCUMENTATION_TRUTHFULNESS_MATRIX_CURRENT.csv`](MASTER_DOCUMENTATION_TRUTHFULNESS_MATRIX_CURRENT.csv) |
 | **Outdated inventory** | [`MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv`](MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv) |
 | **Command alignment** | [`MASTER_COMMAND_VERSION_ALIGNMENT_MATRIX_CURRENT.csv`](MASTER_COMMAND_VERSION_ALIGNMENT_MATRIX_CURRENT.csv) · [`MASTER_COMMAND_SEQUENCE_VERSION_ALIGNMENT_CURRENT.csv`](MASTER_COMMAND_SEQUENCE_VERSION_ALIGNMENT_CURRENT.csv) |
 | **Remediation plan** | [`MASTER_DOCUMENTATION_REMEDIATION_PLAN_CURRENT.md`](MASTER_DOCUMENTATION_REMEDIATION_PLAN_CURRENT.md) |
+| **Apnea alignment** | [`MASTER_APNEA_DOCUMENTATION_ALIGNMENT_CURRENT.csv`](MASTER_APNEA_DOCUMENTATION_ALIGNMENT_CURRENT.csv) · [`MASTER_APNEA_DOCS_INDEX_REPAIR_PLAN_CURRENT.md`](MASTER_APNEA_DOCS_INDEX_REPAIR_PLAN_CURRENT.md) |
+| **Algorithmic gate** | [`MASTER_ALGORITHMIC_DOCUMENTATION_TRUTHFULNESS_GATE_CURRENT.md`](MASTER_ALGORITHMIC_DOCUMENTATION_TRUTHFULNESS_GATE_CURRENT.md) |
 | **Post-remediation alignment** | [`MASTER_POST_REMEDIATION_DOCUMENTATION_ALIGNMENT_CURRENT.csv`](MASTER_POST_REMEDIATION_DOCUMENTATION_ALIGNMENT_CURRENT.csv) |
 | **Remediation command alignment** | [`MASTER_REMEDIATION_COMMAND_DOCUMENTATION_ALIGNMENT_CURRENT.csv`](MASTER_REMEDIATION_COMMAND_DOCUMENTATION_ALIGNMENT_CURRENT.csv) |
 | **Audit 07 alignment** | [`MASTER_07_AUDIT_COMMAND_ALIGNMENT_CURRENT.csv`](MASTER_07_AUDIT_COMMAND_ALIGNMENT_CURRENT.csv) |
-| **Verdict** | **PARTIAL** · README/INDEX baseline drift · P0 claim docs remain |
+| **Launch sequence** | [`commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_V1.5.md`](../commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_V1.5.md) |
+| **Validate** | `./Scripts/validate_commands_for_cursor_integrity.sh` **PASS** |
+| **Verdict** | **PARTIAL** · README/INDEX baseline drift · P0 claim docs · Apnea audit outputs under-indexed |
 ```
 
 ---
@@ -47,62 +51,41 @@ Post-remediation read-only rerun @ `451f8fb`: command bodies 01–07 **ALIGNED**
 
 | Row | Current INDEX | Planned |
 |-----|---------------|---------|
-| Command 01 | V2.1 | **V2.2** |
-| Command 02 | V1.1 | **V1.2** |
-| Command 03 | V2.2 | **V2.3** |
-| Command 04 | V1.1 | **V1.2** |
-| Command 05 | V1.1 | **V1.2** |
-| Command 06 | V1.1 | **V1.2** |
-| Command 07 | (partial) | **V1.0** — audit-only verification |
-| Command 10 | referenced | Restore file or **archive banner** |
+| Orchestrator | V1.3 | **V1.5** |
+| Command 01 | V2.1/V2.2 | **V1.5** |
+| Command 02 | V1.1/V1.2 | **V1.5** |
+| Command 03 | V2.2/V2.3 | **V1.5** |
+| Command 04 | V1.1/V1.2 | **V1.5** |
+| Command 05 | V1.1/V1.2 | **V1.5** |
+| Command 06 | V1.1/V1.2 | **V1.5** |
+| Command 07 | V1.0 | **V1.5** — audit-only verification |
+| Command 10/11 | Command 10 filename | **Command 11** `11-MASTER_2026_06_30...` |
 
 ---
 
-## 4. Orchestrator V1.3 block additions (P1)
+## 4. Orchestrator V1.5 block additions (P1)
 
-Add to existing orchestrator block:
+Add to orchestrator block:
 
 - [`MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX_CURRENT.csv`](MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX_CURRENT.csv)
 - [`MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX_CURRENT.csv`](MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX_CURRENT.csv)
 - [`MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT.md`](MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT.md)
+- [`MASTER_ALGORITHMIC_DOCUMENTATION_TRUTHFULNESS_GATE_CURRENT.md`](MASTER_ALGORITHMIC_DOCUMENTATION_TRUTHFULNESS_GATE_CURRENT.md)
 - [`MASTER_LATEST_WATCH_DEVELOPMENT_DOC_ALIGNMENT_CURRENT.csv`](MASTER_LATEST_WATCH_DEVELOPMENT_DOC_ALIGNMENT_CURRENT.csv)
 - [`MASTER_ENTITLEMENT_DOCUMENTATION_ALIGNMENT_CURRENT.csv`](MASTER_ENTITLEMENT_DOCUMENTATION_ALIGNMENT_CURRENT.csv)
-- [`commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-30.md`](../commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-30.md)
+- Apnea audit outputs (see `MASTER_APNEA_DOCS_INDEX_REPAIR_PLAN_CURRENT.md`)
 
 ---
 
-## 5. Snorkeling consolidated block (P2)
+## 5. Missing INDEX links (P2)
 
-Add subsection linking:
+| Topic | Planned link |
+|-------|--------------|
+| Project overview | `Docs/README.md` ✓ (exists) |
+| Safety philosophy | `SAFETY_DISCLAIMER.md` ✓ |
+| Apnea first-class audits | **MISSING** — add block |
+| Superseded commands | **PARTIAL** — link `commands_for_cursor/OOLD/` |
+| Physical QA pending | **PARTIAL** — centralize `MASTER_*_PHYSICAL_*` matrices |
+| Command 06 V1.5 outputs | **MISSING** — add block §2 |
 
-- [`SNORKELING_ARCHITECTURE.md`](SNORKELING_ARCHITECTURE.md)
-- [`SNORKELING_IOS_WATCH_ARCHITECTURE.md`](SNORKELING_IOS_WATCH_ARCHITECTURE.md)
-- [`SNORKELING_IOS_WATCH_ROADMAP_P1_P2_P3.md`](SNORKELING_IOS_WATCH_ROADMAP_P1_P2_P3.md)
-- [`SNORKELING_RELEASE_CHECKLIST.md`](SNORKELING_RELEASE_CHECKLIST.md)
-- [`AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md`](AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md)
-- Verdict: **INTERNAL_READY** · **PHYSICAL_QA_PENDING**
-
----
-
-## 6. Missing links checklist
-
-| Topic | Planned INDEX location | Status |
-|-------|------------------------|--------|
-| Project overview | Docs/README.md | **PASS** |
-| Safety philosophy | SAFETY_DISCLAIMER | **PASS** |
-| Settings mode switch | IOS_COMPANION_SETTINGS_MODE_SWITCH | **MISSING** |
-| Activity settings ownership | ACTIVITY_SETTINGS_OWNERSHIP_MATRIX | **PARTIAL** |
-| Logbook ownership | DIR_DIVING_LOGBOOK_OWNERSHIP matrix | **PARTIAL** |
-| Briefing cards | PLANNER_BRIEFING_CARD_KIND_MATRIX | **MISSING** |
-| Ratio Deco | RATIO_DECO_COMPARATIVE_HEURISTIC | **MISSING** |
-| Physical QA pending hub | MASTER_UI_UX_EXTERNAL_PHYSICAL_QA_PENDING | **PARTIAL** |
-| Superseded V3.0 commands | Archive banner under audit commands | **MISSING** |
-| Launch sequence 2026-06-30 | commands_for_cursor helper | **MISSING** |
-
----
-
-## 7. Superseded index entries (P1)
-
-Add banner on any remaining `6-DIR_DIVING_GIT_DOCUMENTATION_ALIGNMENT_COMMAND_CCR_UPDATED_V3.0.md` references:
-
-> **Superseded by** `06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md`
+See also `MASTER_APNEA_DOCS_INDEX_REPAIR_PLAN_CURRENT.md` for Apnea-specific INDEX repairs.

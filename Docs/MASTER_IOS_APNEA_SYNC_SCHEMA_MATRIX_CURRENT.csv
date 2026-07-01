@@ -1,0 +1,11 @@
+Schema_ID,Direction,Payload_Key,Codec,Algorithm_Version,Signing,Activity_Scope,iOS_Role,Watch_Role,Cross_Activity_Reject,Test_Evidence,Pass,Notes
+APNEA-SESSION-INGEST,Watch→iOS,dirdiving_apnea_session,ActivitySyncEnvelope → ApneaSyncCodec,ApneaSyncCodec.algorithmVersion,HMAC-SHA256 when secret,Apnea only,IOSApneaLogbookStore ingest,Watch session export,YES,ApneaSyncCodecTests;ApneaSessionSyncTransportNegativeTests,PASS,Activity envelope discriminated
+APNEA-TOMBSTONE,Watch↔iOS,dirdiving_deleted_apnea_session_tombstones,ActivitySyncTombstoneCodec,1,HMAC-SHA256,Apnea only,Merge delete IDs,Publish tombstones,YES,ActivitySyncTombstoneTests,PASS,Signed primary
+APNEA-PLAN-TRANSFER,iOS→Watch,ApneaSyncTransferSupport userInfo,ApneaSyncCodec,ApneaSyncCodec.currentSchemaVersion,HMAC + checksum,Apnea only,IOSApneaWatchTransferService,Watch plan import,YES,ApneaSyncCodecTests;ApneaOfflineOnlineEndToEndIntegrationTests,PASS,Schema version in capability keys
+APNEA-PLAN-SNAPSHOT,iOS→Watch,dirdiving_apnea_plan_snapshot,ApneaSyncCodec,current,HMAC,Apnea only,Application context,Watch snapshot,YES,ApneaSyncTransferSupport,PASS,Revision + checksum keys
+APNEA-ACK,Watch↔iOS,Apnea sync ACK,symmetric signed ack,1,HMAC,Apnea only,WatchSyncService paths,ACK symmetry,YES,ApneaSyncAckNegativeTests,PASS,Negative paths tested
+DIVING-SESSION-REJECT,Watch→iOS,dirdiving_dive_session,WatchDiveSyncCodec,n/a,HMAC,Diving only,Must NOT ingest in Apnea store,n/a,YES,ActivitySyncCrossDecodeRejectionTests,PASS,Mandatory isolation
+SNORKEL-SESSION-REJECT,Watch→iOS,dirdiving_snorkeling_session,SnorkelingSessionSyncCodec,n/a,HMAC,Snorkeling only,Must NOT ingest in Apnea,n/a,YES,ActivitySyncCrossDecodeRejectionTests,PASS,Mandatory isolation
+APNEA-LEGACY-V1,Watch→iOS,legacy transport keys,Apnea legacy codec,1,partial,Apnea,Backward compat,Watch export,YES,ApneaSyncCodecNegativePathTests,PASS,Fail-closed on malformed
+APNEA-MERGE,Watch→iOS,session merge,ApneaSessionMergeIntegrity,1,n/a,Apnea,Duplicate ID merge,Watch re-send,YES,ApneaSessionMergeIntegrityTests,PASS,No sample drop
+APNEA-UNITS,Settings sync,useMetricUnits,SharedIOSSettingsStore,n/a,n/a,Shared metric flag,Apnea display,Watch display,N/A,IOSActivitySettingsCoherenceTests,PASS,Shared units only — not diving gas

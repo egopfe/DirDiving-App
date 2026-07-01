@@ -22,3 +22,4 @@ FI-020,Restore,post-crash,tissue reset detection,recovery_tissue_reset_detected 
 FI-021,Environment,missing env,start FC,canStart fails,no sea-level fallback,N/A,NO,start blocked,P4,FullComputerPrediveReadiness,N/A,OrchestratedAltitudeEnvironmentTests
 FI-022,Memory pressure,active dive,low memory,N/A NOT_EXECUTED,N/A,N/A,N/A,N/A,P2,N/A,Instruments profiling,PENDING
 FI-023,Physical,all,real Watch underwater,N/A,PENDING_PHYSICAL,N/A,N/A,N/A,P2,PHYSICAL_QA matrix,Execute wet QA,PENDING_PHYSICAL
+FI-024,Water auto-open,idle,Apnea preferred destination with shallow policy,route to valid step not crash,divingModeSelection in test harness,N/A,N/A,routing only,P2,WatchWaterAutoOpenPolicyTests @2c30412,Align test DepthCapabilityPolicy,WFC-P2-005

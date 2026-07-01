@@ -1,55 +1,30 @@
 Duplicate_Group_ID,Consolidated_Finding_ID,Source_Audit,Source_Finding_ID,Source_Title,Same_Root_Cause,Same_Symptom,Same_Affected_Files,Same_Affected_Runtime,Merge_Decision,Severity_Adjustment,Reason,Notes
-DG-DOC-002,CONS-001,06-Docs,DOC-P0-001,Command 01 body mismatch,Yes,Yes,Yes,No,MERGE,Escalated P0,Same permutation root cause across 01-04,FIXED @ 5d757cc — orchestrator refresh @ 8ae1034
-DG-DOC-002,CONS-001,06-Docs,DOC-P0-004,Orchestrator preflight missing STOP,Yes,Yes,Partial,No,MERGE,None,Same command integrity cluster,
-DG-GF-001,CONS-002,02-iOS,IOS-MASTER-F016,iOS GF preset mismatch,Yes,Yes,Yes,Yes,MERGE,None,iOS+Release same import parity gap,FIXED_SOFTWARE @ 5d757cc
-DG-GF-001,CONS-002,05-Release,MASB-SW-01,GF software gate FAIL,Yes,Yes,Yes,Yes,MERGE,None,Release gate reflects same root cause,
-DG-GF-001,CONS-038,01-Watch,MWFC-P3-004,Import test GF order,Yes,Partial,Yes,Yes,LINK_NOT_MERGE,None,Same GF mismatch symptom; test maintenance separate ID,
-DG-GF-001,CONS-043,01-Watch,MASB-SW-04,GF preset external gate,Partial,Yes,Partial,Yes,LINK_NOT_MERGE,None,External validation layer on CONS-002 software fix,
-DG-ORACLE-001,CONS-008,01-Watch,MWFC-P1-001,Oracle uses production projection,Yes,Yes,Yes,Yes,MERGE,None,Independent oracle root cause,
-DG-EXT-001,CONS-009,01-Watch,MWFC-P1-002,External Bühlmann gap,Yes,Yes,No,Yes,MERGE,None,Same evidence gap,
-DG-EXT-001,CONS-009,02-iOS,IOS-MASTER-F011,External Bühlmann gap,Yes,Yes,No,Yes,MERGE,None,Same root cause,
-DG-EXT-001,CONS-009,05-Release,MASB-E-01,External validation blocker,Yes,Yes,No,Yes,MERGE,None,Release reflects same gap,
-DG-PHY-001,CONS-010,01-Watch,MWFC-P2-001,Physical Watch QA,Yes,Yes,Partial,Yes,MERGE,None,Simulator not hardware,
-DG-PHY-001,CONS-010,05-Release,MASB-P-01,CMAltimeter physical gate,Yes,Yes,Partial,Yes,MERGE,None,Same physical depth evidence gap,
-DG-SYNC-001,CONS-011,03-UI/UX,MUIUX-P1-002,Paired sync UI QA,Yes,Yes,No,Yes,MERGE,None,Same paired campaign,
-DG-SYNC-001,CONS-011,04-Main,MASTER-SEC-001,Field sync security,Yes,Yes,Yes,Yes,MERGE,None,Security+sync same field matrix,
-DG-SYNC-001,CONS-011,04-Main,MASTER-SYNC-001,Large payload transfer,Yes,Yes,Yes,Yes,MERGE,None,Same paired test session,
-DG-SYNC-001,CONS-011,02-iOS,IOS-MASTER-F014,Briefing transfer QA,Yes,Yes,Partial,Yes,MERGE,None,Briefing in paired campaign,
-DG-SYNC-001,CONS-011,05-Release,MASB-P-02,Paired device gate,Yes,Yes,No,Yes,MERGE,None,Release gate same campaign,
-DG-A11Y-001,CONS-012,03-UI/UX,MUIUX-P1-003,Accessibility manual QA,Yes,Yes,No,Yes,MERGE,None,Same manual a11y matrix,
-DG-A11Y-001,CONS-012,05-Release,MASB-P-03,Accessibility physical gate,Yes,Yes,No,Yes,MERGE,None,Release reflects same gap,
-DG-REL-001,CONS-013,03-UI/UX,MUIUX-P1-004,PDF physical render,Yes,Yes,No,Yes,MERGE,None,Same release evidence pack,
-DG-REL-001,CONS-044,05-Release,MASB-L-01,Legal sign-off,Partial,Yes,No,No,LINK_NOT_MERGE,None,Legal layer extends CONS-013 evidence,
-DG-WAO-001,CONS-021,03-UI/UX,WAO-G-008,End-to-end water physical,Yes,Yes,Yes,Yes,MERGE,None,SOFTWARE_READY vs PENDING_PHYSICAL preserved,
-DG-WAO-001,CONS-021,05-Release,MASB-WAO-01,WAO release blocker,Yes,Yes,Yes,Yes,MERGE,None,Same physical WAO gate,
-DG-WAO-001,CONS-019,04-Main,MASTER-WAO-001,Water FC policy skip,Partial,Yes,Yes,Yes,KEEP_SEPARATE,None,Different root cause — software policy gap vs physical QA,
-DG-WAO-001,CONS-020,04-Main,MASTER-WAO-002,Submersion timeout,Partial,Yes,Yes,Yes,KEEP_SEPARATE,None,Timeout is software risk validated physically,
-DG-WAO-002,CONS-018,01-Watch,MWFC-P2-005,WAO startup test drift,Yes,Yes,Yes,No,MERGE,None,Test expectation from WAO routing,
-DG-WAO-002,CONS-017,01-Watch,MWFC-P2-004,Watch test suite failures,Partial,Yes,Yes,No,LINK_NOT_MERGE,None,Broader test maintenance includes CONS-018,
-DG-HW-001,CONS-022,03-UI/UX,MASB-HW-01,Crown physical gate,Yes,Yes,Yes,Yes,MERGE,None,Underwater HW physical cluster,
-DG-HW-001,CONS-022,03-UI/UX,MASB-HW-02,Action Button physical,Yes,Yes,Yes,Yes,MERGE,None,Same underwater campaign,
-DG-HW-001,CONS-022,03-UI/UX,MASB-HW-03,Water Lock interaction,Yes,Yes,Yes,Yes,MERGE,None,Same underwater campaign,
-DG-DEPTH-001,CONS-042,05-Release,MASB-SW-02,Shallow depth software gate,Yes,Yes,Yes,Yes,MERGE,None,Shallow wet QA cluster,
-DG-DEPTH-001,CONS-042,05-Release,MASB-P-07,Shallow physical gate,Yes,Yes,Yes,Yes,MERGE,None,Physical shallow evidence,
-DG-DEPTH-001,CONS-006,04-Main,MASTER-DEPTH-001,Shallow FC toggle,Partial,Yes,Yes,Yes,KEEP_SEPARATE,None,Process exposure — related but distinct software control,
-DG-DEPTH-001,CONS-007,04-Main,MASTER-DEPTH-002,Depth metadata trust,Partial,Yes,Partial,Yes,KEEP_SEPARATE,None,Plist probe — different root cause,
-DG-DOC-001,CONS-034,06-Docs,DOC-P1-003,INDEX drift,Yes,Yes,Yes,No,MERGE,None,Documentation debt,
-DG-DOC-001,CONS-034,03-UI/UX,MUIUX-P2-003,Localization scanner fixed,Partial,No,No,No,KEEP_SEPARATE,None,FIXED item — not merged into CONS-034,
-DG-PERF-001,CONS-023,04-Main,MASTER-PERF-001,Field battery thermal,Yes,Yes,Yes,Yes,MERGE,None,Same physical perf campaign,
-DG-PERF-001,CONS-023,05-Release,MASB-P-04,Performance physical gate,Yes,Yes,No,Yes,MERGE,None,Release gate,
-DG-VIS-001,CONS-032,03-UI/UX,MUIUX-P2-002,Pixel baselines,Yes,Yes,Yes,No,MERGE,None,Visual regression evidence gap,
-DG-VIS-001,CONS-032,05-Release,MASB-P-06,Visual regression gate,Yes,Yes,No,No,MERGE,None,Release reflects same gap,
-DG-EXT-002,CONS-030,02-iOS,IOS-MASTER-F013,Subsurface round-trip,Yes,Yes,Yes,Yes,MERGE,None,External interoperability,
-DG-EXT-002,CONS-030,05-Release,MASB-E-02,Subsurface external gate,Yes,Yes,No,Yes,MERGE,None,Release gate,
-DG-PHY-002,CONS-031,02-iOS,IOS-MASTER-F015,Snorkeling GPS field,Yes,Yes,Yes,Yes,MERGE,None,Snorkeling physical,
-DG-PHY-002,CONS-031,05-Release,MASB-P-05,Snorkeling physical gate,Yes,Yes,No,Yes,MERGE,None,Release gate,
-DG-ALT-001,CONS-015,01-Watch,MWFC-P2-002,Altitude oracle replay,Yes,Yes,Yes,Yes,MERGE,None,Altitude evidence partial,
-DG-EVID-001,CONS-045,04-Main,MASTER-DCA-018,Physical QA aggregate,Yes,Yes,Yes,No,MERGE,None,Meta evidence execution gap,
-DG-EVID-001,CONS-045,05-Release,MASB-P-01,Physical matrix not run,Partial,Yes,No,No,LINK_NOT_MERGE,None,Rolls up multiple physical findings,
-DG-DOC-003,CONS-046,06-Docs,DOC-P1-005,Script filename drift,Yes,Yes,Yes,No,MERGE,Escalated P1,Same integrity gate cluster as CONS-001 repair,OPEN @ 451f8fb
-DG-AUDIT-001,CONS-047,00-Orchestrator,CONS-047,Stale upstream audits,Yes,Yes,Yes,No,MERGE,None,Meta audit freshness — VERIFIED @ 451f8fb,CLOSED
-DG-PHY-003,CONS-048,02-iOS,SNK-P1-P2-P3,Snorkeling 12 QA templates,Yes,Yes,No,Yes,MERGE,Escalated P1,Snorkeling physical meta-finding,0% executed
-DG-PHY-003,CONS-048,03-UI/UX,SNK physical,Route safety field QA,Yes,Yes,No,Yes,MERGE,None,Same Snorkeling campaign,
-DG-PHY-003,CONS-048,05-Release,CONS-048,Snorkeling release gate,Yes,Yes,No,Yes,MERGE,None,Release reflects 12 templates,
-DG-TEST-001,CONS-049,02-iOS,IOS-P1-001,Snorkeling test compile,Yes,Yes,Yes,No,MERGE,Escalated P1,Test infra regression @ 451f8fb,Production builds PASS
-DG-TEST-001,CONS-049,04-Main,MAIN-P2-001,iOS test gate blocked,Partial,Yes,Yes,No,LINK_NOT_MERGE,None,Same compile failure symptom,
+DG-WAO-003,CONS-050,01-Watch,WFC-P2-005,Water auto-open routing tests fail after Apnea P1/P2/P3,Yes,Yes,Yes,Yes,MERGE,None,Apnea @76f3703 changed resolveAutomaticStep; tests expect direct ready/predive,13 failures @2c30412; 0 FC failures
+DG-WAO-003,CONS-050,03-UI/UX,MUIUX-P2-005,WAO routing test drift post-Apnea,Yes,Yes,Yes,Yes,MERGE,None,UI audit cross-read of Watch test harness,12/14 WAO matrix rows FAIL
+DG-WAO-003,CONS-050,04-Main,MAIN-P2-003,Watch routing test drift,Yes,Yes,Yes,Yes,MERGE,None,Main code audit explicit alias MAIN-P2-003=WFC-P2-005,Blocks 1152/1152 green
+DG-WAO-003,CONS-050,05-Release,REL-P2-001,Watch suite partial 1139/1152,Yes,Yes,Partial,Yes,MERGE,None,Release audit attributes partial Watch suite to WFC-P2-005,INTERNAL_TF software still READY
+DG-WAO-003,CONS-050,04-Main,MAIN-APNEA-002,Apnea preferred destination WAO tests fail,Yes,Yes,Yes,Yes,MERGE,None,Apnea-specific subset of same routing test drift,Included in 13 failures
+DG-EXT-001,CONS-009,01-Watch,WFC-P1-001,External Bühlmann validation not executed,Yes,Yes,Yes,Yes,MERGE,None,Same external validation gap,Blocks App Store algorithm claims
+DG-EXT-001,CONS-009,02-iOS,IOS-P2-001,No third-party Bühlmann comparison,Yes,Yes,Yes,Yes,MERGE,None,iOS planner parity depends on same external gate,IOS-P2-001 PENDING_EXTERNAL
+DG-EXT-001,CONS-009,05-Release,MASB-E-01,External validation gaps,Yes,Yes,Yes,Yes,MERGE,None,Release audit meta-finding,0% external executed
+DG-TEST-001,CONS-049,02-iOS,IOS-P1-001,Snorkeling test compile failure,Yes,Yes,Yes,No,MERGE,None,Test infrastructure only,FIXED @2c30412 1655/1655 PASS
+DG-TEST-001,CONS-049,04-Main,MAIN-P2-001,Snorkeling test fixture drift,Yes,Yes,Yes,No,MERGE,None,Same remediation wave,FIXED_SOFTWARE
+DG-DOC-003,CONS-046,06-Docs,DOC-P1-005,Integrity script drift,Yes,Yes,Yes,No,MERGE,None,Script expected superseded V2.1/V1.1 paths,FIXED @6a0005b V1.5 PASS
+DG-DOC-003,CONS-046,04-Main,MAIN-P1-001,Command integrity verified,Yes,Yes,Yes,No,MERGE,None,Main audit confirms script PASS,CONS-046 CLOSED
+DG-DOC-004,CONS-053,06-Docs,DOC-P0-001,Mission Mode doc claims conditional App Store ready,Yes,Yes,Yes,No,MERGE,Escalated P0,Legacy doc contradicts audit PARTIAL verdict,2 P0 legacy claim docs @ audit 06
+DG-DOC-004,CONS-053,06-Docs,DOC-P0-002,Documentation report false CCR external validation,Yes,Yes,Yes,No,MERGE,Escalated P0,False claim in Not claimed section,Blocks truthful release docs
+DG-DOC-005,CONS-054,06-Docs,DOC-P1-001,INDEX README baseline stale,Yes,Yes,Yes,No,MERGE,None,HEAD 2c30412 vs INDEX ad1c836,Documentation readiness 72%
+DG-DOC-005,CONS-054,06-Docs,DOC-P1-002,INDEX SOFTWARE_READY 100% contradicts audits,Yes,Yes,Partial,No,MERGE,None,Software lanes ready; release PARTIAL,Reconcile INDEX verdict
+DG-PHY-001,CONS-010,01-Watch,WFC-P2-002,Physical Watch FC QA not executed,Yes,Yes,Yes,Yes,MERGE,None,Wet depth/CMAltimeter 0%,PENDING_PHYSICAL
+DG-PHY-001,CONS-010,05-Release,MASB-P-01,Physical Watch QA pending,Yes,Yes,Yes,Yes,MERGE,None,Release physical matrix,Do not claim physical PASS
+DG-WAO-001,CONS-021,03-UI/UX,WAO-G-008,Water auto-open physical QA pending,Yes,Yes,Yes,Yes,MERGE,None,Software PASS; wet not executed,SOFTWARE_READY preserved
+DG-WAO-001,CONS-021,05-Release,WAO-PHY-001,WAO end-to-end physical,Yes,Yes,Yes,Yes,MERGE,None,Same physical gate,Blocks WAO claims
+DG-HW-001,CONS-022,03-UI/UX,MASB-HW-01,Underwater Crown physical QA,Yes,Yes,Yes,Yes,MERGE,None,Crown clamp software PASS,Water Lock physical pending
+DG-HW-001,CONS-022,05-Release,HWC-PHY-004,Water Lock physical QA,Yes,Yes,Yes,Yes,MERGE,None,Hardware interaction matrix,Blocks hardware claims
+DG-GF-001,CONS-002,02-iOS,IOS-P0-VERIFIED-001,GF preset parity remediated,Yes,Yes,Yes,Yes,MERGE,None,CONS-002 FIXED @ remediation,Verified @2c30412
+DG-GF-001,CONS-043,01-Watch,MASB-SW-04,GF external spot-check pending,Yes,Partial,Yes,Yes,KEEP_SEPARATE,None,Software PASS vs external validation distinct,CONS-043 PENDING_EXTERNAL
+DG-SNORK-001,CONS-048,02-iOS,IOS-P2-006,12 Snorkeling QA templates pending,Yes,Yes,Yes,Yes,MERGE,None,Snorkeling field QA 0/12,Software P1/P2/P3 PASS
+DG-SNORK-001,CONS-048,04-Main,MAIN-P2-002,Snorkeling physical QA templates,Yes,Yes,Yes,Yes,MERGE,None,Same 12-folder gate,CONS-048 P1 PENDING_PHYSICAL
+DG-SNORK-002,CONS-051,01-Watch,WFC-P2-006,Snorkeling progress test failure,Yes,Yes,Yes,Yes,MERGE,None,Single test isolated from FC,testProgressAtStartIsNearZero FAIL
+DG-SNORK-002,CONS-051,05-Release,REL-P2-002,Snorkeling progress test fail,Yes,Yes,Yes,Yes,MERGE,None,Release audit cross-reference,P2 software gap
+DG-AUDIT-001,CONS-047,00-Orchestrator,CONS-047,Stale upstream audits,Yes,Yes,Yes,No,MERGE,None,01-06 refreshed @2c30412,VERIFIED CLOSED

@@ -6,6 +6,6 @@ DCAP-04,Info.plist metadata only,DepthCapabilityEntitlementProbe.infoPlistMetada
 DCAP-05,Simulation sensor,DepthCapabilityResolver + DeveloperSettings,YES (DEBUG/TF),,none,simulation,NO,NO,DeveloperSensorSourceTests,PASS,Not production FC path
 DCAP-06,None entitlement,DepthCapabilityPolicy.supportsFullComputerRuntime,NO,,none,none,NO,NO,DepthCapabilityTests,PASS,Fail-closed
 DCAP-07,SecTask runtime read,N/A,NOT_SUPPORTED,watchOS limitation,,,N/A,N/A,DepthCapabilityEntitlementProbe comment,PASS,Documented constraint
-DCAP-08,WAO auto-launch gate,DIRStartupSelectionPolicy.resolveAutomaticStep,YES,,resolved policy,blocks FC on shallow,conditional,WatchWaterAutoOpenPolicyTests,PASS,Shallow hardware routes away from FC predive
+DCAP-08,WAO auto-launch gate,DIRStartupSelectionPolicy.resolveAutomaticStep,YES,,resolved policy,blocks FC on shallow,conditional,WatchWaterAutoOpenPolicyTests,PARTIAL,WFC-P2-005,12 routing tests FAIL @2c30412; production L110-112 correct when FC supported
 DCAP-09,Production App Store FC,DepthCapabilityPolicy,YES,,appleFull required,appleFull,YES,YES,DepthCapabilityPolicy.swift,PASS,Shallow-signed builds block FC without dev toggle
 DCAP-10,Physical wet validation,MASTER_SHALLOW_DEPTH_RELEASE_GATE,NOT_EXECUTED,,,,PENDING_PHYSICAL,PENDING_PHYSICAL,CONS-042,PASS (software),Physical QA separate gate

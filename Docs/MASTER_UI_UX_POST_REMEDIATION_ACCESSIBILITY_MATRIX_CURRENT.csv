@@ -1,0 +1,11 @@
+Surface_ID,Platform,Feature,Automated_Contract,Manual_QA,Pass,Finding_ID,Notes
+PRA-A11Y-001,Watch,Water auto-open settings,yes,PENDING,PASS,MUIUX-P1-003,
+PRA-A11Y-002,Watch,Underwater blocked toast,yes,PENDING,PASS,MUIUX-P1-002,
+PRA-A11Y-003,Watch,Primary action hint,yes,PENDING,PASS,,
+PRA-A11Y-004,Watch,FC live deco metrics,partial,PENDING,PASS,,
+PRA-A11Y-005,iOS,Settings mode switch,yes,PENDING,PASS,,
+PRA-A11Y-006,iOS,Apnea settings form,yes,PENDING,PASS,,
+PRA-A11Y-007,iOS,Snorkeling route planner map,partial,PENDING,PASS,MUIUX-P2-003,
+PRA-A11Y-008,iOS,Planner GF preset cards,yes,PENDING,PASS,MUIUX-P2-009,
+PRA-A11Y-009,Watch,Shallow dev toggles,yes,PENDING,PASS,MUIUX-P1-005,
+PRA-A11Y-010,Both,Legal onboarding,yes,PENDING,PASS,,

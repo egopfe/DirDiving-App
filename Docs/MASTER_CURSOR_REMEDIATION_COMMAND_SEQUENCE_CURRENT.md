@@ -1,63 +1,56 @@
-# Master Cursor Remediation Command Sequence — Current
+# Cursor / Codex Remediation Command Sequence — CURRENT
 
-**Baseline:** `main` @ `451f8fb` (Snorkeling @ `dbe5d8b`; remediation @ `5d757cc`)  
-**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR...V1.3`  
-**Date:** 2026-06-30
-
-**Command 10 consolidated software remediation: COMPLETE @ `5d757cc`.** Snorkeling P1/P2/P3 software: **COMPLETE @ `dbe5d8b`.** Domain audits **01–06: COMPLETE @ `451f8fb` (CONS-047 closed).** Next: test compile fix, script fix, physical QA.
+**Baseline:** `main` @ `2c30412`  
+**Orchestrator:** V1.5 — planning only; **does not launch Command 10/11**
 
 ---
 
-## Sequence
+## Recommended sequence
 
-| Step | Command / action | Batch | Findings | Status |
-|------|------------------|-------|----------|--------|
-| 0 | **Batch 0:** Full `xcodebuild` iOS + Watch build | Batch-0 | CONS-014 | **PARTIAL** — builds PASS; iOS tests FAIL |
-| 1 | **Batch 9 (doc P0):** Restore command bodies 01–04 | Batch-9 | CONS-001 | **COMPLETE** @ 5d757cc |
-| 2 | **Batch 4:** iOS GF presets | Batch-4 | CONS-002, CONS-038 | **COMPLETE** @ 5d757cc |
-| 3 | **Batch 2:** Sync ACK/tombstone | Batch-2 | CONS-003..005 | **COMPLETE** @ 5d757cc |
-| 4 | **Batch 6:** WAO depth gate | Batch-6 | CONS-019, CONS-018 | **COMPLETE** @ 5d757cc |
-| 5 | **Batch 1:** Oracle independence | Batch-1 | CONS-008 | **COMPLETE** @ 5d757cc |
-| 6 | **Batch 5:** PlannerStore deinit | Batch-5 | CONS-027 | **COMPLETE** @ 5d757cc |
-| 7 | **Snorkeling P1/P2/P3 software** | Snorkeling | — | **COMPLETE** @ dbe5d8b |
-| 8 | **Audit reruns 01–06** @ HEAD | Rerun | CONS-047 | **COMPLETE** @ 451f8fb |
-| 9 | **Audit 07 + orchestrator 00** | Verification | — | **COMPLETE** @ 451f8fb |
-| 10 | **Test fix:** Snorkeling iOS Algorithm Tests compile | Batch-0 | CONS-049 | **NEXT — P1** |
-| 11 | **Script fix:** `validate_commands_for_cursor_integrity.sh` | Script | CONS-046 | **NEXT — P1** |
-| 12 | **Physical QA:** Snorkeling 12 templates | Batch-8 | CONS-048 | **NEXT** |
-| 13 | **Physical QA:** Ultra depth/CMAltimeter | Batch-8 | CONS-010 | **NEXT** |
-| 14 | **Physical QA:** Shallow wet + WAO + HW | Batch-8 | CONS-042, CONS-021, CONS-022 | **NEXT** |
-| 15 | **Paired device QA** | Batch-8 | CONS-011 | **NEXT** |
-| 16 | **Accessibility field matrix** | Batch-6/8 | CONS-012 | **NEXT** |
-| 17 | **External validation:** Bühlmann + GF | Batch-8 | CONS-009, CONS-043 | **NEXT** |
-| 18 | **Release/legal:** PDF + counsel | Batch-9 | CONS-013, CONS-044 | **NEXT** |
+| Command | Name | Purpose | Input findings | Allowed files | Forbidden | Audits to rerun |
+|---------|------|---------|----------------|---------------|-----------|-----------------|
+| **R01** | Baseline and test-gate hardening | Lock clean main; verify gates G-001..G-009 | Batch-0 | Scripts/; CI configs | Production algorithms | 05 |
+| **R09** | UI/UX truthfulness + WAO test alignment | Close CONS-050 WFC-P2-005; CONS-051; a11y contracts | CONS-050; CONS-051; CONS-012 | Tests/WatchAlgorithmTests/*WAO*; Utils/WatchLaunchRoutingPolicy.swift; Docs WAO policy | BühlmannCore; FC engine timing | 01;03;04;05 |
+| **R10** | QA evidence + physical-test scaffolding | Execute physical/external matrices; no false closure | CONS-009; CONS-010; CONS-021; CONS-022; CONS-042; CONS-048; APNEA-PHY-001 | Docs/QA_EVIDENCE/**; templates only until field run | Production code unless blocker | 01;02;03;05 |
+| **R11** | Release / legal / App Store wording | CONS-044; CONS-013; demote false claims | CONS-053; CONS-044; CONS-013 | Legal docs; TestFlight notes; marketing copy | Algorithm changes | 05;06 |
+| **R12** | Documentation + feature-matrix alignment | CONS-054 INDEX/README; feature matrix rows | CONS-053; CONS-054 | Docs/INDEX.md; README.md; DIR_DIVING_Feature_Comparison.csv | Production code | 06 |
+| **R02** | Watch FC P0/P1 remediation | Only if audit 01 finds new FC defects | None open @ 2c30412 | Watch FC paths per finding | Convenience refactors | 01;03;04;05 |
+| **R03** | Watch FC oracle regression | Altitude oracle extension CONS-015 | CONS-015; WFC-P2-003 | Tests/WatchAlgorithmTests; BuhlmannCore tests | Constants without reference | 01;05 |
+| **R05** | Activity Settings / Logbook isolation | CONS-028; CONS-040; Apnea cloud decision | P3 settings findings | iOSApp/Services/*Settings*; iOSApp/Views | Cross-activity stores | 02;03;04;06 |
 
 ---
 
-## Recommended next commands
+## Next command (orchestrator recommendation)
+
+**Do not launch Command 10/11 automatically.**
+
+**Recommended next:** **R09 — WAO routing test alignment (CONS-050 / WFC-P2-005)**
+
+### R09 scope outline
+
+- **Purpose:** Align `WatchWaterAutoOpenPolicyTests` and `WatchLaunchRoutingPolicyTests` with intentional post-Apnea `divingModeSelection` routing **or** document and adjust policy if regression confirmed.
+- **Input findings:** CONS-050; WFC-P2-005; MAIN-P2-003; MUIUX-P2-005; MAIN-APNEA-002; CONS-051 (Snorkeling progress test).
+- **Allowed files:** `Tests/WatchAlgorithmTests/WatchWaterAutoOpenPolicyTests.swift`; `WatchLaunchRoutingPolicyTests.swift`; `Utils/DIRStartupSelectionPolicy.swift`; `Utils/WatchWaterAutoOpenPolicy.swift`; `Docs/WATCH_WATER_AUTO_OPEN_POLICY.md`.
+- **Forbidden:** `Shared/BuhlmannCore/*`; `FullComputerRuntimeEngine`; sync schemas; Apnea store isolation logic without audit rerun.
+- **Required safeguards:** Preserve DepthCapabilityPolicy gate (CONS-019); Apnea architecture isolation tests must remain PASS.
+- **Validation:** G-009 Watch Algorithm Tests 1152/1152; G-028 WAO tests; G-010 FC oracle suites unchanged PASS.
+- **Audits to rerun:** 01; 03; 04; 05.
+- **Acceptance:** 1152/1152 Watch tests green; 0 FC test regressions; WAO policy documented.
+- **Rollback:** Revert test-only changes; restore 1139/1152 baseline if policy change rejected.
+
+---
+
+## Deferred until after R09 + physical scaffolding
+
+- **R10** physical QA campaigns (CONS-048 12 Snorkeling folders; CONS-010 wet FC).
+- **R11** legal review (CONS-044) — after CONS-053 P0 doc repair.
+- **R12** INDEX/README refresh @ `2c30412` — after technical truth stable.
+
+---
+
+## Explicitly excluded from orchestrator 00
 
 ```text
-1. Fix Snorkeling test compile — disambiguate distanceMeters; unify SnorkelingRoutePlannerDraft types (CONS-049)
-2. Fix Scripts/validate_commands_for_cursor_integrity.sh to V2.2/V1.2/V2.3 (CONS-046)
-3. Batch 8 — Snorkeling physical QA (12 templates) + Diving physical campaigns
+07 — Post-remediation verification (after remediation complete)
+10/11 — Consolidated software remediation (already executed @ 7a429a7/6a0005b; do not re-launch from 00)
 ```
-
----
-
-## Batch status (@ 451f8fb)
-
-| Batch | Scope | Status |
-|-------|-------|--------|
-| 0 | Baseline protection | **PARTIAL** — iOS tests blocked |
-| 1–7 | Software remediation | **COMPLETE** |
-| Snorkeling | P1/P2/P3 software | **COMPLETE** @ dbe5d8b |
-| Rerun | Audits 01–06 | **COMPLETE** @ 451f8fb |
-| Script | Command integrity gate | **OPEN** (CONS-046) |
-| 8 | Physical/external QA | **ACTIVE** (+ Snorkeling 12) |
-| 9 | Release/legal/docs | **PARTIAL** |
-
----
-
-## Audit rerun triggers
-
-See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`. **01–06 CURRENT @ 451f8fb.** Rerun **02, 05, 07** after CONS-049 fix.

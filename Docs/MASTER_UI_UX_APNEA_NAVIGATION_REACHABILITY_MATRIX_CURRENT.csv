@@ -1,0 +1,13 @@
+Route_ID,Activity,Platform,Feature,Entry_Point,Target_Screen,Reachable,Blocked_Condition,Test,Pass,Finding_ID,Notes
+APN-NAV-001,Apnea,iOS,Apnea root tab,ContentView tab,IOSApneaRootView,yes,none,IOSActivitySettingsRoutingTests,yes,,
+APN-NAV-002,Apnea,iOS,Settings via gear,Dashboard gear,IOSCompanionSettingsRootView initialMode apnea,yes,none,IOSActivitySettingsRoutingTests,yes,,
+APN-NAV-003,Apnea,iOS,Settings via More switch,MoreView,IOSApneaSettingsContent,yes,none,IOSActivitySettingsContentVisibilityTests,yes,,
+APN-NAV-004,Apnea,iOS,Sessions list,Apnea tab,IOSApneaSessionsListView,yes,none,IOSActivityLogbookRoutingTests,yes,,
+APN-NAV-005,Apnea,iOS,Session detail,Sessions row,IOSApneaSessionDetailView,yes,none,IOSApneaLogbookStoreTests,yes,,
+APN-NAV-006,Apnea,iOS,Profile editor,Profiles,IOSApneaProfileEditorView,yes,none,partial,MUIUX-P2-007,Alarms/markers not in editor
+APN-NAV-007,Apnea,iOS,Training planner,Dashboard,IOSApneaSessionPlannerView,yes,none,ApneaCompanionProfilePresetsTests,yes,,
+APN-NAV-008,Apnea,Watch,Live ready,Activity select,ApneaView,yes,none,ApneaWatchLayoutContractTests,yes,,
+APN-NAV-009,Apnea,Watch,Settings gear,Apnea header,SettingsView scoped,yes,active session,WatchSettingsRoutingTests,yes,,Hidden when session active
+APN-NAV-010,Apnea,Watch,Settings blocked underwater,Active session,Crown to settings,no,clamp to live,WatchUnderwaterNavigationClampTests,yes,,
+APN-NAV-011,Apnea,iOS,Diving logbook from Apnea,Any,LogbookView,no,cross-activity forbidden,IOSActivityLogbookRoutingTests,yes,,P0 negative PASS
+APN-NAV-012,Apnea,Watch,Diving logbook tab,TabView,DiveLogListView,no,activity != diving,WatchActivityLogbookRoutingTests,yes,,

@@ -1,7 +1,21 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ `ad1c836`
+**Aggiornato:** 2026-07-01  
+**Branch consigliato:** `main` = `origin/main` @ `235b7d9`
+
+---
+
+## Aggiornamento indice 2026-07-01 — Orchestrator V1.5 full audit 01–06 @ `235b7d9`
+
+Audits 01–06 + consolidation @ `2c30412`; PARTIAL verdict; internal TestFlight software READY; physical/external pending.
+
+| Campo | Valore |
+|-------|--------|
+| **Plan** | [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md) |
+| **Findings** | [`MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`](MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv) |
+| **Verdict** | **PARTIAL** · **INTERNAL_TF_SOFTWARE_READY** · **CONS-050 WAO tests** · **PHYSICAL_QA_PENDING** |
+
+---
 
 ## Aggiornamento indice 2026-07-01 — Apnea P1/P2/P3 verification @ `ad1c836`
 

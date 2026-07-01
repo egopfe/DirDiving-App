@@ -1,0 +1,12 @@
+Data_Element,Source,Platform,Activity,Storage,Export,Cloud,Third_Party,Redaction,Opt_In_Required,User_Control,Test_Evidence,Status,Notes
+Apnea session depth samples,Watch depth,Watch,Apnea,dirdiving_apnea_sessions.json,PDF/CSV local,Watch iCloud optional,None,N/A,N/A,Delete session,ApneaSessionMergeIntegrityTests,PASS,No GPS in core Apnea path
+Apnea recovery intervals,Apnea engine,Watch,Apnea,Session JSON,Export views,None,None,N/A,N/A,N/A,Apnea lifecycle tests,PASS,Health-like — not medical guarantee
+Apnea targets/alarms,User settings,Both,Apnea,Activity settings namespace,None,WC settings sync only,None,N/A,N/A,Settings,IOSActivitySettingsCoherenceTests,PASS,No diving gas data
+Apnea statistics aggregates,Computed,Both,Apnea,Session + dashboard cache,PDF export,None,None,N/A,N/A,N/A,Apnea statistics tests,PASS,Local compute
+Apnea plan snapshot,iOS companion,iOS,Apnea,ApneaSyncCodec transfer,None,WC only,None,N/A,N/A,N/A,ApneaSyncCodecTests,PASS,Isolated from FC plan
+Apnea tombstones,Delete action,Both,Apnea,Signed WC + KVS Watch,None,KVS Watch only,None,N/A,N/A,Delete,ActivitySyncTombstoneTests,PASS,HMAC when secret present
+Apnea iOS cloud backup,N/A,iOS,Apnea,Blocked by CloudBackupCapability,None,none — stub UI,None,N/A,N/A,Settings truthful,ApneaCloudBackupStubTruthfulnessTests,PASS,CONS-039 documented
+Apnea auto-detection events,Runtime heuristics,Watch,Apnea,Session metadata,Export optional,None,None,N/A,N/A,N/A,Apnea auto-detection tests,PASS,Physical wet NOT_EXECUTED
+Cross: Diving profile in Apnea export,N/A,N/A,Apnea,Must not appear,N/A,N/A,N/A,N/A,N/A,N/A,ActivitySyncCrossDecodeRejectionTests,PASS,Isolation gate
+Cross: Snorkeling GPS in Apnea,N/A,N/A,Apnea,Must not appear,N/A,N/A,N/A,N/A,N/A,N/A,IOSActivityLogbookDataIsolationTests,PASS,Separate stores
+Apnea diagnostics signposts,OSLog,Both,Apnea,Unified logging,None,None,None,No coordinates in signpost names,N/A,N/A,DIRPerformanceSignpost policy,PASS,apnea_sample_process category

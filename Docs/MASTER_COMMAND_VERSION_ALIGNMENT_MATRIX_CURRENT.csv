@@ -1,33 +1,47 @@
 Command_File,Current_Status,Sequence_Position,Merged_Into,Still_Active,Superseded,Reason,Must_Update,Must_Archive,Notes
-0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED_V3.0.md,missing from active dir,legacy 0,02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE,no,yes,Math scope merged into Command 02,no,yes,Copy in OOLD/
-0W-DIR_DIVING_WATCH_COMPLETE_MATH_FUNCTIONS_AUDIT_V3.0.md,missing from active dir,legacy 0W,01-MASTER_WATCH_FULL_COMPUTER,no,yes,Watch math merged into Command 01,no,yes,Copy in OOLD/
-1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED_V3.0.md,missing from active dir,legacy 1,02-MASTER_IOS,no,yes,Bühlmann readiness merged,no,yes,OOLD/
-2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md,missing from active dir,legacy 2,01-MASTER_WATCH,no,yes,Watch algorithm merged,no,yes,OOLD/
-3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md,missing from active dir,legacy 3,02-MASTER_IOS,no,yes,iOS algorithm merged,no,yes,OOLD/
-4-DIR_DIVING_UI_UX_AUDIT_CCR_UPDATED_V3.0.md,missing from active dir,legacy 4,03-MASTER_UI_UX,no,yes,UI/UX merged,no,yes,OLD V2.0 only
-5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V3.0.md,missing from active dir,legacy 5,04-MASTER_MAIN_CODE,no,yes,Main code merged,no,yes,OLD V2.0 only
-6-DIR_DIVING_GIT_DOCUMENTATION_ALIGNMENT_COMMAND_CCR_UPDATED_V3.0.md,missing from active dir,legacy 6,06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT,no,yes,Doc alignment superseded,no,yes,OLD V2.0 only
-7-DIR_DIVING_ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_AUDIT_V3.0.md,missing from active dir,legacy 7,02+03 master audits,no,yes,Settings/logbook in iOS+UI/UX,no,yes,Not in repo active path
-8-DIR_DIVING_SYNC_PERSISTENCE_SCHEMA_AUDIT_V3.0.md,missing from active dir,legacy 8,04-MASTER_MAIN_CODE,no,yes,Sync merged,no,yes,Not in repo active path
-9-DIR_DIVING_SECURITY_PRIVACY_TRUST_AUDIT_V3.0.md,missing from active dir,legacy 9,04-MASTER_MAIN_CODE,no,yes,Security merged,no,yes,Not in repo active path
-10-DIR_DIVING_PERFORMANCE_CONCURRENCY_BATTERY_AUDIT_V3.0.md,missing from active dir,legacy 10,04-MASTER_MAIN_CODE,no,yes,Performance merged,no,yes,Not in repo active path
-11-DIR_DIVING_LOCALIZATION_ACCESSIBILITY_AUDIT_V3.0.md,missing from active dir,legacy 11,03-MASTER_UI_UX,no,yes,l10n/a11y in UI/UX,no,yes,Not in repo active path
-12-DIR_DIVING_TEST_QA_EVIDENCE_AUDIT_V3.0.md,missing from active dir,legacy 12,05-MASTER_RELEASE_QA,no,yes,QA evidence merged,no,yes,Not in repo active path
-13-DIR_DIVING_RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_V3.0.md,missing from active dir,legacy 13,05-MASTER_RELEASE_QA,no,yes,Legal claims merged,no,yes,Not in repo active path
-14-DIR_DIVING_MOCKUP_VISUAL_REGRESSION_AUDIT_V3.0.md,missing from active dir,legacy 14,03-MASTER_UI_UX,no,yes,Mockups in UI/UX,no,yes,Not in repo active path
-15-DIR_DIVING_WATCH_LIVE_BUHLMANN_SCHREINER_MULTILEVEL_AUDIT_V1.0.md,missing from active dir,legacy 15,01-MASTER_WATCH,no,yes,Multilevel merged into Watch FC,no,yes,OOLD 01WWATCH variant
-16-DIR_DIVING_COMPLETE_UI_UX_IMPLEMENTATION_COHERENCE_AUDIT_V1.0.md,missing from active dir,legacy 16,03-MASTER_UI_UX,no,yes,Coherence in UI/UX V2.x,no,yes,Not in repo active path
-IOS_PERFORMANCE_OPTIMIZATION_AUDIT_COMMAND_V1.0.md,orphan command doc,parallel,04-MASTER_MAIN_CODE partial,no,yes,Partial merge into 04,no,yes,IOS performance audit outputs remain indexed
-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.2.md,aligned active,01,15+2+0W,yes,no,Launch order 01; filename/body V2.2 match,no,no,@ 451f8fb
-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.2.md,aligned active,02,0+1+3,yes,no,Launch order 02; filename/body V1.2 match,no,no,@ 451f8fb
-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md,aligned active,03,4+11+14+16,yes,no,Launch order 03; filename/body V2.3 match,no,no,@ 451f8fb
-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.2.md,aligned active,04,5+8+9+10,yes,no,Launch order 04; filename/body V1.2 match,no,no,@ 451f8fb
-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md,aligned active,05,12+13,yes,no,Launch order 05; filename/body V1.2 match,no,no,@ 451f8fb
-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md,aligned active,06,6,yes,no,This audit command,no,no,Output this pass @ 451f8fb
-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.0.md,aligned active,07,post-remediation verify,yes,no,Launch order 07; audit-only not remediation,no,no,INDEX documents; outputs expected after run
-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,missing from disk,10,remediation not audit,no,yes,Indexed but file absent,yes,no,Restore from archive or regenerate; CONS-047
-00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.3.md,aligned active,00,orchestrates 01–07,yes,no,V1.3 correct filename/body,no,no,References V2.2/V2.3/V1.2 wave
-00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-30.md,active helper,00,documents 01–07,yes,no,Correct sequence doc,yes,no,Supersedes 2026-06-28 launch doc
-commands_for_cursor/OOLD/01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.1.md,archive,01 prior,superseded by V2.2,no,yes,V2.1 prior filename,no,yes,Archive reference
-commands_for_cursor/OOLD/03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md,archive,03 prior,superseded by V2.3,no,yes,V2.2 prior filename,no,yes,Archive reference
-Scripts/validate_commands_for_cursor_integrity.sh,stale gate,integrity,01–06 paths,yes,no,Expects V2.1/V1.1 filenames; disk V2.2/V2.3/V1.2,yes,no,CONS-046; update script not command bodies
+0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED_V3.0.md,archived,n/a,01-MASTER_WATCH + 02-MASTER_IOS,yes,yes,CCR V3.0 track superseded by master audits,no,yes,OOLD/
+0W-DIR_DIVING_WATCH_COMPLETE_MATH_FUNCTIONS_AUDIT_V1.0.md,archived,n/a,01-MASTER_WATCH,yes,yes,Watch math folded into forensic audit,no,yes,OOLD/
+1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED_V3.0.md,archived,n/a,02-MASTER_IOS,yes,yes,CCR V3.0 iOS audit superseded,no,yes,OOLD/
+2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md,archived,n/a,01-MASTER_WATCH,yes,yes,Watch algorithm audit superseded,no,yes,OOLD/
+3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md,archived,n/a,02-MASTER_IOS,yes,yes,iOS algorithm audit superseded,no,yes,OOLD/
+4-DIR_DIVING_UI_UX_AUDIT_CCR_UPDATED_V3.0.md,archived,n/a,03-MASTER_UI_UX,yes,yes,UI/UX V3.0 superseded,no,yes,OOLD/
+5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V3.0.md,archived,n/a,04-MASTER_MAIN,yes,yes,Main code V3.0 superseded,no,yes,OOLD/
+6-DIR_DIVING_GIT_DOCUMENTATION_ALIGNMENT_COMMAND_CCR_UPDATED_V3.0.md,archived,n/a,06-MASTER_DOCUMENTATION,yes,yes,Git alignment superseded by Command 06,no,yes,OOLD/
+7-DIR_DIVING_ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_AUDIT_V3.0.md,archived,n/a,02+03 master audits,yes,yes,Activity architecture folded into 02/03,no,yes,OOLD/
+8-DIR_DIVING_SYNC_PERSISTENCE_SCHEMA_AUDIT_V3.0.md,archived,n/a,04-MASTER_MAIN,yes,yes,Sync audit folded into main code audit,no,yes,OOLD/
+9-DIR_DIVING_SECURITY_PRIVACY_TRUST_AUDIT_V3.0.md,archived,n/a,04+05 master audits,yes,yes,Security folded into 04/05,no,yes,OOLD/
+10-DIR_DIVING_PERFORMANCE_CONCURRENCY_BATTERY_AUDIT_V3.0.md,archived,n/a,04-MASTER_MAIN,yes,yes,Performance folded into main code audit,no,yes,OOLD/
+11-DIR_DIVING_LOCALIZATION_ACCESSIBILITY_AUDIT_V3.0.md,archived,n/a,03+05 master audits,yes,yes,Localization folded into UI/UX + release,no,yes,OOLD/
+12-DIR_DIVING_TEST_QA_EVIDENCE_AUDIT_V3.0.md,archived,n/a,05-MASTER_RELEASE,yes,yes,QA audit folded into release audit,no,yes,OOLD/
+13-DIR_DIVING_RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_V3.0.md,archived,n/a,05-MASTER_RELEASE,yes,yes,Legal claims folded into release audit,no,yes,OOLD/
+14-DIR_DIVING_MOCKUP_VISUAL_REGRESSION_AUDIT_V3.0.md,archived,n/a,03-MASTER_UI_UX,yes,yes,Mockup audit folded into UI/UX,no,yes,OOLD/
+15-DIR_DIVING_WATCH_LIVE_BUHLMANN_SCHREINER_MULTILEVEL_AUDIT_V1.0.md,archived,n/a,01-MASTER_WATCH,yes,yes,Live Bühlmann folded into forensic audit,no,yes,OOLD/
+16-DIR_DIVING_COMPLETE_UI_UX_IMPLEMENTATION_COHERENCE_AUDIT_V1.0.md,archived,n/a,03-MASTER_UI_UX,yes,yes,UI coherence folded into UI/UX audit,no,yes,OOLD/
+IOS_PERFORMANCE_OPTIMIZATION_AUDIT_COMMAND_V1.0.md,archived,n/a,04-MASTER_MAIN,yes,yes,iOS perf folded into main code audit,no,yes,OOLD/
+MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.1.md,superseded,01,01-MASTER...V1.5,yes,yes,V2.1 superseded by V1.5 launch-order rename,no,yes,OOLD/
+MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.1.md,superseded,02,02-MASTER...V1.5,yes,yes,V1.1 superseded by V1.5,no,yes,OOLD/
+MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md,superseded,03,03-MASTER...V1.5,yes,yes,V2.2 superseded by V1.5,no,yes,OOLD/
+MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.1.md,superseded,04,04-MASTER...V1.5,yes,yes,V1.1 superseded by V1.5,no,yes,OOLD/
+MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.1.md,superseded,05,05-MASTER...V1.5,yes,yes,V1.1 superseded by V1.5,no,yes,OOLD/
+MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.1.md,superseded,06,06-MASTER...V1.5,yes,yes,V1.1 superseded by V1.5,no,yes,OOLD/
+00-MASTER_SUPER_ORCHESTRATOR...V1.3.md,superseded,00,00-MASTER...V1.5,yes,yes,V1.3 superseded by V1.5,no,yes,OOLD/
+01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.2.md,superseded,01,01-MASTER...V1.5,yes,yes,V2.2 interim superseded by V1.5,no,yes,OOLD/
+02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.2.md,superseded,02,02-MASTER...V1.5,yes,yes,V1.2 interim superseded by V1.5,no,yes,OOLD/
+03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md,superseded,03,03-MASTER...V1.5,yes,yes,V2.3 interim superseded by V1.5,no,yes,OOLD/
+04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.2.md,superseded,04,04-MASTER...V1.5,yes,yes,V1.2 interim superseded by V1.5,no,yes,OOLD/
+05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md,superseded,05,05-MASTER...V1.5,yes,yes,V1.2 interim superseded by V1.5,no,yes,OOLD/
+06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md,superseded,06,06-MASTER...V1.5,yes,yes,V1.2 interim superseded by V1.5,no,yes,OOLD/
+07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.0.md,superseded,07,07-MASTER...V1.5,yes,yes,V1.0 interim superseded by V1.5,no,yes,OOLD/
+00-MASTER_SUPER_ORCHESTRATOR...V1.5.md,active,00,n/a,yes,no,Current orchestrator,no,no,Canonical @ 2c30412
+01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V1.5.md,active,01,n/a,yes,no,Current launch order 01,no,no,Body/filename parity PASS
+02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.5.md,active,02,n/a,yes,no,Current launch order 02,no,no,
+03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.5.md,active,03,n/a,yes,no,Current launch order 03,no,no,
+04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.5.md,active,04,n/a,yes,no,Current launch order 04,no,no,
+05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.5.md,active,05,n/a,yes,no,Current launch order 05,no,no,
+06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.5.md,active,06,n/a,yes,no,Current launch order 06,no,no,This audit
+07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.5.md,active,07,n/a,yes,no,Current launch order 07 audit-only,no,no,
+11-MASTER_2026_06_30_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_COMMAND_V1.0.md,active,11,n/a,yes,no,Remediation not audit; INDEX still cites Command 10,yes,no,COMMAND_10_DOCUMENTED: PARTIAL
+10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,missing,10,n/a,no,yes,Expected by INDEX; body is Command 11,yes,no,Restore alias or update INDEX
+00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_V1.5.md,active,helper,n/a,yes,no,Launch sequence helper,no,no,Supersedes 2026-06-30 doc
+00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-30.md,superseded,helper,V1.5 launch doc,yes,yes,Pre-V1.5 launch sequence,no,yes,OOLD/
+DIR_DIVING_APNEA_IOS_WATCH_P1_P2_P3_CURSOR_COMMAND.md,active,feature,n/a,yes,no,Apnea implementation command not audit sequence,no,no,Separate from 01–07

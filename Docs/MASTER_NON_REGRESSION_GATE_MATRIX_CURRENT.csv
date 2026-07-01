@@ -1,37 +1,31 @@
 Gate_ID,Gate_Name,Applies_To_Batch,Applies_To_Findings,Command,Expected_Result,Blocks_Merge,Physical_Required,External_Required,Evidence_File,Notes
-GATE-001,Baseline git clean,Batch-0,All,git status --short,PASS / exit 0,Yes,No,No,,Type=Always; before=All; after=Batch-0; failure=Stop remediation; No unrelated dirty production files; orchestrator refresh @ 0126699
-GATE-002,xcodegen,Batch-0,All,xcodegen generate,PASS / exit 0,Yes,No,No,,Type=Always; before=All; after=All; failure=Stop; Project consistency; orchestrator refresh @ 0126699
-GATE-003,Target isolation,Batch-0,All,./Scripts/check_main_target_isolation.sh,PASS / exit 0,Yes,No,No,,Type=Always; before=All; after=All; failure=Stop; No experimental target bleed; orchestrator refresh @ 0126699
-GATE-004,Secrets scan,Batch-0,All,./Scripts/check_secrets.sh,PASS / exit 0,Yes,No,No,,Type=Always; before=All; after=All; failure=Stop; No credential leak; orchestrator refresh @ 0126699
-GATE-005,Localization audit,Batch-0,All,./Scripts/audit_localization.sh,PASS / exit 0,Yes,No,No,,Type=Always; before=All; after=All; failure=Stop; Key parity EN/IT; orchestrator refresh @ 0126699
-GATE-006,Command permutation check,Batch-0,CONS-001;CONS-046,./Scripts/validate_commands_for_cursor_integrity.sh,PASS / exit 0,Yes,No,No,,CONS-001 bodies FIXED; script FAIL @ 451f8fb — CONS-046 OPEN
-GATE-007,Consolidated software readiness,Batch-0,All,./Scripts/validate_consolidated_software_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Batch-specific; before=Batch-0; after=Batch-1+; failure=Stop if FAIL; Software 100% @ 5d757cc; orchestrator refresh @ 0126699
-GATE-008,Full build+test @ HEAD,Batch-0,CONS-014;CONS-049,xcodebuild iOS+Watch @451f8fb,BUILD PASS; iOS tests FAIL,Yes,No,No,,Builds SUCCEEDED; iOS Algorithm Tests compile FAIL — CONS-049
-GATE-009,Watch algorithm tests,Batch-1,CONS-008,./Scripts/validate_watch_complete_algorithm_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Watch; before=Batch-1; after=Batch-1; failure=Stop; Full Computer safety CONS-008; orchestrator refresh @ 0126699
-GATE-010,Altitude readiness,Batch-1,CONS-015,./Scripts/validate_watch_buhlmann_altitude_readiness.sh,PASS / exit 0,Yes,No,Yes,,Type=Watch; before=Batch-1; after=Batch-1; failure=Stop; CONS-015 altitude replay; orchestrator refresh @ 0126699
-GATE-011,FC release hard,Batch-1,All,./Scripts/validate_full_computer_release_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Watch; before=Batch-1; after=Batch-1; failure=Stop; Timing/degraded policy; orchestrator refresh @ 0126699
-GATE-012,GF preset unit tests,Batch-1,All,FullComputerGradientFactorPresetTests,PASS / exit 0,Yes,No,No,,Type=Watch; before=Batch-1; after=Batch-1; failure=Stop; Watch preset triplets; orchestrator refresh @ 0126699
-GATE-013,Sync schema,Batch-2,All,./Scripts/validate_multi_activity_sync_persistence_schema_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-2; after=Batch-2; failure=Stop; Activity isolation; orchestrator refresh @ 0126699
-GATE-014,Security privacy,Batch-2,CONS-003..005,./Scripts/validate_security_privacy_trust_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-2; after=Batch-2; failure=Stop; CONS-003..005 HMAC/tombstone; orchestrator refresh @ 0126699
-GATE-015,Sync integration tests,Batch-2,All,WatchSyncPendingQueueTests;WatchSyncServiceIntegrationTests,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-2; after=Batch-2; failure=Stop; In-flight + userInfo ACK; orchestrator refresh @ 0126699
-GATE-016,Activity settings/logbook,Batch-3,CONS-028;CONS-040,./Scripts/validate_activity_settings_navigation_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-3; after=Batch-3; failure=Stop; CONS-028 CONS-040; orchestrator refresh @ 0126699
-GATE-017,iOS algorithms,Batch-4,CONS-002,./Scripts/validate_ios_complete_algorithm_readiness.sh,PASS / exit 0,Yes,No,No,,Type=iOS; before=Batch-4; after=Batch-4; failure=Stop; CONS-002 GF import; orchestrator refresh @ 0126699
-GATE-018,GF import tests,Batch-4,All,DivePlanPackageBuilderTests;FullComputerImportedPlanStoreTests,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-4; after=Batch-4; failure=Stop; All iOS presets import; orchestrator refresh @ 0126699
-GATE-019,iOS performance,Batch-5,CONS-027,./Scripts/validate_ios_performance_readiness.sh,PASS / exit 0,Yes,No,No,,Type=iOS; before=Batch-5; after=Batch-5; failure=Stop; CONS-027 planner lifecycle; orchestrator refresh @ 0126699
-GATE-020,Perf concurrency,Batch-5,All,./Scripts/validate_performance_concurrency_battery_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-5; after=Batch-5; failure=Stop; Battery/concurrency; orchestrator refresh @ 0126699
-GATE-021,UI/UX software,Batch-6,CONS-019,./Scripts/validate_ui_ux_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-6; after=Batch-6; failure=Stop; CONS-019 WAO policy; orchestrator refresh @ 0126699
-GATE-022,Mockup paths,Batch-6,All,./Scripts/validate_mockup_visual_regression_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-6; after=Batch-6; failure=Stop; 59/59 paths; orchestrator refresh @ 0126699
-GATE-023,Accessibility contracts,Batch-6,CONS-012,./Scripts/audit_accessibility_contracts.sh,PASS / exit 0,Yes,Yes,No,,Type=Cross; before=Batch-6; after=Batch-6; failure=Stop; Before manual a11y CONS-012; orchestrator refresh @ 0126699
-GATE-024,WAO policy tests,Batch-6,All,WatchWaterAutoOpenPolicyTests;WatchLaunchRoutingPolicyTests,PASS / exit 0,Yes,No,No,,Type=Watch; before=Batch-6; after=Batch-6; failure=Stop; June 2026 WAO wave; orchestrator refresh @ 0126699
-GATE-025,Release legal scanner,Batch-7,All,./Scripts/validate_release_legal_claims_readiness.sh,PASS / exit 0,Yes,No,Yes,,Type=Cross; before=Batch-7; after=Batch-9; failure=Stop; Claims scanner PASS; orchestrator refresh @ 0126699
-GATE-026,Depth capability tests,Batch-7,CONS-006;CONS-007,DepthCapabilityTests;DepthCapabilityEntitlementProbe review,PASS / exit 0,Yes,No,No,,Type=Watch; before=Batch-7; after=Batch-7; failure=Stop; CONS-006 CONS-007; orchestrator refresh @ 0126699
-GATE-027,Shallow signing manifest,Batch-7,All,CI entitlements vs plist parity check,PASS / exit 0,Yes,No,No,,Type=Watch; before=Batch-7; after=Batch-7; failure=Stop; Shallow default @7dfefe2; orchestrator refresh @ 0126699
-GATE-028,Test QA evidence,Batch-8,All,./Scripts/validate_test_qa_evidence_readiness.sh,PASS / exit 0,Yes,No,No,,Type=Cross; before=Batch-8; after=Batch-8; failure=Stop; Software traceability; orchestrator refresh @ 0126699
-GATE-029,Physical QA matrix,Batch-8,CONS-010..013;CONS-021..022;CONS-042,Docs/QA_EVIDENCE/* signed artifacts,Signed evidence artifact or explicit PENDING_PHYSICAL/PENDING_EXTERNAL status,Yes,Yes,No,Docs/QA_EVIDENCE/* signed artifacts,Type=Manual; before=Batch-8; after=Batch-8; failure=Mark PENDING_PHYSICAL; CONS-010..013 CONS-021..022 CONS-042; orchestrator refresh @ 0126699
-GATE-030,WAO physical gate,Batch-8,All,MASTER_WATER_AUTO_OPEN_PHYSICAL_QA_GATE execution,Signed evidence artifact or explicit PENDING_PHYSICAL/PENDING_EXTERNAL status,Yes,Yes,No,MASTER_WATER_AUTO_OPEN_PHYSICAL_QA_GATE execution,Type=Manual; before=Batch-8; after=Batch-8; failure=Mark PENDING_PHYSICAL; Preserve SOFTWARE_READY; orchestrator refresh @ 0126699
-GATE-031,HW underwater gate,Batch-8,CONS-022,WATCH_UNDERWATER_FAST_CONTROLS templates,Signed evidence artifact or explicit PENDING_PHYSICAL/PENDING_EXTERNAL status,Yes,Yes,No,WATCH_UNDERWATER_FAST_CONTROLS templates,Type=Manual; before=Batch-8; after=Batch-8; failure=Mark PENDING_PHYSICAL; CONS-022; orchestrator refresh @ 0126699
-GATE-032,Shallow depth gate,Batch-8,CONS-042,MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX execution,Signed evidence artifact or explicit PENDING_PHYSICAL/PENDING_EXTERNAL status,Yes,Yes,No,MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX execution,Type=Manual; before=Batch-8; after=Batch-8; failure=Mark PENDING_PHYSICAL; CONS-042; orchestrator refresh @ 0126699
-GATE-033,External Bühlmann,Batch-8,CONS-009,BUHLMANN_EXTERNAL QA_EVIDENCE,Signed evidence artifact or explicit PENDING_PHYSICAL/PENDING_EXTERNAL status,Yes,No,Yes,BUHLMANN_EXTERNAL QA_EVIDENCE,Type=Manual; before=Batch-8; after=Batch-8; failure=Mark PENDING_EXTERNAL; CONS-009; orchestrator refresh @ 0126699
-GATE-034,Command body repair,Batch-9,CONS-001,validate_commands_for_cursor_integrity.sh PASS,PASS / exit 0,Yes,No,No,validate_commands_for_cursor_integrity.sh PASS,Type=Manual; before=Batch-9; after=Batch-9; failure=Stop if FAIL; CONS-001 FIXED @ 5d757cc — regression guard only; orchestrator refresh @ 0126699
-GATE-035,Documentation truth,Batch-9,CONS-034,Docs/INDEX.md + feature matrix review,PASS / exit 0,Yes,No,No,Docs/INDEX.md + feature matrix review,Type=Manual; before=Batch-9; after=Batch-9; failure=Stop; CONS-034 post-technical; orchestrator refresh @ 0126699
-GATE-036,Legal marketing sign-off,Batch-9,CONS-044,Counsel approval artifacts,Signed evidence artifact or explicit PENDING_PHYSICAL/PENDING_EXTERNAL status,Yes,No,Yes,Counsel approval artifacts,Type=Manual; before=Batch-9; after=Batch-9; failure=Stop; CONS-044 App Store; orchestrator refresh @ 0126699
+G-000,Branch main clean,Batch-0,All,git status --short,Empty or docs-only,NO,No,No,git status,Pre-remediation baseline
+G-001,Target isolation,All,All,./Scripts/check_main_target_isolation.sh,PASS,YES,No,No,check_main_target_isolation.sh,Activity target boundaries
+G-002,Secrets scan,All,All,./Scripts/check_secrets.sh,PASS,YES,No,No,check_secrets.sh,No credential leaks
+G-003,Localization audit,All,All,./Scripts/audit_localization.sh,PASS,YES,No,No,audit_localization.sh,EN/IT key parity
+G-004,Command integrity V1.5,Batch-0;Batch-9,CONS-046,./Scripts/validate_commands_for_cursor_integrity.sh,PASS,YES,No,No,validate_commands_for_cursor_integrity.sh,PASS @2c30412
+G-005,xcodegen generate,All,All,xcodegen generate,PASS,YES,No,No,xcodegen output,Project sync
+G-006,iOS build,All,All,xcodebuild -scheme DIRDiving iOS build,BUILD SUCCEEDED,YES,No,No,xcodebuild log,PASS @2c30412
+G-007,Watch build,All,All,xcodebuild -scheme DIRDiving Watch App build,BUILD SUCCEEDED,YES,No,No,xcodebuild log,PASS @2c30412
+G-008,iOS Algorithm Tests,All,CONS-049,xcodebuild -scheme DIRDiving iOS Algorithm Tests test,1655/1655 PASS,YES,No,No,MASTER_IOS audit,PASS @2c30412
+G-009,Watch Algorithm Tests,Batch-6,CONS-050,xcodebuild -scheme DIRDiving Watch Algorithm Tests test,1152/1152 PASS,YES,No,No,MASTER_WATCH audit,PARTIAL 1139/1152 @2c30412
+G-010,Watch FC oracle replay,Batch-1,CONS-009;WFC-P1-001,Audit15MultilevelOracleProfilesTests,PASS,YES,No,Yes,MASTER_WATCH oracle matrices,FC math PASS
+G-011,Schreiner vectors,Batch-1,FC math,Audit15 Schreiner suites,PASS,YES,No,No,SCHREINER_TEST_VECTOR_MATRIX,PASS @2c30412
+G-012,Multilevel ML-01..ML-10,Batch-1,FC math,Audit15MultilevelOracleProfilesTests,PASS,YES,No,No,MULTILEVEL_DECO_TRANSITION_MATRIX,PASS @2c30412
+G-013,Altitude matrix,Batch-1,CONS-015,OrchestratedAltitudeEnvironmentTests,PARTIAL,YES,Yes,Yes,ALTITUDE_MATRIX,Elevation oracle gap
+G-014,Settings ownership tests,Batch-3,Activity isolation,IOSActivitySettingsCoherenceTests,PASS,YES,No,No,SETTINGS_OWNERSHIP_MATRIX,PASS @2c30412
+G-015,Logbook ownership tests,Batch-3,Activity isolation,Logbook routing tests,PASS,YES,No,No,LOGBOOK_OWNERSHIP_MATRIX,PASS @2c30412
+G-016,Sync namespace tests,Batch-2,Sync integrity,ActivitySync*Tests,PASS,YES,No,No,SYNC_MESSAGE_NAMESPACE_MATRIX,Apnea isolated
+G-017,Schema migration tests,Batch-2,Schema,SchemaMigrationTests,PASS,YES,No,No,SCHEMA_MIGRATION_MATRIX,PASS @2c30412
+G-018,Backup restore tests,Batch-2,Persistence,BackupRestoreIsolationTests,PASS,YES,No,No,BACKUP_RESTORE_ISOLATION_MATRIX,PASS @2c30412
+G-019,Security malformed payload tests,Batch-7,Security,SecurityPrivacyTrustRemediationTests,PASS,YES,No,No,SECURITY_THREAT_MODEL,Static PASS
+G-020,Performance budget tests,Batch-5,Performance,PerformanceConcurrencyBatteryRemediationTests,PASS,YES,No,No,PERFORMANCE_BUDGET_MATRIX,Simulator only
+G-021,UI snapshot tests,Batch-6,CONS-032,IOSUIUXRemediationTests,PASS,YES,No,No,VISUAL_REGRESSION_COVERAGE_MATRIX,Structural PASS
+G-022,Mockup visual regression,Batch-6,CONS-032,capture_visual_regression_baselines.sh,PENDING_MANUAL,YES,Yes,No,PHYSICAL_PIXEL_DIFF,0/59 baselines
+G-023,Accessibility contracts,Batch-6,CONS-012,audit_accessibility_contracts.sh,PASS,YES,Yes,No,ACCESSIBILITY_MANUAL_QA_TEMPLATE,Manual pending
+G-024,Release claims check,Batch-9,CONS-044;CONS-053,validate_release_legal_claims_readiness.sh,PASS software,YES,No,Yes,CLAIMS_EVIDENCE_MATRIX,Legal pending
+G-025,Documentation truthfulness,Batch-9,CONS-053;CONS-054,Doc review vs MASTER_* audits,No P0 contradictions,YES,No,No,DOCUMENTATION_TRUTHFULNESS_MATRIX,2 P0 legacy docs open
+G-026,Physical Watch FC QA,Batch-8,CONS-010,MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX,Executed signed,YES,Yes,No,QA_EVIDENCE/BUHLMANN_EXTERNAL,0% @2c30412
+G-027,External Bühlmann validation,Batch-8,CONS-009,External validation plan,Third-party signed,YES,Yes,Yes,EXTERNAL_VALIDATION_GAPS,0% @2c30412
+G-028,WAO routing tests green,Batch-6,CONS-050,WatchWaterAutoOpenPolicyTests;WatchLaunchRoutingPolicyTests,All PASS,YES,No,No,WATCH_WATER_AUTO_OPEN_QA_MATRIX,13 failures @2c30412
+G-029,Apnea isolation gate,Batch-3,APNEA-005..009,ApneaArchitectureIsolationTests,PASS,YES,No,No,MASTER_APNEA_CONSOLIDATED_AUDIT_FINDINGS,PASS @2c30412
