@@ -129,6 +129,8 @@ final class ApneaWatchLayoutContractTests: XCTestCase {
             activeAlarmCount: 1,
             configuredAlarmLabels: ["Depth 20 m"],
             buddyReminderEnabled: true,
+            checklistCompletedCount: 0,
+            checklistTotalCount: 0,
             sensorDegraded: sensorDegraded,
             hapticsEnabled: true,
             missionModeEnabled: false,

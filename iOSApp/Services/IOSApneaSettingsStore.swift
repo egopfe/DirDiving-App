@@ -22,8 +22,36 @@ final class IOSApneaSettingsStore: ObservableObject {
         isReady = true
     }
 
+    var isChecklistComplete: Bool {
+        ApneaChecklistProgress.isComplete(settings.preApneaChecklist)
+    }
+
+    var buddyChecklistConfirmed: Bool {
+        ApneaChecklistProgress.buddyConfirmed(in: settings.preApneaChecklist)
+    }
+
+    var checklistCompletedCount: Int {
+        ApneaChecklistProgress.completedCount(in: settings.preApneaChecklist)
+    }
+
+    var checklistTotalCount: Int {
+        ApneaChecklistProgress.totalCount(in: settings.preApneaChecklist)
+    }
+
+    func setChecklistItem(id: UUID, isChecked: Bool) {
+        guard let index = settings.preApneaChecklist.firstIndex(where: { $0.id == id }) else { return }
+        settings.preApneaChecklist[index].isChecked = isChecked
+        persist()
+    }
+
+    func resetChecklist() {
+        settings.preApneaChecklist = ApneaChecklistCatalog.defaultItems()
+        persist()
+    }
+
     func persist() {
         guard isReady else { return }
+        settings.schemaVersion = ApneaCompanionSettings.currentSchemaVersion
         if let data = try? JSONEncoder().encode(settings) {
             defaults.set(data, forKey: storageKey)
         }

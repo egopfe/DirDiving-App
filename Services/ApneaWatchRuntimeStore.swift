@@ -449,6 +449,10 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
         let averageRecovery = recoveries.isEmpty ? 0 : recoveries.reduce(0, +) / Double(recoveries.count)
         let qualityReport = ApneaDataQualityEvaluator.evaluate(session: snapshot.session)
 
+        let settings = package?.body.settings ?? .default
+        let checklistCompleted = ApneaChecklistProgress.completedCount(in: settings.preApneaChecklist)
+        let checklistTotal = ApneaChecklistProgress.totalCount(in: settings.preApneaChecklist)
+
         return ApneaWatchPresentationInput(
             isSessionStarted: lifecyclePhase != .idle,
             showSessionSummary: showSessionSummary,
@@ -464,7 +468,9 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
             recoveryPolicyLabel: planPresentation.recoveryPolicyLabel,
             activeAlarmCount: planPresentation.enabledAlarmLabels.count,
             configuredAlarmLabels: planPresentation.enabledAlarmLabels,
-            buddyReminderEnabled: true,
+            buddyReminderEnabled: settings.hapticsEnabled,
+            checklistCompletedCount: checklistCompleted,
+            checklistTotalCount: checklistTotal,
             sensorDegraded: isSensorDegraded,
             hapticsEnabled: hapticsEnabled,
             missionModeEnabled: planPresentation.missionModeEnabled || missionModeEnabled,
@@ -509,6 +515,8 @@ private extension ApneaWatchPresentationInput {
         activeAlarmCount: 0,
         configuredAlarmLabels: [],
         buddyReminderEnabled: true,
+        checklistCompletedCount: 0,
+        checklistTotalCount: ApneaChecklistCatalog.defaultItems().count,
         sensorDegraded: false,
         hapticsEnabled: true,
         missionModeEnabled: false,

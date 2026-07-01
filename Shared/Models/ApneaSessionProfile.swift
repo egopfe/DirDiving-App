@@ -103,6 +103,7 @@ enum ApneaSessionProfileBridge {
             displayName: profile.displayName,
             targetHoldSeconds: profile.targetDurationSeconds,
             targetDepthMeters: profile.targetDepthMeters,
+            maxRepetitions: profile.maxRepetitions,
             minimumRecoveryPolicy: profile.recoveryPolicy,
             enabledAlerts: profile.alarms.contains(where: \.isEnabled)
         )

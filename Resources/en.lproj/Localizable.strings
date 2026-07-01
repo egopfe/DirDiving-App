@@ -1532,5 +1532,8 @@
 "apnea.watch.layout.hold" = "HOLD";
 "apnea.watch.layout.depth" = "DEPTH";
 "apnea.watch.layout.time" = "TIME";
+"apnea.watch.precheck" = "Pre-check";
+"apnea.watch.precheck.reminder" = "Buddy / recovery reminder";
+"apnea.watch.precheck.count_format" = "Pre-check: %d/%d";
 "apnea.summary.reps" = "Reps";
 "apnea.summary.max_depth" = "Max depth";

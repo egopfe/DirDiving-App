@@ -3,7 +3,6 @@ import SwiftUI
 struct IOSApneaSessionCheckView: View {
     @EnvironmentObject private var profileStore: IOSApneaProfileStore
     @EnvironmentObject private var settingsStore: IOSApneaSettingsStore
-    @EnvironmentObject private var buddyStore: IOSApneaBuddySafetyStore
 
     @State private var selectedProfileID: UUID?
 
@@ -20,7 +19,7 @@ struct IOSApneaSessionCheckView: View {
                 recoveryPolicy: selectedProfile?.recoveryPolicy ?? .default,
                 recoveryAlertsEnabled: settingsStore.settings.hapticsEnabled,
                 buddyReminderShown: true,
-                buddyChecklistConfirmed: buddyStore.profile.preSessionConfirmation.isConfirmed,
+                buddyChecklistConfirmed: settingsStore.buddyChecklistConfirmed,
                 watchBatteryLow: nil,
                 depthSensorAvailable: nil,
                 heartRateAvailable: nil

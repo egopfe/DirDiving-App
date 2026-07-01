@@ -11,6 +11,31 @@ struct IOSApneaSessionPlannerView: View {
 
     @State private var transferMessage: String?
 
+    private var selectedCompanionProfile: ApneaCompanionProfile? {
+        plannerStore.draftPlan.profileID.flatMap { profileStore.profile(id: $0) }
+            ?? profileStore.allProfiles().first
+    }
+
+    private var selectedSessionProfile: ApneaSessionProfile? {
+        selectedCompanionProfile.map(ApneaSessionProfileBridge.fromCompanion)
+    }
+
+    private var plannerSessionCheckResult: ApneaSessionCheckResult {
+        ApneaReadinessPresentation.plannerSessionCheck(
+            profile: selectedSessionProfile,
+            recoveryPolicy: plannerStore.draftPlan.recoveryPolicy,
+            recoveryAlertsEnabled: settingsStore.settings.hapticsEnabled,
+            buddyChecklistConfirmed: settingsStore.buddyChecklistConfirmed
+        )
+    }
+
+    private var canSendToWatch: Bool {
+        ApneaReadinessPresentation.canSendToWatch(
+            plannerValid: plannerStore.isValid,
+            sessionCheck: plannerSessionCheckResult
+        )
+    }
+
     var body: some View {
         DIRScreenContainer {
             Form {
@@ -76,6 +101,72 @@ struct IOSApneaSessionPlannerView: View {
                         .foregroundStyle(DIRTheme.muted)
                 }
 
+                Section(DIRIOSLocalizer.string("apnea.checklist.title")) {
+                    Text(DIRIOSLocalizer.string("apnea.checklist.operational_reminder"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+
+                    ForEach(settingsStore.settings.preApneaChecklist.sorted { $0.sortIndex < $1.sortIndex }) { item in
+                        Toggle(
+                            DIRIOSLocalizer.string(item.localizationKey),
+                            isOn: Binding(
+                                get: { settingsStore.settings.preApneaChecklist.first(where: { $0.id == item.id })?.isChecked ?? false },
+                                set: { settingsStore.setChecklistItem(id: item.id, isChecked: $0) }
+                            )
+                        )
+                        .tint(DIRTheme.cyan)
+                    }
+
+                    Text(
+                        String(
+                            format: DIRIOSLocalizer.string("apnea.checklist.completed_format"),
+                            settingsStore.checklistCompletedCount,
+                            settingsStore.checklistTotalCount
+                        )
+                    )
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                }
+
+                Section(DIRIOSLocalizer.string("apnea.session_check.title")) {
+                    statusRow(
+                        DIRIOSLocalizer.string("apnea.session_check.status"),
+                        DIRIOSLocalizer.string(ApneaReadinessPresentation.sessionCheckStatusKey(for: plannerSessionCheckResult.status))
+                    )
+                    if let profile = selectedCompanionProfile {
+                        statusRow(
+                            DIRIOSLocalizer.string("apnea.readiness.profile"),
+                            profile.isPreset ? DIRIOSLocalizer.string(profile.displayName) : profile.displayName
+                        )
+                    }
+                    statusRow(
+                        DIRIOSLocalizer.string("apnea.recovery.title"),
+                        settingsStore.settings.hapticsEnabled
+                            ? DIRIOSLocalizer.string("apnea.session_check.enabled")
+                            : DIRIOSLocalizer.string("apnea.session_check.disabled")
+                    )
+                    statusRow(
+                        DIRIOSLocalizer.string("apnea.readiness.checklist"),
+                        settingsStore.isChecklistComplete
+                            ? DIRIOSLocalizer.string("apnea.session_check.ready")
+                            : DIRIOSLocalizer.string("apnea.session_check.incomplete")
+                    )
+
+                    ForEach(plannerSessionCheckResult.issues) { issue in
+                        Text(DIRIOSLocalizer.string(issue.localizationKey))
+                            .foregroundStyle(DIRTheme.orange)
+                            .font(.caption)
+                    }
+
+                    if !plannerStore.validationIssues.isEmpty {
+                        ForEach(plannerStore.validationIssues, id: \.self) { issue in
+                            Text(validationText(for: issue))
+                                .foregroundStyle(DIRTheme.orange)
+                                .font(.caption)
+                        }
+                    }
+                }
+
                 Section(DIRIOSLocalizer.string("apnea.ios.planner.notes")) {
                     TextField(DIRIOSLocalizer.string("apnea.ios.planner.notes"), text: Binding(
                         get: { plannerStore.draftPlan.notes ?? "" },
@@ -86,20 +177,6 @@ struct IOSApneaSessionPlannerView: View {
                     ), axis: .vertical)
                 }
 
-                Section(DIRIOSLocalizer.string("apnea.ios.planner.readiness")) {
-                    if plannerStore.validationIssues.isEmpty {
-                        Text(DIRIOSLocalizer.string("apnea.session_check.ready"))
-                            .foregroundStyle(DIRTheme.green)
-                            .font(.headline.weight(.semibold))
-                    } else {
-                        ForEach(plannerStore.validationIssues, id: \.self) { issue in
-                            Text(validationText(for: issue))
-                                .foregroundStyle(DIRTheme.orange)
-                                .font(.caption)
-                        }
-                    }
-                }
-
                 Section(DIRIOSLocalizer.string("apnea.ios.planner.watch_transfer")) {
                     HStack(spacing: 10) {
                         Image(systemName: transferStatusIcon)
@@ -107,6 +184,11 @@ struct IOSApneaSessionPlannerView: View {
                         Text(transferMessage ?? transferStatusText(transferService.state))
                             .foregroundStyle(DIRTheme.muted)
                             .font(.caption)
+                    }
+                    if plannerSessionCheckResult.status == .warning {
+                        Text(DIRIOSLocalizer.string("apnea.session_check.warning"))
+                            .font(.caption)
+                            .foregroundStyle(DIRTheme.orange)
                     }
                 }
             }
@@ -121,7 +203,7 @@ struct IOSApneaSessionPlannerView: View {
                 Button(DIRIOSLocalizer.string("apnea.ios.planner.send_watch")) {
                     sendToWatch()
                 }
-                .disabled(!plannerStore.isValid)
+                .disabled(!canSendToWatch)
             }
         }
         .onAppear {
@@ -133,6 +215,14 @@ struct IOSApneaSessionPlannerView: View {
         }
         .onChange(of: transferService.state) { _, newState in
             transferMessage = transferStatusText(newState)
+        }
+    }
+
+    private func statusRow(_ title: String, _ value: String) -> some View {
+        HStack {
+            Text(title).foregroundStyle(DIRTheme.muted)
+            Spacer()
+            Text(value).foregroundStyle(.white)
         }
     }
 
