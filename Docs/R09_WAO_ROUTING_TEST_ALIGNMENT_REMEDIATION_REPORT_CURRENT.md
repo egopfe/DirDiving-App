@@ -2,7 +2,7 @@
 
 **Branch:** `main`  
 **Baseline HEAD (before):** `0d3a26b`  
-**Remediation HEAD (after):** pending commit  
+**Remediation HEAD (after):** `cc0efc6`  
 **Scope:** Software-only Batch-6 / R09 per `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`  
 **Excluded:** Physical QA, wet/field QA, legal, App Store, external Bühlmann validation
 

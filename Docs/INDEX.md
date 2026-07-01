@@ -1,11 +1,11 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-01  
-**Branch consigliato:** `main` = `origin/main` @ `0d3a26b` (R09 remediation uncommitted)
+**Branch consigliato:** `main` = `origin/main` @ `cc0efc6`
 
 ---
 
-## Aggiornamento indice 2026-07-01 — R09 WAO routing test alignment (local)
+## Aggiornamento indice 2026-07-01 — R09 WAO routing test alignment 
 
 CONS-050 / WFC-P2-005 closed: Watch **1152/1152** PASS; snorkeling progress fix; CONS-053/054 doc alignment.
 
@@ -24,7 +24,7 @@ Audits 01–06 + consolidation @ `2c30412`; PARTIAL verdict; internal TestFlight
 |-------|--------|
 | **Plan** | [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md) |
 | **Findings** | [`MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`](MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv) |
-| **Verdict** | **PARTIAL** · **INTERNAL_TF_SOFTWARE_READY** · **CONS-050 FIXED (R09 local)** · **PHYSICAL_QA_PENDING** |
+| **Verdict** | **PARTIAL** · **INTERNAL_TF_SOFTWARE_READY** · **CONS-050 FIXED** · **PHYSICAL_QA_PENDING** |
 
 ---
 
