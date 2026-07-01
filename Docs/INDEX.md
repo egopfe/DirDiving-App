@@ -1,11 +1,11 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-01  
-**Branch consigliato:** `main` = `origin/main` @ pending orchestrator V1.5 audit
+**Branch consigliato:** `main` = `origin/main` @ `235b7d9`
 
 ---
 
-## Aggiornamento indice 2026-07-01 — Orchestrator V1.5 full audit 01–06 @ pending
+## Aggiornamento indice 2026-07-01 — Orchestrator V1.5 full audit 01–06 @ `235b7d9`
 
 Audits 01–06 + consolidation @ `2c30412`; PARTIAL verdict; internal TestFlight software READY; physical/external pending.
 
