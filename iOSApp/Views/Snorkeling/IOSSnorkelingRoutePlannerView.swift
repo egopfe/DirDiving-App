@@ -35,14 +35,14 @@ struct IOSSnorkelingRoutePlannerView: View {
 
                     mapSection
                     waypointList
-                    routeSafetySection
-                    returnToEntrySection
                     profilesSection
                     routeTypeSection
                     routeProfileKindSection
                     returnAlertSection
                     checklistSection
+                    returnToEntrySection
                     estimatesCard
+                    routeSafetySection
                     transferSection
                     exportSection
                     actionButtons
