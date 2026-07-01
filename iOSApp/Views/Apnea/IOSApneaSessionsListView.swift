@@ -3,9 +3,15 @@ import SwiftUI
 struct IOSApneaSessionsListView: View {
     @EnvironmentObject private var logbook: IOSApneaLogbookStore
     @EnvironmentObject private var demoLogbookSettings: IOSActivityDemoLogbookSettingsStore
+    @EnvironmentObject private var coordinator: IOSCompanionStoreCoordinator
+    @EnvironmentObject private var logbookVisibility: IOSActivityLogbookVisibilitySettingsStore
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+
+    private var showsUnifiedLogbook: Bool {
+        logbookVisibility.showAllActivitiesInApneaLogbook
+    }
 
     private var realEntries: [IOSApneaLogbookDisplayEntry] {
         IOSLogbookDisplayComposer.apneaEntries(realSessions: logbook.sessions, demoSessions: [])
@@ -26,7 +32,14 @@ struct IOSApneaSessionsListView: View {
     var body: some View {
         NavigationStack {
             DIRScreenContainer {
-                if isEmpty {
+                if showsUnifiedLogbook {
+                    ScrollView(showsIndicators: false) {
+                        IOSUnifiedLogbookListView(hostActivity: .apnea)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                    }
+                    .dirCompanionScrollSurface()
+                } else if isEmpty {
                     emptyState
                 } else {
                     List {

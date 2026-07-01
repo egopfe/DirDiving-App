@@ -1172,7 +1172,7 @@ apnea.ios.records.most_dives,apnea,ios,iOSApp/Utils/IOSApneaLogbookPresentation.
 apnea.ios.records.session_context,apnea,ios,iOSApp/Utils/IOSApneaLogbookPresentation.swift,Sessione,Session,no,no,no,PASS,
 apnea.ios.records.tie_format,apnea,ios,iOSApp/Utils/IOSApneaLogbookPresentation.swift,Parimerito con altre %d voci,Tied with %d other entries,yes,yes,no,PASS,
 apnea.ios.records.title,apnea,ios,iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift;iOSApp/Views/Apnea/IOSApneaSessionsListView.swift,Record personali,Personal records,no,no,no,PASS,
-apnea.ios.session.detail.title,apnea,ios,iOSApp/Utils/IOSApneaLogbookPresentation.swift;iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift,Sessione,Session,no,no,no,PASS,
+apnea.ios.session.detail.title,apnea,ios,iOSApp/Utils/IOSApneaLogbookPresentation.swift;iOSApp/Utils/IOSUnifiedLogbookPresentationBuilder.swift;iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift,Sessione,Session,no,no,no,PASS,
 apnea.ios.session.dives,apnea,ios,iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift,Immersioni,Dives,no,no,no,PASS,
 apnea.ios.session.no_dives,apnea,ios,iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift,Nessuna immersione registrata in questa sessione.,No dives recorded in this session.,no,no,no,PASS,
 apnea.ios.session.tab.charts,apnea,ios,,Grafici,Charts,no,no,no,PASS,
