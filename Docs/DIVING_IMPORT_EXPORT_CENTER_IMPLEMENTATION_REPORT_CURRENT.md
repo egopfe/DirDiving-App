@@ -3,7 +3,7 @@
 **Date:** 2026-07-01  
 **Branch:** `main`  
 **Baseline commit:** `b7163a3`  
-**Implementation commit:** (see git log)
+**Implementation commit:** `32234d1`
 
 ---
 
