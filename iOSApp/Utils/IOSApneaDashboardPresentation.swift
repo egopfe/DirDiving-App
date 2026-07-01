@@ -73,6 +73,8 @@ enum IOSApneaDashboardPresentationMapper {
 enum IOSApneaProfilePresentation {
     static func subtitle(for profile: ApneaCompanionProfile) -> String {
         var parts: [String] = []
+        let kind = profile.profileKind ?? ApneaSessionProfileBridge.profileKind(for: profile.discipline)
+        parts.append(DIRIOSLocalizer.string(kind.localizationKey))
         if let depth = profile.targetDepthMeters {
             parts.append(String(format: "%.0f m", depth))
         }
@@ -81,6 +83,9 @@ enum IOSApneaProfilePresentation {
         }
         let recovery = recoveryLabel(for: profile.recoveryPolicy)
         if !recovery.isEmpty { parts.append(recovery) }
+        if let maxReps = profile.maxRepetitions {
+            parts.append("\(maxReps) reps")
+        }
         let alarmCount = profile.alarms.filter(\.isEnabled).count
         if alarmCount > 0 {
             parts.append("\(alarmCount) alarms")

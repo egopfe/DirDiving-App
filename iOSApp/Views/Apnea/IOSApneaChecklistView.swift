@@ -1,16 +1,44 @@
 import SwiftUI
 
 struct IOSApneaChecklistView: View {
-    @EnvironmentObject private var buddyStore: IOSApneaBuddySafetyStore
-    @State private var items: [ApneaChecklistItem] = ApneaChecklistCatalog.defaultItems()
+    @EnvironmentObject private var settingsStore: IOSApneaSettingsStore
+    @State private var isResetConfirmationPresented = false
 
     var body: some View {
         DIRScreenContainer {
             List {
+                Section {
+                    Text(DIRIOSLocalizer.string("apnea.checklist.operational_reminder"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                }
+
                 Section(DIRIOSLocalizer.string("apnea.checklist.title")) {
-                    ForEach($items) { $item in
-                        Toggle(DIRIOSLocalizer.string(item.localizationKey), isOn: $item.isChecked)
-                            .tint(DIRTheme.cyan)
+                    ForEach(settingsStore.settings.preApneaChecklist.sorted { $0.sortIndex < $1.sortIndex }) { item in
+                        Toggle(
+                            DIRIOSLocalizer.string(item.localizationKey),
+                            isOn: Binding(
+                                get: { settingsStore.settings.preApneaChecklist.first(where: { $0.id == item.id })?.isChecked ?? false },
+                                set: { settingsStore.setChecklistItem(id: item.id, isChecked: $0) }
+                            )
+                        )
+                        .tint(DIRTheme.cyan)
+                    }
+
+                    Text(
+                        String(
+                            format: DIRIOSLocalizer.string("apnea.checklist.completed_format"),
+                            settingsStore.checklistCompletedCount,
+                            settingsStore.checklistTotalCount
+                        )
+                    )
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+
+                    Button(role: .destructive) {
+                        isResetConfirmationPresented = true
+                    } label: {
+                        Text(DIRIOSLocalizer.string("apnea.checklist.reset"))
                     }
                 }
 
@@ -23,19 +51,16 @@ struct IOSApneaChecklistView: View {
             .scrollContentBackground(.hidden)
         }
         .navigationTitle(DIRIOSLocalizer.string("apnea.checklist.title"))
-        .onAppear {
-            syncFromBuddyStoreIfNeeded()
-        }
-    }
-
-    private func syncFromBuddyStoreIfNeeded() {
-        let catalog = ApneaChecklistCatalog.defaultItems()
-        if buddyStore.profile.checklist.count == catalog.count {
-            for index in items.indices {
-                if index < buddyStore.profile.checklist.count {
-                    items[index].isChecked = buddyStore.profile.checklist[index].isCompleted
-                }
+        .alert(
+            DIRIOSLocalizer.string("apnea.checklist.reset.confirm_title"),
+            isPresented: $isResetConfirmationPresented
+        ) {
+            Button(DIRIOSLocalizer.string("common.cancel"), role: .cancel) {}
+            Button(DIRIOSLocalizer.string("apnea.checklist.reset"), role: .destructive) {
+                settingsStore.resetChecklist()
             }
+        } message: {
+            Text(DIRIOSLocalizer.string("apnea.checklist.reset.confirm_message"))
         }
     }
 }

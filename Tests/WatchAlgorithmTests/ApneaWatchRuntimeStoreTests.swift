@@ -68,6 +68,8 @@ final class ApneaWatchRuntimeStoreTests: XCTestCase {
             activeAlarmCount: 0,
             configuredAlarmLabels: [],
             buddyReminderEnabled: true,
+            checklistCompletedCount: 0,
+            checklistTotalCount: 0,
             sensorDegraded: true,
             hapticsEnabled: true,
             missionModeEnabled: false,
