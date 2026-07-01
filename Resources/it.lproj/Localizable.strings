@@ -1532,5 +1532,8 @@
 "apnea.watch.layout.hold" = "APNEA";
 "apnea.watch.layout.depth" = "PROF";
 "apnea.watch.layout.time" = "TEMPO";
+"apnea.watch.precheck" = "Pre-check";
+"apnea.watch.precheck.reminder" = "Promemoria buddy / recupero";
+"apnea.watch.precheck.count_format" = "Pre-check: %d/%d";
 "apnea.summary.reps" = "Ripetizioni";
 "apnea.summary.max_depth" = "Profondità max";

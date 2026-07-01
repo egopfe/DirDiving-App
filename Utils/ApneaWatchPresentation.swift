@@ -36,6 +36,8 @@ struct ApneaWatchPresentationInput: Equatable {
     var activeAlarmCount: Int
     var configuredAlarmLabels: [String]
     var buddyReminderEnabled: Bool
+    var checklistCompletedCount: Int
+    var checklistTotalCount: Int
     var sensorDegraded: Bool
     var hapticsEnabled: Bool
     var missionModeEnabled: Bool
@@ -92,6 +94,7 @@ struct ApneaWatchPresentationOutput: Equatable {
     var profileLayoutMetrics: ApneaWatchProfileLayoutMetrics?
     var sessionSummaryMetrics: ApneaSessionSummaryMetrics?
     var recoveryTargetReachedText: String?
+    var precheckLabel: String
 }
 
 enum ApneaWatchPresentation {
@@ -174,6 +177,17 @@ enum ApneaWatchPresentation {
             ? String(localized: "apnea.watch.recovery_target_reached")
             : nil
 
+        let precheckLabel: String
+        if input.checklistTotalCount > 0 {
+            precheckLabel = String(
+                format: String(localized: "apnea.watch.precheck.count_format"),
+                input.checklistCompletedCount,
+                input.checklistTotalCount
+            )
+        } else {
+            precheckLabel = String(localized: "apnea.watch.precheck.reminder")
+        }
+
         return ApneaWatchPresentationOutput(
             stage: stage,
             startEnabled: startEnabled,
@@ -202,7 +216,8 @@ enum ApneaWatchPresentation {
             configuredAlarms: input.configuredAlarmLabels,
             profileLayoutMetrics: profileLayout,
             sessionSummaryMetrics: summaryMetrics,
-            recoveryTargetReachedText: recoveryTargetReachedText
+            recoveryTargetReachedText: recoveryTargetReachedText,
+            precheckLabel: precheckLabel
         )
     }
 
