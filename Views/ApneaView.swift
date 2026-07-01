@@ -5,6 +5,7 @@ struct ApneaView: View {
     @EnvironmentObject private var apneaLogbook: ApneaLogbookStore
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var navigation: AppNavigationStore
+    @EnvironmentObject private var gps: GPSManager
     @ObservedObject private var importedPlan = ApneaImportedPlanStore.shared
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
 
@@ -41,6 +42,7 @@ struct ApneaView: View {
         }
         .dynamicTypeSize(.xSmall ... .accessibility2)
         .onAppear {
+            runtime.attachSurfaceLocation(gps: gps)
             runtime.configureRuntimePreferences(
                 hapticsEnabled: hapticsEnabled,
                 missionModeEnabled: importedPlan.readyPresentation.missionModeEnabled
