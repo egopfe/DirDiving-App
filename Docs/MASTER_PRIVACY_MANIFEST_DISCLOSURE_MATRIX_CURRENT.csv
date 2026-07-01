@@ -4,7 +4,7 @@ Entry exit GPS,Diving,yes,yes,yes,optional CSV,no,opt-in if in session,yes,yes,y
 Snorkeling route track,Snorkeling,yes,yes,yes,yes,no,no,yes,yes,yes,yes,High,PASS,SOFTWARE_READY,PENDING_PHYSICAL,Local-only cloud
 Snorkeling dip events,Snorkeling,yes,yes,yes,yes,no,no,yes,yes,yes,yes,Low,PASS,SOFTWARE_READY,N/A,
 Session photos,Snorkeling,yes,yes,yes,share sheet,no,no,yes,yes,yes,yes,High,PARTIAL,SOFTWARE_READY,PENDING_PHYSICAL,SNK photo privacy field QA pending
-Apnea timings stats,Apnea,yes,yes,yes,yes,no,no,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,Cloud explicitly unavailable
+Apnea timings stats,Apnea,yes,yes,yes,yes,no,stub opt-in,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,IOS-P3-002 iCloud stub documented @2c30412
 Apnea buddy notes,Apnea,yes,yes,yes,redacted export,no,no,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,
 Equipment gas data,Diving,yes,yes,yes,PDF export,no,opt-in diving,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,
 CCR bailout data,Diving,yes,yes,plan package only,PDF export,no,opt-in diving,yes,yes,yes,yes,High,PASS,SOFTWARE_READY,N/A,Reference-only posture

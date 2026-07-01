@@ -1,112 +1,73 @@
 # Master Feature Matrix Repair Plan — Current
 
-**Audit:** Command 06 — Documentation / Repository Alignment **V1.2**  
-**Target matrix:** `Docs/DIR_DIVING_Feature_Comparison.csv`  
-**Reference matrices:** `MASTER_UI_UX_FEATURE_IMPLEMENTATION_MATRIX_CURRENT.csv`, `MASTER_IOS_FEATURE_INVENTORY_CURRENT.csv`, `MASTER_WATCH_FULL_COMPUTER_FEATURE_INVENTORY_CURRENT.csv`  
-**Baseline:** `main` @ `451f8fb`  
-**Date:** 2026-06-30
+**Audit:** Command 06 V1.5  
+**Target:** `Docs/DIR_DIVING_Feature_Comparison.csv`  
+**Baseline:** `main` @ `2c30412`  
+**Date:** 2026-07-01
 
 Do **not** edit the CSV in this audit pass.
 
 ---
 
-## 1. Current assessment
+## 1. Duplicate / conflicting rows (P1)
 
-| Criterion | Status | Notes |
-|-----------|--------|-------|
-| Diving Gauge | **PASS** | Core navigation row; Watch algorithm rows |
-| Diving Full Computer | **PASS** | Row 429; not certified noted |
-| Apnea MAIN | **PARTIAL** | Rows 430 accurate; conflicts with experimental rows 20–26 |
-| Snorkeling MAIN | **PARTIAL** | Row 431 accurate; conflicts with experimental rows 12–19; 18 SNORKELING_* docs not reflected |
-| iOS Settings mode switcher | **MISSING** | Implemented; not in CSV |
-| Activity Settings (Watch/iOS) | **MISSING** | Ownership matrices not reflected |
-| Activity Logbooks | **PARTIAL** | Implied in navigation; no per-activity rows |
-| Watch Full Computer | **PASS** | Row 429 + briefing utility rows |
-| iOS Planner | **PASS** | Extensive planner rows |
-| CCR reference-only | **PASS** | Docs rows 403–406 |
-| Ratio Deco | **MISSING** | No feature row |
-| Equipment | **PASS** | Template rows present |
-| Checklist | **PARTIAL** | CCR checklist weak |
-| Briefing cards | **PARTIAL** | Utility rows 416–417 only |
-| Sync/security | **PASS** | Sync rows present |
-| Privacy | **PARTIAL** | Separate MASTER files not in CSV |
-| Physical QA | **PARTIAL** | PENDING inconsistent on experimental rows |
-| External validation | **PARTIAL** | Not on CSV |
-| TestFlight/App Store readiness | **OUTDATED** | Some doc rows lack PENDING gates |
-| **Water auto-open routing** | **MISSING** | FC-020 feature inventory |
-| **GF preset selection (Watch FC)** | **MISSING** | FC-019 feature inventory |
-| **Shallow depth entitlement / dev toggles** | **MISSING** | FC-017–018; DEPTH_CAPABILITY matrix |
-| **Digital Crown / Action Button underwater** | **MISSING** | MASTER_WATCH_UNDERWATER_HARDWARE matrix |
-
-**Verdict:** `FEATURE_MATRIX_CURRENT: PARTIAL`
+| Rows | Issue | Planned fix |
+|------|-------|-------------|
+| 12–26 (codex experimental Apnea/Snorkeling) vs 430–433 (MAIN) | Conflicting **Experimental** vs **Implemented** | Add column note **SUPERSEDED_BY_ROW_430** on legacy codex rows; keep for history |
+| Row 430 Apnea | Accurate MAIN status | Retain as canonical Apnea row |
+| Row 431+ Snorkeling | Accurate MAIN status | Retain as canonical Snorkeling row |
 
 ---
 
-## 2. Conflicting rows to reconcile
+## 2. Missing rows — add from feature inventories (P1)
 
-| CSV rows | Issue | Planned fix |
-|----------|-------|-------------|
-| 12–26 (`Experimental,codex/experimental-features`) | Implies Apnea/Snorkeling not on MAIN | Change `Branch` to `codex/experimental-features (legacy)`; Notes: superseded by 430–433 |
-| 340, 383 | "UI/UX readiness 100%" doc rows | Append Notes: "software only; physical QA PENDING" |
-| 376–379 | Experimental architecture rows | Prefix `(legacy branch)`; link SNORKELING_ARCHITECTURE / APNEA_ARCHITECTURE |
-
----
-
-## 3. Planned new rows (exact content)
-
-### Row A — iOS Settings mode switcher
-
-```csv
-Core,main,iOS Companion,Settings,iOS activity mode switcher,Implemented,Yes,Yes,Yes,Segmented Diving/Apnea/Snorkeling scope routing in Settings; UI-only visibility gates.,iOS_look_feel.png,"it, en",IOSCompanionSettingsModeSwitch tests; not in CSV @ 451f8fb.
-```
-
-### Row B — Watch water auto-open routing
-
-```csv
-Core,main,Apple Watch,Navigation,Water auto-open routing,Implemented,Yes,Yes,Yes,Submersion launch routes to mode selection or FC predive; does NOT start dive.,settings_from_workflow.png,"it, en",WATCH_WATER_AUTO_OPEN_POLICY.md; physical QA PENDING.
-```
-
-### Row C — Full Computer GF preset selection
-
-```csv
-Core,main,Apple Watch,Diving,Full Computer GF preset selection,Implemented,Yes,Yes,Yes,Three presets at predive; locked during active FC runtime; snapshotted to logbook.,MASTER_REFERENCE_DIVING_LIVE.png,"it, en",MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX; not certified.
-```
-
-### Row D — Shallow depth developer testing toggles
-
-```csv
-Core,main,Apple Watch,Settings,Developer shallow Gauge/FC testing toggles,Implemented,Yes,Yes,Yes,Default OFF; TestFlight/internal only; not production decompression guidance.,settings_from_workflow.png,"it, en",MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX; wet QA PENDING.
-```
-
-### Row E — Snorkeling iOS companion (expand row 433)
-
-Add Notes to row 433: `See SNORKELING_IOS_WATCH_ARCHITECTURE.md; map type settings; route planner; PHYSICAL_QA_PENDING.`
-
-### Row F — Ratio Deco heuristic
-
-```csv
-Algorithm,main,iOS Companion,Planner,Ratio Deco comparative heuristic,Implemented,Yes,Yes,N/A,Comparative heuristic alongside Bühlmann; not a decompression algorithm.,ios_planner_reference.png,"it, en",RATIO_DECO_COMPARATIVE_HEURISTIC.md.
-```
+| Feature | Source inventory | Planned CSV row fields |
+|---------|------------------|------------------------|
+| iOS Settings mode switcher | `MASTER_UI_UX_SETTINGS_OWNERSHIP_MATRIX` | Core, main, iOS, All, mode switcher, Implemented, PHYSICAL_QA n/a |
+| Watch water auto-open routing | `MASTER_WATCH_WATER_AUTO_OPEN_AUDIT` FC-016 | Core, main, Apple Watch, Diving, WAO policy, Implemented, PENDING physical |
+| Full Computer GF preset selection | `MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX` | Core, main, Apple Watch, Diving, GF presets predive, Implemented |
+| GF predive snapshot persistence | FC-019 feature inventory | Algorithm, main, Apple Watch, Diving, GF snapshot, Implemented |
+| Shallow-depth developer Gauge toggle | `MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX` | Core, main, Apple Watch, Diving, dev shallow Gauge, Implemented, Internal TF only |
+| Shallow-depth developer FC toggle | Same matrix | Core, main, Apple Watch, Diving, dev shallow FC, Implemented, Internal TF only |
+| Apnea WAO boundary | `MASTER_WATCH_APNEA_WATER_AUTO_OPEN_BOUNDARY_MATRIX` | Core, main, Apple Watch, Apnea, WAO no auto-start, Implemented, PENDING |
+| Legacy App Intent routing | `MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION` | Safety, main, Apple Watch, All, Legacy intent block, Implemented |
 
 ---
 
-## 4. Snorkeling documentation cross-reference
+## 3. Activity coverage verification (P2)
 
-Snorkeling is **documented** outside the CSV in 18 files. Matrix repair should add a Documentation row:
-
-```csv
-Documentation,main,All,Snorkeling,Snorkeling architecture and release docs,Implemented,Yes,N/A,N/A,18 SNORKELING_* docs; INTERNAL_READY · PHYSICAL_QA_PENDING.,SNORKELING_ARCHITECTURE.md,"it, en",validate_snorkeling_release_readiness.sh.
-```
+| Area | Matrix status | Action |
+|------|---------------|--------|
+| Diving Gauge | Present | None |
+| Diving Full Computer | Present row 429 | Cross-link GF/WAO rows |
+| Apnea | Row 430 accurate | Reconcile experimental duplicates |
+| Snorkeling | Rows 431+ | Reconcile experimental duplicates |
+| iOS Planner | Present | None |
+| CCR reference-only | Documented rows | None |
+| Briefing cards | Present | Confirm reference-only note |
+| Sync/security | Partial | Add CONS-003/004/005 remediation note row |
+| Physical QA | Missing aggregate row | Add **Documentation** row: all physical QA PENDING |
 
 ---
 
-## 5. Repair sequence
+## 4. Truthfulness constraints for new rows
 
-1. Reconcile experimental legacy rows (12–26) — **P1**
-2. Add 2026 wave rows A–D — **P1**
-3. Add mode switcher + Ratio Deco — **P2**
-4. Append PENDING gates to readiness doc rows — **P2**
-5. Add Snorkeling documentation row — **P2**
+All new rows must include:
 
-**Estimated new rows:** 6  
-**Estimated row edits:** 15
+- **Not certified** where decompression-adjacent
+- **PENDING_PHYSICAL** for water auto-open, shallow wet, Crown, Action Button
+- **Internal/TestFlight only** for developer shallow toggles
+- **Does not start dive/session** for WAO rows
+
+---
+
+## 5. Priority summary
+
+| Priority | Items |
+|----------|------:|
+| P1 | Dedupe Apnea/Snorkeling experimental rows; add 8 missing 2026-wave rows |
+| P2 | Physical QA aggregate row; sync remediation note |
+| P3 | Column formatting cleanup |
+
+**Estimated new rows:** 8–10  
+**Estimated row annotations:** 14 legacy codex rows

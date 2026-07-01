@@ -1,0 +1,11 @@
+Case_ID,Activity,Water_Auto_Open_Mode,Preferred_Destination,DepthCapability_TestContext,Expected_Step,Actual_Step@2c30412,FC_Predive_Required,Pass,Severity,Evidence,Notes
+WAO-001,Diving,preferredMode,FC fullComputer,full depth supports FC,fullComputerPrediveConfiguration,divingModeSelection,PARTIAL,FAIL,P2,WatchWaterAutoOpenPolicyTests,Test harness may lack FC capability mock
+WAO-002,Diving,preferredMode,Gauge,full depth,ready(diving gauge),divingModeSelection,N/A,FAIL,P2,WatchWaterAutoOpenPolicyTests,
+WAO-003,Apnea,preferredMode,Apnea,default,ready(apnea gauge),divingModeSelection,N/A,FAIL,P2,WatchWaterAutoOpenPolicyTests,Apnea must not route to diving selection
+WAO-004,Snorkeling,preferredMode,Snorkeling,default,ready(snorkeling),divingModeSelection,N/A,FAIL,P2,WatchWaterAutoOpenPolicyTests,
+WAO-005,Diving,lastSelected,FC fullComputer,full depth,fullComputerPrediveConfiguration,divingModeSelection,YES,FAIL,P2,testLastSelectedFullComputerRoutesPrediveConfiguration,
+WAO-006,Diving,disabled,any,any,resolveLaunchStep,N/A,N/A,PASS,P4,WatchWaterAutoOpenPolicyTests,Disabled mode unaffected
+WAO-007,Diving,preferredMode,FC,shallow no dev toggle,divingModeSelection or gauge fallback,policy dependent,PARTIAL,NOT_EXECUTED,P4,DepthCapabilityTests,Physical shallow gate CONS-042
+WAO-008,Apnea,water intent,Apnea,idle,ready(apnea),divingModeSelection,N/A,FAIL,P2,WatchLaunchRoutingPolicyTests,Post Apnea P1/P2/P3
+WAO-009,Diving,water intent,FC,full depth,fullComputerPrediveConfiguration,divingModeSelection,YES,FAIL,P2,WatchLaunchRoutingPolicyTests,
+WAO-010,All,system submerged launch,routing enabled,policy dependent,valid launch step,mixed,PARTIAL,PARTIAL,P2,WFC-P2-005,13 failures aggregate; FC math unaffected

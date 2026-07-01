@@ -1,10 +1,11 @@
-Check_ID,Artifact,Expected_Body,Actual_Body_At_451f8fb,Launch_Order_Match,Filename_Version_Match,Script_Reference,Status,Severity,Notes
-CI-01,commands_for_cursor/01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.2.md,Watch Full Computer forensic audit,LAUNCH ORDER 01 present; Watch FC body,PASS,PASS,validate_commands_for_cursor_integrity.sh expects V2.1,FAIL,P1,Script stale — CONS-046
-CI-02,commands_for_cursor/02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.2.md,iOS deep comprehensive audit,LAUNCH ORDER 02 present; iOS body,PASS,PASS,Script expects V1.1,FAIL,P1,Script stale
-CI-03,commands_for_cursor/03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md,UI/UX audit,LAUNCH ORDER 03 present; UI/UX body,PASS,PASS,Script expects V2.2,FAIL,P1,Script stale
-CI-04,commands_for_cursor/04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.2.md,Main code sync security performance,LAUNCH ORDER 04 present; Main body,PASS,PASS,Script expects V1.1,FAIL,P1,Script stale
-CI-05,commands_for_cursor/05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md,Release QA evidence,LAUNCH ORDER 05 present; Release body,PASS,PASS,Script expects V1.1,FAIL,P1,Script stale
-CI-06,commands_for_cursor/06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md,Documentation alignment,LAUNCH ORDER 06 present; Docs body,PASS,PASS,Script expects V1.1 not listed,FAIL,P1,Script omits V1.2 file
-CI-07,commands_for_cursor/00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.3.md,Orchestrator V1.3,Orchestrator body present,N/A,PASS,Not in integrity script,PASS,P3,Manual verify PASS
-CI-08,CONS-001 body permutation repair,01=Watch 02=iOS 03=UI 04=Main,Filenames match bodies @ 451f8fb,PASS,PASS,N/A,PASS,P0 cleared,CONS-001 FIXED_DOCUMENTATION; script gate still FAIL
-CI-09,OOLD archive alignment,Superseded bodies in OOLD/,Present under commands_for_cursor/OOLD/,PASS,PASS,N/A,PASS,P3,Archive for rollback reference
+Check_ID,Artifact,Expected_Body,Actual_Body_At_2c30412,Launch_Order_Match,Filename_Version_Match,Script_Reference,Status,Severity,Notes
+CI-01,commands_for_cursor/01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V1.5.md,Watch Full Computer forensic,LAUNCH ORDER 01; Watch FC body,PASS,PASS,validate_commands_for_cursor_integrity.sh V1.5,PASS,,CONS-046 V1.5
+CI-02,commands_for_cursor/02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.5.md,iOS deep comprehensive,LAUNCH ORDER 02; iOS body,PASS,PASS,Script expects V1.5,PASS,,
+CI-03,commands_for_cursor/03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.5.md,UI/UX audit,LAUNCH ORDER 03; UI/UX body,PASS,PASS,Script expects V1.5,PASS,,
+CI-04,commands_for_cursor/04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.5.md,Main code sync security,LAUNCH ORDER 04; Main body,PASS,PASS,Script expects V1.5,PASS,,
+CI-05,commands_for_cursor/05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.5.md,Release QA evidence,LAUNCH ORDER 05; Release body,PASS,PASS,Script expects V1.5,PASS,,
+CI-06,commands_for_cursor/06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.5.md,Documentation alignment,LAUNCH ORDER 06; Docs body,PASS,PASS,Script expects V1.5,PASS,,
+CI-07,commands_for_cursor/07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.5.md,Post-remediation verification,LAUNCH ORDER 07 body,PASS,PASS,Script expects V1.5,PASS,,
+CI-08,commands_for_cursor/00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.5.md,Orchestrator V1.5,Orchestrator body present,N/A,PASS,Script optional check,PASS,,
+CI-09,CONS-001 body permutation repair,01=Watch 02=iOS 03=UI 04=Main,Filenames match bodies @ 2c30412,PASS,PASS,N/A,PASS,,CONS-001 FIXED
+CI-10,validate_commands_for_cursor_integrity.sh execution,Exit 0,PASS @ 2c30412,N/A,N/A,bash script,PASS,,MAIN-P1-001 VERIFIED

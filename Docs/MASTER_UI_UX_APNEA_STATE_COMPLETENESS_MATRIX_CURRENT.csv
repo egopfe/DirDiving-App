@@ -1,0 +1,13 @@
+Screen_ID,Activity,Platform,State,Implemented,UX_Complete,Accessible,Localized,Test,Pass,Finding_ID,Notes
+APN-ST-001,Apnea,iOS,Empty logbook,yes,yes,yes,yes,IOSApneaLogbookStoreTests,yes,,
+APN-ST-002,Apnea,iOS,Loading sync,partial,yes,partial,yes,IOSApneaSyncTests,partial,,
+APN-ST-003,Apnea,iOS,Permission missing,yes,yes,yes,yes,IOSApneaSettingsStoreTests,yes,,
+APN-ST-004,Apnea,iOS,Profile validation error,yes,yes,yes,yes,IOSApneaProfileEditorTests,yes,,
+APN-ST-005,Apnea,iOS,iCloud backup stub,yes,yes,yes,yes,n/a,yes,MUIUX-P3-005,Honest disclosure
+APN-ST-006,Apnea,Watch,Pre-session ready,yes,yes,partial,partial,ApneaWatchLayoutContractTests,yes,MUIUX-P2-006,
+APN-ST-007,Apnea,Watch,Active session,yes,yes,partial,yes,ApneaWatchRuntimeStoreTests,yes,,
+APN-ST-008,Apnea,Watch,Recovery countdown,yes,yes,partial,yes,ApneaRecoveryPolicyLifecycleTests,yes,,
+APN-ST-009,Apnea,Watch,Training overlay ack,yes,yes,partial,yes,ApneaTrainingCompoundTests,yes,,@76f3703
+APN-ST-010,Apnea,Watch,Alarm overlay,yes,yes,partial,yes,ApneaAlarmRuntimeTests,yes,,
+APN-ST-011,Apnea,Watch,Restore after relaunch,yes,yes,partial,yes,ApneaCheckpointTests,yes,,
+APN-ST-012,Apnea,Watch,Blocked navigation toast,yes,yes,yes,yes,WatchUnderwaterNavigationClampTests,yes,,

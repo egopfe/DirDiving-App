@@ -1,0 +1,13 @@
+Requirement_ID,Mode,Activity,Expected_Routing,Settings_Copy_Truthful,Blocked_Active_Session,FC_Predive_Gate,Automated_Test,Test_Result,Physical_QA,Pass,Finding_ID,Notes
+PR-WAO-001,Disabled,All,Normal startup,yes,n/a,n/a,WatchWaterAutoOpenPolicyTests,PASS,NOT_EXECUTED,PASS,,
+PR-WAO-002,Last selected,Diving Gauge,Gauge ready,yes,yes,n/a,WatchWaterAutoOpenPolicyTests,FAIL,PENDING,FAIL,MUIUX-P2-005,Observes divingModeSelection
+PR-WAO-003,Last selected,Diving FC,FC predive,yes,yes,yes,WatchWaterAutoOpenPolicyTests,FAIL,PENDING,FAIL,MUIUX-P2-005,
+PR-WAO-004,Last selected,Apnea,Apnea ready,yes,yes,n/a,WatchWaterAutoOpenPolicyTests,FAIL,PENDING,FAIL,MUIUX-P2-005,Post-Apnea P1/P2/P3
+PR-WAO-005,Last selected,Snorkeling,Snork ready,yes,yes,n/a,WatchWaterAutoOpenPolicyTests,FAIL,PENDING,FAIL,MUIUX-P2-005,
+PR-WAO-006,Preferred,Diving Gauge,Gauge ready,yes,yes,n/a,WatchWaterAutoOpenPolicyTests,FAIL,PENDING,FAIL,MUIUX-P2-005,
+PR-WAO-007,Preferred,Diving FC,FC predive,yes,yes,yes,WatchLaunchRoutingPolicyTests,FAIL,PENDING,FAIL,MUIUX-P2-005,
+PR-WAO-008,Preferred,Apnea,Apnea ready,yes,yes,n/a,WatchWaterAutoOpenPolicyTests,FAIL,PENDING,FAIL,MUIUX-P2-005,
+PR-WAO-009,Active session block,All,No route change,yes,yes,n/a,WatchWaterAutoOpenPolicyTests,PASS,NOT_EXECUTED,PASS,,
+PR-WAO-010,Legal gate,All,Intent blocked without legal,yes,n/a,n/a,OpenWaterAutoLaunchModeIntentTests,PASS,NOT_EXECUTED,PASS,,
+PR-WAO-011,No startManualDive,All,Routing only,yes,n/a,n/a,WatchWaterAutoOpenPolicyTests,PASS,NOT_EXECUTED,PASS,,
+PR-WAO-012,System listing claim,Watch,Not guaranteed in copy,yes,n/a,n/a,WatchWaterAutoOpenSettingsCopyTests,PASS,PENDING_PHYSICAL,PASS,MUIUX-P1-001,

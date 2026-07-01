@@ -21,7 +21,7 @@ EC-IOS-019,GF preset,Diving,All,iOS aggressive 40/85 plan package,Watch import,I
 EC-IOS-020,GF preset,Diving,All,Invalid pair 30/80,Watch import,Fail-closed,invalidGradientFactors,0,0,PASS,,FullComputerImportedPlanStoreTests,
 EC-IOS-021,Briefing,Diving,All,Briefing card manifest,Export,referenceOnly true,Always true,0,0,PASS,,PlannerBriefingCardManifest,
 EC-IOS-022,Route,Snorkeling,All,Invalid GPS track,Session start,Graceful empty state,Handled,0,0,PASS,,IOSSnorkelingNoGPSPresentationTests,
-EC-IOS-023,Snorkeling,Snorkeling,Route,Empty point array distance,SnorkelingDistanceCalculator,distanceMeters 0,Compile+return 0,Compile fail,0,0,FAIL,P1,SnorkelingDistanceCalculatorTests,IOS-P1-001 ambiguous overload
+EC-IOS-023,Snorkeling,Snorkeling,Route,Empty point array distance,SnorkelingDistanceCalculator,distanceMeters 0,Compile+return 0,Return 0,0,0,PASS,P4,SnorkelingDistanceCalculatorTests @2c30412,IOS-P1-001 closed
 EC-IOS-024,Snorkeling,Snorkeling,Route,Invalid route for Watch transfer,Validation,Block transfer,allowsWatchTransfer false,0,0,PASS,,SnorkelingRouteValidatorTests,
 EC-IOS-025,Snorkeling,Snorkeling,All,Fake logbook ON,Real sessions present,DEMO section only stats isolated,Isolated,0,0,NOT_EXECUTED,,SnorkelingExportPayloadTests,Compile blocked
 EC-IOS-026,Sync,Diving,All,Unsigned legacy tombstone with secret,Signed path active,Prefer signed verify,Signed primary + legacy mirror,0,0,PASS,P3,ActivitySyncTombstoneTests,CONS-005 documented

@@ -6,7 +6,7 @@ Apnea Logbook,Apnea,synchronized,Apnea logbook route,IOSApneaSessionsListView,ye
 Snorkeling Logbook,Snorkeling,synchronized,Snorkeling session save,IOSSnorkelingSessionsListView,yes,yes,partial,no,yes,yes,,
 Gauge TTV,Diving,intentionally asymmetric,TTV on Watch,n/a (Planner TTS reference),yes,yes,n/a,yes,yes,yes,,Gauge≠Full Computer
 Full Computer TTS,Diving,intentionally asymmetric,TTS on Watch,Planner TTS reference,yes,yes,partial,yes,yes,yes,,
-GF presets,Diving,synchronized,FullComputerGradientFactorSettingsStore,DivePlanPackageBuilder,yes,yes,yes,no,yes,yes,,CONS-002 fixed
+GF presets,Diving,synchronized,FullComputerGradientFactorSettingsStore,DivePlanPackageBuilder,yes,yes,yes,no,partial,partial,MUIUX-P2-009,40/85 label Moderate vs Aggressive
 Planner,Diving,iOS-only reference,n/a,PlannerView,yes,yes,partial,yes,yes,yes,,Not live Watch authority
 Briefing cards,Diving,reference-only,BriefingCardInventory,Planner briefing export,yes,yes,yes,yes,yes,yes,,
 CCR planning,Diving,reference-only,n/a,CCRPlannerView,yes,yes,n/a,yes,yes,yes,MUIUX-P2-002,Not controller

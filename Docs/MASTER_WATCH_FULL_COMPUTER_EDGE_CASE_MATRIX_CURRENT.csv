@@ -18,4 +18,6 @@ EC-016,Diving,Full Computer,Stale sensor proposal,age>max,reject start,Fail clos
 EC-017,Diving,Full Computer,Future schema checkpoint,schemaVersion+1,restore fails,Fail closed,PASS,PENDING,PENDING,PASS,P3,FullComputerRecoveryCheckpointTests,
 EC-018,Diving,Full Computer,No physical evidence,all paths,N/A,PENDING_PHYSICAL marked,PENDING,PENDING,PENDING,N/A,P2,Audit rule,
 EC-019,Snorkeling,Snorkeling,GPS isolation,route active,N/A,No FC engine reference,PASS,PENDING,PENDING,PASS,P4,SnorkelingCrossDomainIsolationTests,Isolation check only
+EC-020,Apnea,Apnea,FC symbol isolation,Apnea runtime,N/A,No FC/Bühlmann refs,PASS,PENDING,PENDING,PASS,P4,ApneaArchitectureIsolationTests,@2c30412 Apnea P1/P2/P3
+EC-021,Diving,Full Computer,Water auto-open FC route,submerged launch,preferred FC,fullComputerPrediveConfiguration,routing test FAIL,PENDING,PENDING,FAIL,P2,WFC-P2-005,Production policy may differ in test harness
 EC-020,Diving,Full Computer,Duplicate timestamp,duplicate tick,no double integrate,Guard or degrade,Degraded/reject,PENDING,PENDING,PASS,P3,FullComputerTimingFaultTests,

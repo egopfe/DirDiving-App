@@ -1,0 +1,13 @@
+Claim_ID,Surface,Claim_Text_or_Key,Allowed,Required_Disclaimer,Evidence_Type,Evidence_Path,Technical_Status,Software_Status,Physical_Status,Release_Blocking,Notes
+APN-CLM-01,Watch+iOS,Apnea is not decompression diving,yes,Activity isolation,tests,ApneaArchitectureIsolationTests,PASS,SOFTWARE_READY,N/A,No,
+APN-CLM-02,Watch+iOS,Recovery policy not medical advice,yes,No medical guarantee,strings + tests,ApneaReleaseHardValidationTests,PASS,SOFTWARE_READY,N/A,No,
+APN-CLM-03,Watch,Auto-detection not physically validated,yes,Pending field QA,audit posture,MASTER_APNEA_RELEASE_QA_EVIDENCE_AUDIT_CURRENT.md,PASS,SOFTWARE_READY,PENDING,Yes,Honest pending label
+APN-CLM-04,Watch,WAO does not start Apnea session,yes,Predive/ready only,policy,WatchWaterAutoOpenPolicy + boundary audit,PASS,SOFTWARE_READY,PENDING,Yes,WFC-P2-005 test drift
+APN-CLM-05,Watch+iOS,No GF/gas/MOD/PPO2 in Apnea,yes,Activity boundary,tests,IOSActivitySettingsRoutingTests,PASS,SOFTWARE_READY,N/A,No,
+APN-CLM-06,Watch+iOS,No cross-activity logbook leakage,yes,Strict ownership,tests,IOSActivityLogbookRoutingTests,PASS,SOFTWARE_READY,N/A,No,
+APN-CLM-07,Watch+iOS,No cross-activity settings leakage,yes,Strict ownership,tests,IOSActivitySettingsRoutingTests,PASS,SOFTWARE_READY,N/A,No,
+APN-CLM-08,iOS,Apnea cloud backup stub disclosed,yes,Stub documented,audit,IOS-P3-002,PASS,SOFTWARE_READY,N/A,No,P3
+APN-CLM-09,Watch,Training P1/P2/P3 not certified coaching,yes,User training aid only,strings,Apnea training UI,PASS,SOFTWARE_READY,N/A,No,
+APN-CLM-10,Export,Apnea export disclaimers,yes,EXPORT_DISCLAIMER_POLICY,tests,IOSApneaSessionExportService,PASS,SOFTWARE_READY,N/A,No,
+APN-CLM-11,Watch,Digital Crown clamp not physical QA passed,yes,Software only until field,audit,HWC matrix,PASS,SOFTWARE_READY,PENDING,Yes,
+APN-CLM-12,Watch,Depth profile accuracy not field-certified,yes,Watch sensor limitations,strings,Apnea live UI,PASS,SOFTWARE_READY,PENDING,Yes,

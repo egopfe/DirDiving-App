@@ -1,43 +1,49 @@
-# DIR DIVING — App Store Post-Remediation Pending Gate (Current)
+# App Store Post-Remediation Pending Gate — CURRENT
 
 **Command:** 05 §2B  
-**Date:** 2026-06-30  
-**Branch:** `main` @ `451f8fb`
+**Baseline:** `main` @ `2c30412`  
+**Audit date:** 2026-07-01
 
 ---
 
-## Pending Gates (must remain open until evidence exists)
+## Pending Gates (Not Closed by Software Remediation)
 
-| Gate | Status | Blocker IDs | Notes |
-|------|--------|-------------|-------|
-| Physical Watch QA | **PENDING** | PDQ-W-001..038 | 0% executed |
-| Physical iPhone QA | **PENDING** | PDQ-I-001..016 | 0% executed |
-| Paired-device QA | **PENDING** | PDQ-P-001..008 | 0% executed |
-| Underwater / depth sensor | **PENDING** | PDQ-W-025, PDQ-W-032..033 | Shallow wet NOT_EXECUTED |
-| CMAltimeter physical | **PENDING** | REQ-FC-08, REQ-ALT-03 | CoreMotion field samples |
-| Water auto-open physical | **PENDING** | WAO-PHY-001..003 | System listing NOT_EXECUTED |
-| Hardware controls physical | **PENDING** | HWC-PHY-001..004 | Water Lock, Crown, Action Button |
-| Snorkeling field QA | **PENDING** | CONS-048 | 12/12 templates |
-| External Bühlmann/Schreiner | **PENDING** | WFC-P1-001 | Third-party oracle |
-| External Subsurface | **PENDING** | MEXT-SS-01 | Tool round-trip |
-| CCR external | **PENDING** | MEXT-CCR-01 | Reference-only posture only |
-| Legal counsel review | **PENDING** | CONS-044 | Marketing sign-off |
-| ASC metadata / screenshots | **PENDING** | MASB-L-03 | Incomplete assets |
-| Full-depth entitlement field | **PENDING** | CAP-W-DEPTH-FULL | Alternate archive only |
-| Accessibility manual QA | **PENDING** | PDQ-I-014, PDQ-I-015 | VoiceOver/Dynamic Type |
-| Incident / rollback drill | **PENDING** | AB support gate | Not executed |
-| iOS test regression | **OPEN** | IOS-P1-001 | Must fix before ASC submission |
+| Gate ID | Category | Status | Severity | Notes |
+|---|---|---|---|---|
+| MASB-P-01 | Physical Watch QA | PENDING_PHYSICAL | P1 | 0% executed — CMAltimeter, depth, WAO |
+| MASB-P-02 | Physical iPhone QA | PENDING_PHYSICAL | P1 | VoiceOver, PDF, scroll, Instruments |
+| MASB-P-03 | Paired-device QA | PENDING_PHYSICAL | P1 | WC sync, briefing transfer, tombstones |
+| MASB-P-04 | Underwater / depth sensor | PENDING_PHYSICAL | P1 | Shallow wet Gauge/FC |
+| MASB-P-05 | External Bühlmann/Schreiner | PENDING_EXTERNAL_VALIDATION | P1 | WFC-P1-001 / CONS-009 |
+| MASB-P-06 | Legal / marketing review | PENDING_LEGAL_REVIEW | P1 | CONS-044 counsel sign-off |
+| MASB-P-07 | App Store assets / screenshots | PENDING_EVIDENCE | P2 | Marketing pack incomplete |
+| MASB-P-08 | Snorkeling field QA | PENDING_PHYSICAL | P1 | CONS-048 — 12/12 templates |
+| MASB-P-09 | Apnea wet QA | PENDING_PHYSICAL | P2 | Auto-detection, recovery UX |
+| MASB-P-10 | Full-depth entitlement | NOT_AVAILABLE | P2 | Shallow-only default signing |
+| MASB-P-11 | Accessibility manual QA | PENDING_PHYSICAL | P2 | VoiceOver field pass |
+| MASB-P-12 | Incident / rollback drill | NOT_EXECUTED | P3 | Process documented; drill pending |
 
 ---
 
-## App Store Decision
+## Software Remediation Did NOT Close
 
 ```text
-APP_STORE_POST_REMEDIATION_GATE: NOT_READY
-REASON: All physical + external + legal gates open; IOS-P1-001 unresolved
-NO_FAKE_GATE_CLOSURE: PASS — gates correctly marked PENDING
+Physical Watch, underwater, Water Lock, Action Button, Digital Crown, shallow wet
+Paired-device field sync
+External Bühlmann / Subsurface / CCR validation
+Legal counsel App Store marketing sign-off
+Full-depth entitlement provisioning
+Snorkeling open-water GPS (12 templates)
+Apnea wet auto-detection field validation
 ```
 
 ---
 
-**Status:** COMPLETE @ `451f8fb` · 2026-06-30
+## Verdict
+
+```text
+APP_STORE_WITH_LEGAL_PHYSICAL_EXTERNAL_GATES: NOT_READY
+EXTERNAL_TESTFLIGHT_WITH_PHYSICAL_GATES: NOT_READY
+NO_FAKE_PHYSICAL_EXTERNAL_CLAIMS: PASS
+RELEASE_SOFTWARE_READINESS_AFTER_REMEDIATION: 82
+```

@@ -1,5 +1,5 @@
 Requirement_ID,Area,Feature,Source_File,Source_Symbol,Expected_Behavior,Automated_Test,Simulator_Evidence,Physical_QA,Water_Lock_QA,Action_Button_QA,Digital_Crown_QA,Legal_Gate,Safety_Gate,Result,Severity,Finding_ID,Notes
-UW-001,Crown,Vertical page navigation,Views/ContentView.swift,TabView.verticalPage,Crown rotation changes screens,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,n/a,PENDING_PHYSICAL,n/a,PASS,PASS,,,@451f8fb
+UW-001,Crown,Vertical page navigation,Views/ContentView.swift,TabView.verticalPage,Crown rotation changes screens,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,n/a,PENDING_PHYSICAL,n/a,PASS,PASS,,,@2c30412
 UW-002,Crown,Active session page policy,Utils/WatchUnderwaterPagePolicy.swift,allowedPages,Activity-restricted pages during session,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,n/a,PENDING_PHYSICAL,n/a,PASS,PASS,,,
 UW-003,Crown,Diving Live+Compass+Images,Utils/WatchUnderwaterPagePolicy.swift,allowedPages,Diving allows live compass images if present,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,n/a,PENDING_PHYSICAL,n/a,PASS,PASS,,,
 UW-004,Crown,Apnea live only,Utils/WatchUnderwaterPagePolicy.swift,allowedPages,Apnea active only live,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,n/a,PENDING_PHYSICAL,n/a,PASS,PASS,,,

@@ -1,6 +1,7 @@
 # Watch Full Computer — External Validation Plan — CURRENT
 
-**Baseline:** `main` @ `451f8fb`  
+**Baseline:** `main` @ `2c30412`  
+**Audit date:** 2026-07-01  
 **Status:** **PENDING_EXTERNAL_VALIDATION** (all items unless noted)
 
 ---
@@ -20,7 +21,7 @@
 |---|---|---|
 | Tissue loading oracle | PASS | `IndependentBuhlmannOracle.swift` |
 | Schedule/TTS on oracle tissues | PASS | CONS-008 remediation |
-| ML-01…ML-10 replay | PASS | Audit15 test suites @451f8fb (353/355 Watch tests pass) |
+| ML-01…ML-10 replay | PASS | Audit15 test suites @2c30412 (all FC tests pass; 1139/1152 Watch suite) |
 
 ---
 

@@ -13,4 +13,4 @@ ML-02 EAN50 switch,FullComputerRuntimeEngine,Oracle replay,YES,NO,Audit15Multile
 ML-03 Trimix,FullComputerRuntimeEngine,Oracle replay,YES,NO,Audit15MultilevelOracleProfilesTests,PASS,tissue 0.0001 bar,He+N2 dual gas
 ML-04 Sawtooth,FullComputerRuntimeEngine,Oracle replay,YES,NO,Audit15MultilevelOracleProfilesTests,PASS,tissue 0.0001 bar,No schedule cache assumption
 ML-05 Re-descent,FullComputerRuntimeEngine,Oracle replay,YES,NO,Audit15RedescentOracleTests,PASS,tissue 0.0001 bar,Deco reappearance
-External validation campaign,Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/,None,N/A,N/A,N/A,PENDING_EXTERNAL_VALIDATION,N/A,MWFC-P1-002
+External validation campaign,Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/,None,N/A,N/A,N/A,PENDING_EXTERNAL_VALIDATION,N/A,MWFC-P1-002 @2c30412
