@@ -3,10 +3,20 @@ import Combine
 import os
 
 @MainActor
+protocol DiveLogWatchSyncing: AnyObject {
+    func transferToWatch(_ session: DiveSession)
+    func publishDeletedSessionIDs(_ ids: Set<UUID>)
+}
+
+@MainActor
 final class DiveLogStore: ObservableObject {
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "DiveLogStore")
 
     static let includeDemoLogbookKey = "dirdiving_ios_include_demo_logbook"
+    static var testHook_storageDirectoryURL: URL?
+    static var testHook_userDefaults: UserDefaults?
+    static var testHook_skipInitialLoad = false
+    static var testHook_recordWatchTransfer: ((DiveSession) -> Void)?
 
     @Published private(set) var sessions: [DiveSession] = [] {
         didSet { saveIfReady() }
@@ -15,7 +25,7 @@ final class DiveLogStore: ObservableObject {
     @Published var includeDemoLogbook: Bool {
         didSet {
             guard isReady, includeDemoLogbook != oldValue else { return }
-            UserDefaults.standard.set(includeDemoLogbook, forKey: Self.includeDemoLogbookKey)
+            preferencesDefaults.set(includeDemoLogbook, forKey: Self.includeDemoLogbookKey)
             applyDemoLogbookPreference()
         }
     }
@@ -36,12 +46,12 @@ final class DiveLogStore: ObservableObject {
     private var deletedSessionIDs: Set<UUID> = []
     private var isReady = false
     private var hasLoadedSessions = false
-    private weak var watchSync: WatchSyncService?
+    private weak var watchSync: (any DiveLogWatchSyncing)?
 
-    init(cloudSync: CloudSyncStore? = nil, watchSync: WatchSyncService? = nil) {
+    init(cloudSync: CloudSyncStore? = nil, watchSync: (any DiveLogWatchSyncing)? = nil) {
         self.cloudSync = cloudSync
         self.watchSync = watchSync
-        includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
+        includeDemoLogbook = (Self.testHook_userDefaults ?? UserDefaults.standard).bool(forKey: Self.includeDemoLogbookKey)
         deletedSessionIDs = loadDeletedSessionIDs()
         isReady = true
 
@@ -64,6 +74,10 @@ final class DiveLogStore: ObservableObject {
 
     private func performInitialLoadIfNeeded() async {
         guard !hasLoadedSessions else { return }
+        if Self.testHook_skipInitialLoad {
+            hasLoadedSessions = true
+            return
+        }
         hasLoadedSessions = true
         let signpost = DIRPerformanceSignpost.begin(.logbookLoad)
         defer { signpost.end() }
@@ -75,14 +89,14 @@ final class DiveLogStore: ObservableObject {
                 .filter { !deletedSessionIDs.contains($0.id) }
         )
 
-        if includeDemoLogbook, sessions.filter({ !$0.isDemoDive }).isEmpty {
-            insertDemoDives()
+        if includeDemoLogbook {
+            insertMissingDemoDives()
         }
 
         saveIfReady()
     }
 
-    func attachWatchSync(_ service: WatchSyncService) {
+    func attachWatchSync(_ service: any DiveLogWatchSyncing) {
         watchSync = service
     }
 
@@ -117,7 +131,11 @@ final class DiveLogStore: ObservableObject {
         sessions.insert(storedSession, at: 0)
         sessions = IOSDiveLogbookPolicy.normalizeAndCap(sessions)
         if !suppressWatchPush {
-            watchSync?.transferToWatch(storedSession)
+            if let record = Self.testHook_recordWatchTransfer {
+                record(storedSession)
+            } else {
+                watchSync?.transferToWatch(storedSession)
+            }
         }
         return true
     }
@@ -321,9 +339,14 @@ final class DiveLogStore: ObservableObject {
         }
     }
 
+    private var preferencesDefaults: UserDefaults {
+        Self.testHook_userDefaults ?? .standard
+    }
+
     private func protectedFileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent(protectedFileName)
+        let base = Self.testHook_storageDirectoryURL
+            ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return base.appendingPathComponent(protectedFileName)
     }
 
     private func removeLegacySessionPayload() {
@@ -337,14 +360,25 @@ final class DiveLogStore: ObservableObject {
 
     private func applyDemoLogbookPreference() {
         if includeDemoLogbook {
-            guard sessions.filter({ !$0.isDemoDive }).isEmpty else { return }
-            insertDemoDives()
+            insertMissingDemoDives()
         } else {
-            sessions.removeAll { $0.isDemoDive }
+            removeDemoDives()
         }
     }
 
-    private func insertDemoDives() {
+    /// Inserts canonical demo dives locally without Watch sync (`add(_:)` is not used).
+    private func insertMissingDemoDives() {
+        let existingIDs = Set(sessions.map(\.id))
+        let missing = makeDemoDives().filter { !existingIDs.contains($0.id) }
+        guard !missing.isEmpty else { return }
+        sessions = IOSDiveLogbookPolicy.normalizeAndCap(sessions + missing)
+    }
+
+    private func removeDemoDives() {
+        sessions.removeAll { $0.isDemoDive }
+    }
+
+    private func makeDemoDives() -> [DiveSession] {
         let names = ["Secca di Mezzo", "Punta Margherita", "Relitto dell'Elba", "Scoglio del Corallo", "Grotta Azzurra"]
         let days = [24, 21, 18, 14, 10]
         let times = [(8, 35), (11, 2), (9, 10), (10, 45), (12, 20)]
@@ -352,7 +386,7 @@ final class DiveLogStore: ObservableObject {
         let durations = [62, 54, 74, 47, 41]
         let gases: [DiveGasLabel] = [.trimix, .oc, .trimix, .nitrox, .oc]
 
-        sessions = IOSDiveLogbookPolicy.normalizeAndCap(names.enumerated().map { idx, name in
+        return names.enumerated().map { idx, name in
             let demoID = DemoDiveCatalog.sessionIDs[idx]
             let start = Calendar.current.date(
                 from: DateComponents(year: 2024, month: 5, day: days[idx], hour: times[idx].0, minute: times[idx].1)
@@ -397,6 +431,18 @@ final class DiveLogStore: ObservableObject {
                 sacLitersMinute: 18.2 + Double(idx),
                 isDemo: true
             )
-        })
+        }
+    }
+
+    func testing_finishInitialLoad(with sessions: [DiveSession]) {
+        hasLoadedSessions = true
+        self.sessions = IOSDiveLogbookPolicy.normalizeAndCap(sessions)
+        if includeDemoLogbook {
+            insertMissingDemoDives()
+        }
+    }
+
+    func testing_reloadFromCloud() {
+        reloadFromCloud()
     }
 }

@@ -6,24 +6,26 @@ enum IOSUnifiedLogbookPresentationBuilder {
         snorkelingSessions: [SnorkelingSession],
         apneaSessions: [ApneaSession],
         units: IOSUnitPreference = .metric,
-        includeDemo: Bool = false
+        includeDivingDemo: Bool = false,
+        includeSnorkelingDemo: Bool = false,
+        includeApneaDemo: Bool = false
     ) -> [IOSUnifiedLogbookEntry] {
         var entries: [IOSUnifiedLogbookEntry] = []
         entries.reserveCapacity(divingSessions.count + snorkelingSessions.count + apneaSessions.count)
 
         for session in divingSessions {
             let isDemo = session.isDemoDive
-            guard includeDemo || !isDemo else { continue }
+            guard includeDivingDemo || !isDemo else { continue }
             entries.append(mapDiving(session, units: units, isDemo: isDemo))
         }
         for session in snorkelingSessions {
             let isDemo = DemoSnorkelingSessionCatalog.isDemoSession(id: session.id)
-            guard includeDemo || !isDemo else { continue }
+            guard includeSnorkelingDemo || !isDemo else { continue }
             entries.append(mapSnorkeling(session, units: units, isDemo: isDemo))
         }
         for session in apneaSessions {
             let isDemo = DemoApneaSessionCatalog.isDemoSession(id: session.id)
-            guard includeDemo || !isDemo else { continue }
+            guard includeApneaDemo || !isDemo else { continue }
             entries.append(mapApnea(session, units: units, isDemo: isDemo))
         }
 

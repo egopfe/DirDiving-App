@@ -15,7 +15,9 @@ struct IOSUnifiedLogbookListView: View {
             snorkelingSessions: coordinator.snorkelingLogbookStoreForPresentation().sessions,
             apneaSessions: coordinator.apneaLogbookStoreForPresentation().sessions,
             units: unitPreference,
-            includeDemo: false
+            includeDivingDemo: coordinator.logStore.includeDemoLogbook,
+            includeSnorkelingDemo: coordinator.demoLogbookSettings.isSnorkelingFakeLogbookEnabled,
+            includeApneaDemo: coordinator.demoLogbookSettings.isApneaFakeLogbookEnabled
         )
     }
 
