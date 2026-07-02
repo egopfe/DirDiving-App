@@ -67,6 +67,9 @@ final class SnorkelingImportedRouteStore: ObservableObject {
             revision: package?.body.revision,
             plannedDistanceMeters: metadata?.estimatedDistanceMeters,
             plannedDurationSeconds: metadata?.estimatedDurationSeconds,
+            waypointCount: metadata?.waypointCount,
+            returnAlertConfigured: metadata?.returnAlertPolicy != .off,
+            offRouteThresholdMeters: metadata?.offRouteThresholdMeters,
             isPendingWhileSessionActive: isPending,
             staleRevisionRejected: staleRevisionRejected,
             lastImportErrorCode: lastImportError.map(importErrorCode)

@@ -140,6 +140,8 @@ targets:
       - Utils/ApneaWatchPresentation.swift
       - Utils/SnorkelingWatchPresentation.swift
       - Utils/SnorkelingWatchReadyPresentationPolicy.swift
+      - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
+      - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - path: Shared
       - path: iOSApp
@@ -276,6 +278,8 @@ targets:
       - Utils/ApneaWatchPresentation.swift
       - Utils/SnorkelingWatchPresentation.swift
       - Utils/SnorkelingWatchReadyPresentationPolicy.swift
+      - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
+      - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
@@ -593,7 +597,12 @@ targets:
       - iOSApp/Utils/IOSSnorkelingLogbookPresentation.swift
       - iOSApp/Utils/SnorkelingRouteSyncStatusPresentation.swift
       - iOSApp/Utils/SnorkelingLogbookDetailPresentation.swift
+      - iOSApp/Utils/SnorkelingMarkerLogbookPresentation.swift
+      - iOSApp/Utils/SnorkelingOperationalThresholds+IOS.swift
       - iOSApp/Utils/SnorkelingWatchSyncStatusPresentation.swift
+      - iOSApp/Services/SnorkelingTrackGPXExportService.swift
+      - iOSApp/Services/SnorkelingTrackKMLExportService.swift
+      - iOSApp/Services/SnorkelingSessionShareSummaryBuilder.swift
       - iOSApp/Services/IOSSnorkelingWatchTransferService.swift
       - iOSApp/Utils/IOSSnorkelingLocationPermission.swift
       - iOSApp/Utils/IOSSnorkelingLocalizationCatalog.swift
@@ -608,6 +617,8 @@ targets:
       - Tests/WatchAlgorithmTests/SnorkelingWatchPresentationTests.swift
       - Utils/SnorkelingWatchPresentation.swift
       - Utils/SnorkelingWatchReadyPresentationPolicy.swift
+      - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
+      - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchLayoutContractTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingPersistenceRecoveryTests.swift
