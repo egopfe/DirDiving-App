@@ -16,6 +16,8 @@ struct DIRDivingApp: App {
     @StateObject private var snorkelingRuntimeStore: SnorkelingWatchRuntimeStore
     @StateObject private var snorkelingLogbookStore: SnorkelingLogbookStore
     @StateObject private var watchSync: WatchSyncService
+    @StateObject private var explorationStore: ExplorationStore
+    @StateObject private var buddyAssist: BuddyAssistService
     @StateObject private var plannerBriefingStore: PlannerBriefingCardStore
     @StateObject private var underwaterActionRouter: WatchUnderwaterActionRouter
     @StateObject private var snorkelingMapTypeSettings = SnorkelingMapTypeSettingsStore()
@@ -51,6 +53,8 @@ struct DIRDivingApp: App {
         _snorkelingRuntimeStore = StateObject(wrappedValue: snorkelingRuntimeStore)
         _snorkelingLogbookStore = StateObject(wrappedValue: snorkelingLogbookStore)
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
+        _explorationStore = StateObject(wrappedValue: ExplorationStore())
+        _buddyAssist = StateObject(wrappedValue: BuddyAssistService())
         _plannerBriefingStore = StateObject(wrappedValue: plannerBriefingStore)
         _underwaterActionRouter = StateObject(
             wrappedValue: WatchUnderwaterActionRouter(
@@ -103,6 +107,8 @@ struct DIRDivingApp: App {
             .environmentObject(snorkelingRuntimeStore)
             .environmentObject(snorkelingLogbookStore)
             .environmentObject(watchSync)
+            .environmentObject(explorationStore)
+            .environmentObject(buddyAssist)
             .environmentObject(plannerBriefingStore)
             .environmentObject(underwaterActionRouter)
             .environmentObject(legalAcceptance)

@@ -14,6 +14,7 @@ enum WatchModeSelectionPreferences {
         set { UserDefaults.standard.set(newValue, forKey: skipWhenSingleModeKey) }
     }
 
-    /// Permanent Mode tab is hidden; mode changes use cold-launch startup flow and Settings while surfaced.
-    static let hasMultipleStableModes = false
+    /// Experimental branch exposes Diving, Apnea, Snorkeling, and Buddy Lab entry points.
+    /// Production `main` sets this to `false` (startup flow + Settings only).
+    static let hasMultipleStableModes = true
 }

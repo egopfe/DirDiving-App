@@ -25,16 +25,28 @@ struct ContentView: View {
             }
             DiveLiveView()
                 .tag(AppPage.live)
+            SnorkelingView()
+                .tag(AppPage.snorkeling)
+            ApneaView()
+                .tag(AppPage.apnea)
             CompassView()
                 .tag(AppPage.compass)
             SettingsView()
                 .tag(AppPage.settings)
+            AlarmSettingsView()
+                .tag(AppPage.alarmSettings)
+            AscentRateSettingsView()
+                .tag(AppPage.ascentSettings)
+            InfoView()
+                .tag(AppPage.info)
             UserImagesView()
                 .tag(AppPage.userImages)
             if activitySelection.selectedActivity == .diving {
                 DiveLogListView()
                     .tag(AppPage.diveLog)
             }
+            BuddyAssistView()
+                .tag(AppPage.buddyAssist)
         }
         .tabViewStyle(.verticalPage)
         .onAppear {

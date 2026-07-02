@@ -146,7 +146,7 @@ struct InfoView: View {
     @ViewBuilder
     private var batteryRow: some View {
         let percent = batteryLevel >= 0 ? Int((batteryLevel * 100).rounded()) : -1
-        VStack(spacing: 5) {
+        return VStack(spacing: 5) {
             HStack {
                 Text(String(localized: "Batteria"))
                     .font(.system(size: 11, weight: .semibold, design: .rounded))

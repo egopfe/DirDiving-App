@@ -1,12 +1,14 @@
 import Combine
 import SwiftUI
 
-/// Main iOS tab bar: Planner (Diving home), Logbook, Analisi, Attrezzatura, Checklist, Settings.
+/// Main iOS tab bar: Planner (Diving home), Explore, Logbook, Analisi, Attrezzatura, Buddy, Checklist, Settings.
 enum IOSTab: Hashable, CaseIterable {
     case planner
+    case explore
     case logbook
     case analysis
     case gear
+    case buddy
     case checklist
     case settings
 }
@@ -69,6 +71,9 @@ struct ContentView: View {
                 mountedTab(.planner) {
                     PlannerRootView()
                 }
+                mountedTab(.explore) {
+                    ExplorationCenterView()
+                }
                 mountedTab(.logbook) {
                     LogbookView()
                 }
@@ -77,6 +82,9 @@ struct ContentView: View {
                 }
                 mountedTab(.gear) {
                     EquipmentView()
+                }
+                mountedTab(.buddy) {
+                    BuddyExperimentalView()
                 }
                 mountedTab(.checklist) {
                     ChecklistView()
@@ -132,7 +140,6 @@ struct ContentView: View {
         return nil
     }
 
-    /// Mount tab roots lazily so PhotosPicker / fileImporter / ShareLink are not created at cold launch.
     @ViewBuilder
     private func mountedTab<Content: View>(_ tab: IOSTab, @ViewBuilder content: () -> Content) -> some View {
         Group {

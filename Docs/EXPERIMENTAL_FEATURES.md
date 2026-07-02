@@ -2,7 +2,16 @@
 
 This document describes **exploratory / legacy-branch** features only. Production **MAIN** ships Diving, Apnea, and Snorkeling; see [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md) and [`SNORKELING_ARCHITECTURE.md`](SNORKELING_ARCHITECTURE.md).
 
-**Buddy Assist**, exploration mockups, and pre-promotion prototypes remain experimental-only and are **not** implied to ship on App Store without separate review.
+**Buddy Assist**, exploration mockups, and pre-promotion prototypes remain experimental-only on `codex/*` branches and are **not** implied to ship on App Store without separate review.
+
+## Current Branch Sync Status
+
+- `origin/main` @ `beced25` (Apnea/Snorkeling on MAIN)
+- This branch: `codex/ios-experimental-features`
+
+This branch retains legacy iOS exploration surfaces. Production Apnea/Snorkeling ship on `main`; do not treat this branch as the production baseline.
+
+Detailed sync report: [`Docs/EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md).
 
 ## Legacy branch `codex/experimental-features`
 
