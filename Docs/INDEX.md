@@ -1,7 +1,18 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` @ `7c459cb`
+**Branch consigliato:** `main` @ `a9fc8a6`
+
+---
+
+## Aggiornamento indice 2026-06-17 — iOS Diving Demo Logbook Regression Fix
+
+Demo logbook toggle now inserts idempotent demo dives alongside real sessions; unified logbook uses per-activity demo flags.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`DIRDIVING_IOS_DIVING_DEMO_LOGBOOK_REGRESSION_FIX_CURRENT.md`](DIRDIVING_IOS_DIVING_DEMO_LOGBOOK_REGRESSION_FIX_CURRENT.md) |
+| **Verdict** | **FIXED_SOFTWARE** · **MANUAL_UI_QA_PENDING** |
 
 ---
 
