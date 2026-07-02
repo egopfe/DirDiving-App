@@ -240,13 +240,12 @@ struct ChecklistView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            Toggle(DIRIOSLocalizer.string("equipment.checklist.gas_flag"), isOn: binding.usesGas)
-                .tint(DIRTheme.yellow)
-                .accessibilityLabel(checklistGasFlagAccessibilityLabel(for: item))
-                .accessibilityHint(DIRIOSLocalizer.string("a11y.checklist.item.toggle.hint"))
-
-            EquipmentChecklistGasSection(item: binding)
-                .animation(.easeInOut(duration: 0.2), value: item.usesGas)
+            if EquipmentItemPresentationPolicy.shouldShowGasEditor(for: item) {
+                Text(DIRIOSLocalizer.string("equipment.item.gas_cylinder"))
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                EquipmentChecklistGasSection(item: binding)
+            }
 
             TextField(DIRIOSLocalizer.string("checklist.item.note_placeholder"), text: binding.note, axis: .vertical)
                 .lineLimit(1...3)
@@ -278,6 +277,11 @@ struct ChecklistView: View {
     private var addItemCard: some View {
         DIRCard(DIRIOSLocalizer.string("equipment.checklist.new_item"), icon: "plus.circle", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 10) {
+                Text(DIRIOSLocalizer.string("equipment.gas_separation_notice"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+
                 TextField(DIRIOSLocalizer.string("equipment.checklist.new_item"), text: $newChecklistTitle)
                     .foregroundStyle(.white)
 
@@ -292,11 +296,21 @@ struct ChecklistView: View {
                 Toggle(DIRIOSLocalizer.string("checklist.add.required"), isOn: $newItemRequired)
                     .tint(DIRTheme.cyan)
 
-                Button(DIRIOSLocalizer.string("equipment.checklist.add")) {
+                Button(DIRIOSLocalizer.string("equipment.add.generic_item")) {
                     addManualItem()
                 }
                 .font(.callout.weight(.bold))
                 .foregroundStyle(DIRTheme.cyan)
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+
+                Divider().overlay(DIRTheme.hairline)
+
+                Button(DIRIOSLocalizer.string("equipment.add.gas_cylinder")) {
+                    addGasCylinderItem()
+                }
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.yellow)
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
@@ -334,6 +348,25 @@ struct ChecklistView: View {
                 isRequired: newItemRequired
             )
         )
+        resetNewItemForm()
+    }
+
+    private func addGasCylinderItem() {
+        let title = newChecklistTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
+        equipment.profile.checklistItems.append(
+            EquipmentChecklistItem(
+                title: title,
+                isReady: false,
+                usesGas: true,
+                kind: .equipment,
+                isRequired: newItemRequired
+            )
+        )
+        resetNewItemForm()
+    }
+
+    private func resetNewItemForm() {
         newChecklistTitle = ""
         newItemKind = .task
         newItemRequired = true
@@ -385,18 +418,6 @@ struct ChecklistView: View {
         return "\(item.title). \(state)"
     }
 
-    private func checklistGasFlagAccessibilityLabel(for item: EquipmentChecklistItem) -> String {
-        var parts = [item.title]
-        parts.append(
-            item.usesGas
-                ? DIRIOSLocalizer.string("a11y.checklist.item.gas_linked")
-                : DIRIOSLocalizer.string("a11y.checklist.item.gas_not_linked")
-        )
-        if item.usesGas, let role = item.gasRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: item) {
-            parts.append(role.localizedTitle)
-        }
-        return parts.joined(separator: ". ")
-    }
 }
 
 struct ChecklistSetupPickerSheet: View {

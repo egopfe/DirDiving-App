@@ -1,7 +1,18 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-02  
-**Branch consigliato:** `main` = `origin/main` @ `741aa37`
+**Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-07-02 — iOS Equipment Gas UI/UX remediation
+
+Removed generic GAS toggle from unrelated checklist items; gas/cylinder items use dedicated creation path and Gas & Cylinders section.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`DIRDIVING_IOS_EQUIPMENT_GAS_UI_UX_REMEDIATION_CURRENT.md`](DIRDIVING_IOS_EQUIPMENT_GAS_UI_UX_REMEDIATION_CURRENT.md) |
+| **Verdict** | **IOS_EQUIPMENT_GAS_UI_UX_REMEDIATION_READY** · **NO_ALGORITHM_REGRESSION** · **MANUAL_UI_QA_PENDING** |
 
 ---
 
