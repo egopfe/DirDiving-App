@@ -142,6 +142,7 @@ targets:
       - Utils/SnorkelingWatchReadyPresentationPolicy.swift
       - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
       - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
+      - Utils/SnorkelingWatchMicroMapPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - path: Shared
       - path: iOSApp
@@ -280,6 +281,7 @@ targets:
       - Utils/SnorkelingWatchReadyPresentationPolicy.swift
       - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
       - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
+      - Utils/SnorkelingWatchMicroMapPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
@@ -603,6 +605,9 @@ targets:
       - iOSApp/Services/SnorkelingTrackGPXExportService.swift
       - iOSApp/Services/SnorkelingTrackKMLExportService.swift
       - iOSApp/Services/SnorkelingSessionShareSummaryBuilder.swift
+      - iOSApp/Utils/SnorkelingPlannedVsActualAnalytics.swift
+      - iOSApp/Utils/SnorkelingWaypointReachedReport.swift
+      - iOSApp/Utils/SnorkelingTrackQualityAnalytics.swift
       - iOSApp/Services/IOSSnorkelingWatchTransferService.swift
       - iOSApp/Utils/IOSSnorkelingLocationPermission.swift
       - iOSApp/Utils/IOSSnorkelingLocalizationCatalog.swift
@@ -619,6 +624,7 @@ targets:
       - Utils/SnorkelingWatchReadyPresentationPolicy.swift
       - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
       - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
+      - Utils/SnorkelingWatchMicroMapPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchLayoutContractTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingPersistenceRecoveryTests.swift
@@ -657,6 +663,12 @@ targets:
       - Tests/iOSAlgorithmTests/IOSSnorkelingNoGPSPresentationTests.swift
       - Tests/iOSAlgorithmTests/IOSSnorkelingExportServiceE2ETests.swift
       - Tests/iOSAlgorithmTests/SnorkelingPhotoMetadataSanitizationTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingWatchMicroMapPresentationTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingPlannedVsActualAnalyticsTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingWaypointReachedReportTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingTrackQualityAnalyticsTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingPhotoMarkerIntegrationTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingP3NoRegressionTests.swift
       - Tests/iOSAlgorithmTests/IOSSnorkelingReleaseHardValidationTests.swift
       - Tests/iOSAlgorithmTests/IOSSnorkelingUIViewContractTests.swift
       - Tests/iOSAlgorithmTests/SnorkelingQAEvidenceCatalogTests.swift

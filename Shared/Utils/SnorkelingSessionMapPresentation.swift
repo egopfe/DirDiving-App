@@ -26,6 +26,7 @@ struct SnorkelingSessionMapModel: Equatable, Hashable, Sendable {
     var isAvailable: Bool
     var unavailableReasonKey: String?
     var showsSparseTrackWarning: Bool
+    var plannedRouteCoordinates: [SnorkelingMapCoordinate]
 
     static let unavailable = SnorkelingSessionMapModel(
         segments: [],
@@ -37,7 +38,8 @@ struct SnorkelingSessionMapModel: Equatable, Hashable, Sendable {
         fixQualityKey: nil,
         isAvailable: false,
         unavailableReasonKey: "snorkeling.ios.map.unavailable",
-        showsSparseTrackWarning: false
+        showsSparseTrackWarning: false,
+        plannedRouteCoordinates: []
     )
 }
 
@@ -61,7 +63,8 @@ enum SnorkelingSessionMapPresentation {
                 fixQualityKey: nil,
                 isAvailable: false,
                 unavailableReasonKey: "snorkeling.ios.map.permission_denied",
-                showsSparseTrackWarning: false
+                showsSparseTrackWarning: false,
+                plannedRouteCoordinates: []
             )
         }
 
@@ -78,7 +81,8 @@ enum SnorkelingSessionMapPresentation {
                     fixQualityKey: "snorkeling.ios.map.fix.none",
                     isAvailable: false,
                     unavailableReasonKey: "snorkeling.ios.map.gps_unavailable",
-                    showsSparseTrackWarning: session.warnings.contains(.sparseTrack)
+                    showsSparseTrackWarning: session.warnings.contains(.sparseTrack),
+                    plannedRouteCoordinates: plannedRouteCoordinates(from: session)
                 )
             }
             return .unavailable
@@ -107,8 +111,29 @@ enum SnorkelingSessionMapPresentation {
             fixQualityKey: fixQualityKey,
             isAvailable: true,
             unavailableReasonKey: nil,
-            showsSparseTrackWarning: session.warnings.contains(.sparseTrack)
+            showsSparseTrackWarning: session.warnings.contains(.sparseTrack),
+            plannedRouteCoordinates: plannedRouteCoordinates(from: session)
         )
+    }
+
+    private static func plannedRouteCoordinates(from session: SnorkelingSession) -> [SnorkelingMapCoordinate] {
+        let plan: SnorkelingRoutePlan? = {
+            if let id = session.activeRoutePlanID {
+                return session.routePlans.first(where: { $0.id == id })
+            }
+            return session.routePlans.first
+        }()
+        guard let plan else { return [] }
+        return SnorkelingDomainSupport.orderedWaypoints(plan.waypoints).map {
+            SnorkelingMapCoordinate(
+                id: $0.id,
+                latitude: $0.latitude,
+                longitude: $0.longitude,
+                capturedAt: nil,
+                horizontalAccuracyMeters: nil,
+                gpsQuality: .measured
+            )
+        }
     }
 
     private static func measuredSurfacePoints(from trackPoints: [SnorkelingTrackPoint]) -> [SnorkelingTrackPoint] {
