@@ -656,6 +656,7 @@ struct IOSSnorkelingRoutePlannerView: View {
         let sent = transferService.send(
             draft: plannerStore.draft,
             profile: profile,
+            operational: SnorkelingOperationalThresholds.from(settings: settingsStore.settings),
             connectivity: SnorkelingWatchTransferConnectivityContext(
                 isSupported: watchSync.isSupported,
                 activationState: watchSync.activationState,

@@ -13,7 +13,13 @@ final class SnorkelingReturnAlertRuntimeTests: XCTestCase {
             estimatedDurationSeconds: 600,
             returnAlertPolicy: policy,
             routeProfileKind: .relaxBeginner,
-            checklistCompletedCount: 0
+            checklistCompletedCount: 0,
+            waypointCount: 2,
+            offRouteThresholdMeters: nil,
+            maxSessionDurationSeconds: nil,
+            maxDistanceMeters: nil,
+            gpsQualityWarningAccuracyMeters: nil,
+            buddyReminderEnabled: nil
         )
     }
 

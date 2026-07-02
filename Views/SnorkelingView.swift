@@ -240,6 +240,12 @@ struct SnorkelingView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
+            Text(ui.routeCompactSummaryText)
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.cyan)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("snorkeling.watch.route_summary")
+
             Text(ui.precheckSummaryText)
                 .font(DiveUI.Typography.hintCaption)
                 .foregroundStyle(DiveUI.cyan)
@@ -520,24 +526,33 @@ struct SnorkelingView: View {
     // MARK: - Actions
 
     private var actionRow: some View {
-        HStack(spacing: 6) {
-            if input.phase == .paused {
-                DiveCommandButton(String(localized: "snorkeling.action.resume"), systemImage: "play.fill", color: DiveUI.green) {
-                    runtime.resumeSession()
-                }
-            } else if input.isSessionStarted {
-                DiveCommandButton(String(localized: "snorkeling.action.pause"), systemImage: "pause.fill", color: DiveUI.yellow) {
-                    runtime.pauseSession()
-                }
-            }
-            DiveCommandButton(String(localized: "snorkeling.action.nav"), systemImage: "location.north.fill", color: DiveUI.blue) {
-                runtime.enterNavigation()
-            }
-            DiveCommandButton(String(localized: "snorkeling.action.return"), systemImage: "arrow.uturn.backward", color: DiveUI.yellow) {
+        VStack(spacing: 6) {
+            DiveCommandButton(
+                ui.returnPrimaryActionTitle,
+                systemImage: "arrow.uturn.backward",
+                color: ui.returnPrimaryActionEnabled ? DiveUI.orange : DiveUI.secondaryText
+            ) {
                 runtime.enterReturnMode()
             }
-            DiveCommandButton(String(localized: "snorkeling.action.marker"), systemImage: "mappin", color: DiveUI.yellow) {
-                runtime.presentSaveMarker()
+            .disabled(!ui.returnPrimaryActionEnabled)
+            .accessibilityIdentifier("snorkeling.action.return.primary")
+
+            HStack(spacing: 6) {
+                if input.phase == .paused {
+                    DiveCommandButton(String(localized: "snorkeling.action.resume"), systemImage: "play.fill", color: DiveUI.green) {
+                        runtime.resumeSession()
+                    }
+                } else if input.isSessionStarted {
+                    DiveCommandButton(String(localized: "snorkeling.action.pause"), systemImage: "pause.fill", color: DiveUI.yellow) {
+                        runtime.pauseSession()
+                    }
+                }
+                DiveCommandButton(String(localized: "snorkeling.action.nav"), systemImage: "location.north.fill", color: DiveUI.blue) {
+                    runtime.enterNavigation()
+                }
+                DiveCommandButton(String(localized: "snorkeling.action.marker"), systemImage: "mappin", color: DiveUI.yellow) {
+                    runtime.presentSaveMarker()
+                }
             }
         }
     }

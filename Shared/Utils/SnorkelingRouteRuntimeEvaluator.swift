@@ -38,10 +38,12 @@ enum SnorkelingRouteRuntimeEvaluator {
         state: inout SnorkelingRouteRuntimeState
     ) -> SnorkelingRouteRuntimeEvaluation {
         let hasCoordinate = currentCoordinate != nil
+        let gpsThresholds = gpsQualityThresholds(from: metadata)
         let gpsBand = SnorkelingGPSQualityEvaluator.evaluate(
             horizontalAccuracyMeters: horizontalAccuracyMeters,
             fixAgeSeconds: fixAgeSeconds,
-            hasCoordinate: hasCoordinate
+            hasCoordinate: hasCoordinate,
+            thresholds: gpsThresholds
         )
 
         if let accuracy = horizontalAccuracyMeters, accuracy.isFinite, accuracy >= 0 {
@@ -63,11 +65,13 @@ enum SnorkelingRouteRuntimeEvaluator {
                 routePoints: routeCoordinates
             )
             let gpsReliable = gpsBand == .good || gpsBand == .medium
+            let offRouteThreshold = metadata?.offRouteThresholdMeters ?? SnorkelingOffRouteDetector.defaultThresholdMeters
             isOffRoute = gpsReliable && SnorkelingOffRouteDetector.isOffRoute(
                 current: currentCoordinate,
-                routePoints: routeCoordinates
+                routePoints: routeCoordinates,
+                thresholdMeters: offRouteThreshold
             )
-            offRoutePaused = !gpsReliable && (offRouteDistance ?? 0) > SnorkelingOffRouteDetector.defaultThresholdMeters
+            offRoutePaused = !gpsReliable && (offRouteDistance ?? 0) > offRouteThreshold
         } else {
             progress = nil
             offRouteDistance = nil
@@ -153,6 +157,19 @@ enum SnorkelingRouteRuntimeEvaluator {
             offRouteEventCount: state.offRouteEventCount,
             maxOffRouteDistanceMeters: state.maxOffRouteDistanceMeters,
             timeOffRouteSeconds: state.timeOffRouteSeconds
+        )
+    }
+
+    private static func gpsQualityThresholds(from metadata: SnorkelingRoutePlanningMetadata?) -> SnorkelingGPSQualityThresholds {
+        guard let accuracy = metadata?.gpsQualityWarningAccuracyMeters, accuracy.isFinite, accuracy > 0 else {
+            return .default
+        }
+        return SnorkelingGPSQualityThresholds(
+            goodAccuracyMeters: 15,
+            mediumAccuracyMeters: max(15, accuracy),
+            goodFixAgeSeconds: 10,
+            mediumFixAgeSeconds: 20,
+            lostFixAgeSeconds: 60
         )
     }
 

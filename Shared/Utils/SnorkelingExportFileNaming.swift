@@ -5,6 +5,8 @@ enum SnorkelingExportFormat: String, CaseIterable, Codable, Hashable, Sendable {
     case csv
     case json
     case gpx
+    case kml
+    case summary
     case chartImage
 }
 
@@ -36,6 +38,8 @@ enum SnorkelingExportFileNaming {
         case .csv: return "DIRDiving_Snorkeling_\(suffix).csv"
         case .json: return "DIRDiving_Snorkeling_\(suffix).json"
         case .gpx: return "DIRDiving_Snorkeling_\(suffix).gpx"
+        case .kml: return "DIRDiving_Snorkeling_\(suffix).kml"
+        case .summary: return "DIRDiving_Snorkeling_\(suffix)_summary.txt"
         case .chartImage: return "DIRDiving_Snorkeling_Chart_\(suffix).png"
         }
     }

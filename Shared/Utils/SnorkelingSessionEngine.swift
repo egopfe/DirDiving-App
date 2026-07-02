@@ -111,6 +111,7 @@ struct SnorkelingSessionEngine {
     private var routePlanningMetadata: SnorkelingRoutePlanningMetadata?
     private var routeCoordinates: [SnorkelingCoordinate] = []
     private var routeRuntimeState = SnorkelingRouteRuntimeState()
+    private var gpsQualityThresholds = SnorkelingGPSQualityThresholds.default
 
     init(
         configuration: SnorkelingLifecycleConfiguration = .default,
@@ -288,6 +289,45 @@ struct SnorkelingSessionEngine {
 
     mutating func setRoutePlanningMetadata(_ metadata: SnorkelingRoutePlanningMetadata?) {
         routePlanningMetadata = metadata
+        if let accuracy = metadata?.gpsQualityWarningAccuracyMeters, accuracy.isFinite, accuracy > 0 {
+            gpsQualityThresholds = SnorkelingGPSQualityThresholds(
+                goodAccuracyMeters: 15,
+                mediumAccuracyMeters: max(15, accuracy),
+                goodFixAgeSeconds: 10,
+                mediumFixAgeSeconds: 20,
+                lostFixAgeSeconds: 60
+            )
+        }
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func applyOperationalThresholds(_ thresholds: SnorkelingOperationalThresholds) {
+        returnAdvisorConfiguration = SnorkelingReturnAdvisorConfiguration(
+            adviseReturnDistanceMeters: thresholds.returnAlertDistanceMeters,
+            adviseReturnDurationSeconds: thresholds.returnAlertDurationSeconds,
+            adviseReturnBatteryFraction: returnAdvisorConfiguration.adviseReturnBatteryFraction,
+            entryReachedRadiusMeters: returnAdvisorConfiguration.entryReachedRadiusMeters,
+            alternateSafeTargetMaximumDistanceMeters: returnAdvisorConfiguration.alternateSafeTargetMaximumDistanceMeters
+        )
+        gpsQualityThresholds = thresholds.gpsQualityThresholds
+        upsertAlarm(
+            kind: .maxDuration,
+            thresholdDurationSeconds: thresholds.maxSessionDurationSeconds,
+            thresholdDistanceMeters: nil
+        )
+        upsertAlarm(
+            kind: .maxDistance,
+            thresholdDurationSeconds: nil,
+            thresholdDistanceMeters: thresholds.maxDistanceMeters
+        )
+        if var metadata = routePlanningMetadata {
+            metadata.offRouteThresholdMeters = thresholds.offRouteThresholdMeters
+            metadata.maxSessionDurationSeconds = thresholds.maxSessionDurationSeconds
+            metadata.maxDistanceMeters = thresholds.maxDistanceMeters
+            metadata.gpsQualityWarningAccuracyMeters = thresholds.gpsQualityWarningAccuracyMeters
+            metadata.buddyReminderEnabled = thresholds.buddyReminderEnabled
+            routePlanningMetadata = metadata
+        }
         refreshSnapshot(wallClock: Date())
     }
 
@@ -349,15 +389,52 @@ struct SnorkelingSessionEngine {
 
     mutating func configureWatchDefaultsIfNeeded() {
         guard session.alarms.isEmpty else { return }
+        let defaults = SnorkelingOperationalThresholds.default
         session.alarms = [
             SnorkelingAlarm(kind: .maxDepth, label: "Depth", thresholdDepthMeters: 10),
-            SnorkelingAlarm(kind: .maxDuration, label: "Duration", thresholdDurationSeconds: 7_200),
-            SnorkelingAlarm(kind: .maxDistance, label: "Distance", thresholdDistanceMeters: 1_500)
+            SnorkelingAlarm(kind: .maxDuration, label: "Duration", thresholdDurationSeconds: defaults.maxSessionDurationSeconds),
+            SnorkelingAlarm(kind: .maxDistance, label: "Distance", thresholdDistanceMeters: defaults.maxDistanceMeters)
         ]
         if session.buddy == nil {
             session.buddy = SnorkelingBuddyInfo(isBuddyPresent: false)
         }
-        refreshSnapshot(wallClock: Date())
+        applyOperationalThresholds(defaults)
+    }
+
+    private mutating func upsertAlarm(
+        kind: SnorkelingAlarmKind,
+        thresholdDurationSeconds: TimeInterval?,
+        thresholdDistanceMeters: Double?
+    ) {
+        if let index = session.alarms.firstIndex(where: { $0.kind == kind }) {
+            if let thresholdDurationSeconds {
+                session.alarms[index].thresholdDurationSeconds = thresholdDurationSeconds
+            }
+            if let thresholdDistanceMeters {
+                session.alarms[index].thresholdDistanceMeters = thresholdDistanceMeters
+            }
+            return
+        }
+        switch kind {
+        case .maxDuration:
+            session.alarms.append(
+                SnorkelingAlarm(
+                    kind: .maxDuration,
+                    label: "Duration",
+                    thresholdDurationSeconds: thresholdDurationSeconds ?? SnorkelingOperationalThresholds.default.maxSessionDurationSeconds
+                )
+            )
+        case .maxDistance:
+            session.alarms.append(
+                SnorkelingAlarm(
+                    kind: .maxDistance,
+                    label: "Distance",
+                    thresholdDistanceMeters: thresholdDistanceMeters ?? SnorkelingOperationalThresholds.default.maxDistanceMeters
+                )
+            )
+        default:
+            break
+        }
     }
 
     @discardableResult
