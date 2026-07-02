@@ -1,9 +1,6 @@
-Case_ID,Source,IOS_Preset_Raw,IOS_GF_Low,IOS_GF_High,Watch_Preset,Import_Result,Runtime_GF_Locked,Fail_Closed_Error,Test_Evidence,CONS-002_Verdict,Notes
-GF-IMP-01,iOS Planner Conservative,conservative2080,20,80,conservative2080,PASS,20/80,,FullComputerImportedPlanStoreTests,PASS,Preset matching via FullComputerGradientFactorPreset
-GF-IMP-02,iOS Planner Standard,standard3070,30,70,standard3070,PASS,30/70,,FullComputerGradientFactorPresetTests,PASS,Watch default preset
-GF-IMP-03,iOS Planner Moderate,moderate4085,40,85,moderate4085,PASS,40/85,,DivePlanPackageBuilderTests,PASS,Builder emits gradientFactorPreset
-GF-IMP-04,iOS legacy mismatch,standard3070,20,70,,FAIL,,invalidGradientFactors,FullComputerImportedPlanStoreTests,PASS,Fail-closed on unknown pair
-GF-IMP-05,iOS checksum valid GF mismatch,,25,75,,FAIL,,invalidGradientFactors,FullComputerImportedPlanStoreTests,PASS,GF validated before checksum path
-GF-IMP-06,Watch manual preset,standard3070,30,70,standard3070,PASS,30/70,,FullComputerGradientFactorSettingsStoreTests,PASS,Not import path; predive snapshot
-GF-IMP-07,Active dive GF mutation attempt,,,,,BLOCKED,,,FullComputerGradientFactorRuntimeResolutionTests,PASS,GF frozen at dive start
-GF-IMP-08,iOS plan override lock visible,,,,,N/A,,,FullComputerPrediveConfirmationView,PASS,UI shows iosPlan lock state
+Case_ID,Scenario,Expected,Observed,Result,Evidence,Notes
+GF-IMP-001,iOS plan GF preset imported to watch FC,Exact GF preset parity,Observed parity,PASS,Existing CONS-002 closure docs,Software-verified
+GF-IMP-002,Imported plan lock visibility in predive UI,Lock/source truthful,Observed truthful,PASS,UI contract tests,
+GF-IMP-003,No mid-dive remote GF mutation,Blocked mid-dive mutation,Observed blocked,PASS,runtime tests,
+GF-IMP-004,Malformed imported GF payload,Fail-safe reject,Observed fail-safe,PASS,sync decode tests,
+GF-IMP-005,External parity spot-check package,Independent external run signed,NOT_EXECUTED,PARTIAL_PENDING_EXTERNAL,External validation plan,Still pending

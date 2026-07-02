@@ -1,0 +1,6 @@
+Claim_ID,Claim,Expected_Position,Status,Evidence,Severity,Pending_Gate,Notes
+EG-CLM-001,Generic GAS toggle removed from misleading surfaces,Must remain removed,PASS,Equipment gas UI audit,P1,PENDING_MANUAL_QA,Software evidence positive
+EG-CLM-002,Dedicated gas/cylinder section path exists,Must remain available,PASS,Equipment gas UI audit,P2,PENDING_MANUAL_QA,Manual UX pending
+EG-CLM-003,usesGas persistence/planner compatibility preserved,Must remain preserved,PASS,Equipment gas UI audit,P1,PENDING_MANUAL_QA,Field workflow validation pending
+EG-CLM-004,No gas-planning certification implication,Must remain absent,PASS,Claims matrix,P0,PENDING_LEGAL_REVIEW,No unsupported authority claims
+EG-CLM-005,No cross-activity leakage into Apnea/Snorkeling unless intended,Must remain isolated,PARTIAL,Audit docs,P1,PENDING_MANUAL_QA,Manual cross-activity check pending

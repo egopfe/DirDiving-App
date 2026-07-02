@@ -1,19 +1,6 @@
-Claim_ID,Post_Remediation_Claim,Allowed,Required_Evidence,Evidence_Status,Physical_Status,External_Status,Legal_Status,Software_Verdict,Truthful,Release_Impact,Severity,Finding_ID,Notes
-PR-001,Watch FC Bühlmann software correct,yes,Audit 01 + FC tests,PASS @2c30412,N/A,PENDING,PASS,PASS,TRUE,Low,,,0 P0 FC @ audit 01
-PR-002,Internal TestFlight software ready,yes,Build + test + script gates,BUILD PASS; iOS 1655 PASS; script PASS,N/A,N/A,N/A,READY,TRUE,Low,,,CONS-046 V1.5 CLOSED; IOS-P1-001 CLOSED
-PR-003,Watch test suite fully green,yes,1152/1152 PASS,1139/1152 PASS,N/A,N/A,N/A,PARTIAL,TRUE,Medium,WFC-P2-005,13 routing failures non-FC
-PR-004,External TestFlight ready with physical gates,no,Physical QA artifacts,0% executed,PENDING,N/A,N/A,NOT_READY,TRUE,High,CONS-042,No fake physical evidence
-PR-005,App Store ready with legal gates,no,Counsel + marketing,NOT_EXECUTED,N/A,N/A,PENDING,NOT_READY,TRUE,High,CONS-044,
-PR-006,CMAltimeter physically validated,no,CoreMotion field samples,NOT_EXECUTED,PENDING,N/A,N/A,NOT_EXECUTED,TRUE,High,WFC-P2-001,Simulator insufficient
-PR-007,External Bühlmann validated,no,Third-party oracle,NOT_EXECUTED,N/A,PENDING,N/A,NOT_EXECUTED,TRUE,High,WFC-P1-001,
-PR-008,Water auto-open physically validated,no,WAO field QA,NOT_EXECUTED,PENDING,N/A,N/A,NOT_EXECUTED,TRUE,High,WAO-PHY-001,
-PR-009,Shallow wet QA passed,no,HARDWARE_QA QA-002,NOT_EXECUTED,PENDING,N/A,N/A,NOT_EXECUTED,TRUE,High,CONS-042,
-PR-010,GF presets are user conservatism not certification,yes,Strings + CLM-GF-01,PASS,N/A,N/A,PASS,PASS,TRUE,Low,,,
-PR-011,Apnea recovery not medical guarantee,yes,ApneaReleaseHardValidationTests,PASS,N/A,N/A,PASS,PASS,TRUE,Low,,,
-PR-012,Planner reference-only not certified deco,yes,IOSPlannerOnboardingEntryFlowTests,PASS,N/A,PENDING,PASS,PASS,TRUE,Low,,,
-PR-013,Developer shallow FC hidden from public,yes,DeveloperSettingsTests default OFF,PASS,N/A,N/A,PASS,PASS,TRUE,Medium,SDG-008,TestFlight disclosure still required
-PR-014,Snorkeling 12 field QA complete,no,CONS-048 templates,0/12 executed,PENDING,N/A,N/A,NOT_EXECUTED,TRUE,High,CONS-048,
-PR-015,Command integrity automation trustworthy,yes,validate_commands script,PASS @2c30412,N/A,N/A,N/A,PASS,TRUE,Low,,,CONS-046 V1.5 CLOSED
-PR-016,No fake external validation claims,yes,Evidence separation,PASS,N/A,PENDING,N/A,PASS,TRUE,Low,,,
-PR-017,Apnea P1/P2/P3 software ready,yes,Apnea isolation + lifecycle tests,PASS @76f3703,PENDING,N/A,PASS,PASS,TRUE,Medium,,,Physical wet pending
-PR-018,Water auto-open does not start Apnea session,yes,Watch policy + boundary audit,PASS software,PENDING,N/A,PASS,PASS,TRUE,Low,,,
+Claim_ID,Post_Remediation_Position,Status,Severity,Evidence,Notes
+PRC-001,No fake physical gate closure,PASS,P0,Physical gate matrices,Pending rows preserved
+PRC-002,No fake external validation closure,PASS,P0,External gaps audit,Pending rows preserved
+PRC-003,Internal software lane may improve without physical closure,PASS,P1,Post-remediation audit,Marked CONDITIONAL not READY
+PRC-004,External TF/App Store remain blocked without legal+physical+external closure,PASS,P1,Release gate matrix,NOT_READY maintained
+PRC-005,No certification/medical escalation in release copy,PASS,P0,Claims matrix,No unsupported authority claims

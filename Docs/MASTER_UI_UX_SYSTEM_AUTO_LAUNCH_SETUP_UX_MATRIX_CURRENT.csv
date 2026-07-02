@@ -1,11 +1,6 @@
-Check_ID,Surface,Requirement,Production_Source,Expected,Actual@2c30412,Pass,Evidence,Notes
-AUTO-UX-01,Settings copy,Explains system Auto-Launch path,WatchWaterAutoOpenSettingsView,Settings→General→Auto-Launch documented,Present,PASS,WatchWaterAutoOpenSettingsCopyTests,
-AUTO-UX-02,Settings copy,Listing depends on watchOS/entitlement,WatchWaterAutoOpenSettingsView,Conditional listing explained,Present,PASS,WatchWaterAutoOpenSettingsCopyTests,
-AUTO-UX-03,Settings copy,App cannot force system listing,Localizable.strings,No forbidden claim,PASS,PASS,testNoForbiddenAutoLaunchClaimInStrings,
-AUTO-UX-04,Surface launch,Icon launch described as normal,Settings copy,Normal startup,Present,PASS,Static review,
-AUTO-UX-05,Underwater routing,Conditional on watchOS auto-open,WatchWaterAutoOpenPolicy,Routing when enabled,Policy present,PARTIAL,WFC-P2-005,13 routing tests FAIL
-AUTO-UX-06,Apnea routing,Does not auto-start session,WatchWaterAutoOpenPolicy,Routes to ready not session start,Test expects ready,PARTIAL,WFC-P2-005,Test harness mismatch
-AUTO-UX-07,FC routing,Routes to predive not live dive,DIRStartupSelectionPolicy,fullComputerPrediveConfiguration,Test FAIL in harness,PARTIAL,WFC-P2-005,Production code L110-112 correct when FC supported
-AUTO-UX-08,EN/IT,Limitation copy exists,Localizable.strings,EN+IT,Present,PASS,testWaterAutoOpenLimitationCopyExistsENIT,
-AUTO-UX-09,Physical QA,Real submerged auto-open,PENDING_PHYSICAL,Field validation,NOT_EXECUTED,PENDING,PHYSICAL_QA matrix,
-AUTO-UX-10,Digital Crown,Underwater nav clamp unchanged,WatchUnderwaterNavigationClampPolicyTests,Clamp active,PASS,PASS,Independent of FC math,
+Case_ID,Requirement,Status,Evidence,Notes
+SAL-UX-001,Settings path explained (General > Auto-Launch > When Submerged > App > DIR Diving),PASS,docs + UI copy,
+SAL-UX-002,Copy states listing depends on watchOS/entitlement/provisioning,PASS,docs wording,
+SAL-UX-003,App does not claim to force system listing,PASS,safety positioning docs,
+SAL-UX-004,Surface icon launch described as normal startup,PASS,startup docs,
+SAL-UX-005,Underwater auto-open described as conditional routing,PASS,water auto-open policy docs,

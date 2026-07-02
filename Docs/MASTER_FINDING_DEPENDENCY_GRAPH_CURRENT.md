@@ -1,23 +1,18 @@
 # Finding Dependency Graph — CURRENT
 
-**Baseline:** `main` @ `2c30412`  
-**Orchestrator:** V1.5 @ 2026-07-01
+**Baseline:** `main` @ `7ae527b`  
+**Orchestrator:** V1.7 @ 2026-07-02
 
 ---
 
 ## Critical dependencies
 
-**CONS-009 / WFC-P1-001** must complete before any external TestFlight or App Store claim of decompression parity or certified planner behavior, because third-party Bühlmann validation evidence does not exist.
-
-**CONS-010, CONS-021, CONS-022, CONS-042, CONS-048, APNEA-PHY-001** must complete before any physical Watch/iPhone/Snorkeling/Apnea field claim, because physical QA matrices are 0% executed.
-
-**CONS-050 / WFC-P2-005** should be resolved (test alignment or documented routing policy) before treating Watch CI as fully green, because 13 routing failures block 1152/1152 PASS even though FC math tests are green.
-
-**CONS-053 (DOC-P0 legacy claims)** must be fixed before documentation or INDEX updates assert App Store or external validation readiness, because two legacy documents contradict audit PARTIAL verdicts.
-
-**CONS-054 (INDEX/README drift)** should follow technical truth fixes (CONS-050, physical gates) and must not precede them, because documentation must reflect known technical state per orchestrator policy §6.9.
-
-**CONS-044 (legal/marketing)** cannot close until CONS-013 PDF physical render and CONS-009 external validation posture are honestly documented for counsel review.
+- `CF-002` must be fixed before `CF-007` can be fully validated because localization parity failures currently break regression confidence in Snorkeling release readiness.
+- `CF-008` and `CF-009` must be fixed before `CF-011` can close because release claims and readiness language cannot be trusted while docs are stale or unsupported.
+- `CF-001` must be fixed before `CF-011` can close because external/App Store decompression claims depend on independent Buhlmann validation.
+- `CF-003` and `CF-004` must be fixed before `CF-011` can close because physical/manual QA evidence is a hard gate for external readiness claims.
+- `CF-006` must be fixed before `CF-012` can close because command inventory integrity is required for clean post-remediation lifecycle governance.
+- `CF-005` is verified and supports `CF-010`; however `CF-010` still requires manual QA completion before unified-logbook truthfulness can be considered fully closed.
 
 ---
 
@@ -25,28 +20,16 @@
 
 ```mermaid
 graph TD
-  WFC_P1[WFC-P1-001 External Bühlmann] --> CONS_009[CONS-009]
-  CONS_009 --> EXT_TF[External TestFlight claims]
-  CONS_009 --> APP_STORE[App Store algorithm claims]
+  CF002[CF-002 DG-LOC-001 localization parity] --> CF007[CF-007 rollback gate]
+  CF008[CF-008 stale INDEX/README] --> CF011[CF-011 external and App Store not ready]
+  CF009[CF-009 unsupported CCR claim doc] --> CF011
+  CF001[CF-001 DG-EXT-001 external Buhlmann validation] --> CF011
+  CF003[CF-003 DG-PHY-001 physical QA backlog] --> CF011
+  CF004[CF-004 DG-SNORK-001 snorkeling field QA pending] --> CF011
 
-  WFC_P2_005[WFC-P2-005 WAO routing tests] --> CONS_050[CONS-050]
-  CONS_050 --> WATCH_CI[1152/1152 Watch tests green]
+  CF006[CF-006 DG-CMD-001 command chain gap] --> CF012[CF-012 manual continuation required]
 
-  CONS_010[CONS-010 Physical FC QA] --> PHY_TF[Physical release claims]
-  CONS_021[CONS-021 WAO physical] --> PHY_TF
-  CONS_022[CONS-022 Underwater HW] --> PHY_TF
-  CONS_042[CONS-042 Shallow wet QA] --> PHY_TF
-  CONS_048[CONS-048 Snorkeling 12 QA] --> PHY_TF
-  APNEA_PHY[APNEA-PHY-001 Apnea wet QA] --> PHY_TF
-
-  CONS_053[CONS-053 P0 legacy claim docs] --> DOC_GATE[Documentation truthfulness]
-  CONS_054[CONS-054 INDEX/README stale] --> DOC_GATE
-
-  CONS_044[CONS-044 Legal sign-off] --> APP_STORE
-  CONS_013[CONS-013 PDF physical render] --> CONS_044
-
-  CONS_046[CONS-046 Script integrity] -.FIXED.-> PREFLIGHT[Audit preflight trustworthy]
-  CONS_049[CONS-049 iOS tests] -.FIXED.-> IOS_CI[1655 iOS tests green]
+  CF005[CF-005 DG-DEMO-001 demo fix verified] --> CF010[CF-010 unified logbook manual QA pending]
 ```
 
 ---
@@ -54,18 +37,16 @@ graph TD
 ## Batch ordering constraints
 
 | Finding cluster | Must fix before | Because |
-|-----------------|-----------------|---------|
-| FC math P0 (none open) | — | 0 P0 @ 2c30412 |
-| CONS-050 WFC-P2-005 | Watch suite green gate | CI regression noise |
-| CONS-051 Snorkeling progress | Snorkeling routing confidence | 1 isolated test failure |
-| Physical QA cluster | External TF | No simulator→physical upgrade |
-| CONS-009 external | App Store deco claims | Missing third-party evidence |
-| CONS-053/054 docs | Marketing/legal refresh | Docs after technical truth |
+|---|---|---|
+| `DG-LOC-001` (`CF-002`) | Internal TestFlight confidence uplift | current test parity failures |
+| `DG-DOC-001` + `DG-DOC-002` (`CF-008`,`CF-009`) | any release-claim refresh | truthfulness/legal baseline |
+| `DG-EXT-001` (`CF-001`) | external TestFlight and App Store claims | independent validation missing |
+| `DG-PHY-001` + `DG-SNORK-001` (`CF-003`,`CF-004`) | external readiness | physical/manual evidence absent |
+| `DG-CMD-001` (`CF-006`,`CF-012`) | post-remediation lifecycle continuity | missing command path integrity |
 
 ---
 
 ## Non-dependencies (keep separate)
 
-- **WFC-P2-004 TTS 1-minute quantization** is documented conservative limitation — does not block internal TestFlight software.
-- **CONS-039 Apnea cloud stub** is accepted risk — does not block Apnea software INTERNAL_READY.
-- **IOS-P3 navigation restore** is UX polish — does not block safety or internal TestFlight software.
+- `CF-005` is already verified (`f90b671`) and should not be reopened while unrelated physical QA work proceeds.
+- `CF-014` (docs alignment debt) should not block Batch-1 quick wins.

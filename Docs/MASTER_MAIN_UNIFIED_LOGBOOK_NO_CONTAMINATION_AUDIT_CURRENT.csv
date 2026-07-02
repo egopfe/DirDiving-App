@@ -1,0 +1,6 @@
+Check_ID,Check,Status,Evidence,Notes
+ULOG-001,Unified timeline reads from activity-owned stores only,PASS,IOSUnifiedLogbookPresentationBuilder + no-contamination tests,
+ULOG-002,Unified timeline does not become canonical storage,PASS,Architecture docs + tests,
+ULOG-003,Unified view does not mutate Watch sync queues,PASS,Read-only presentation model references,
+ULOG-004,Demo/fake entries excluded from real views,PASS,Demo contamination tests + V1.7 demo audit,
+ULOG-005,Manual end-to-end UI verification completed,PENDING_MANUAL_QA,No manual artifacts in this pass,

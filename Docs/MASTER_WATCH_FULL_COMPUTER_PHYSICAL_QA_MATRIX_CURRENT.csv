@@ -1,29 +1,18 @@
-Scenario_ID,Category,Description,Expected,Actual,Result,Evidence_Required,Status,Notes
-PHYS-001,Install,Physical Watch target install on paired device,App launches FC path available,PENDING_PHYSICAL,Signed install log,PENDING_PHYSICAL,Physical Watch available (Apple Watch di Federico) but wet QA not executed
-PHYS-002,Depth sensor,Real depth sensor wet validation,Depth tracks water column,PENDING_PHYSICAL,Video+log,PENDING_PHYSICAL,Simulator only this audit
-PHYS-003,Predive block,Dry-run FC start blocked without valid environment,Start disabled,PENDING_PHYSICAL,Screen recording,PENDING_PHYSICAL,Software PASS OrchestratedAltitudeEnvironmentTests
-PHYS-004,Manual env,Manual Watch environment accepted and logged,Source=manual in logbook,PENDING_PHYSICAL,Logbook export,PENDING_PHYSICAL,
-PHYS-005,Import env,Imported iPhone plan accepted,Source=imported GF locked,PENDING_PHYSICAL,Paired sync log,PENDING_PHYSICAL,Software PASS FullComputerImportedPlanStoreTests
-PHYS-006,CMAltimeter avail,CMAltimeter available on hardware,isAbsoluteAltitudeAvailable true,PENDING_PHYSICAL,Sensor log,PENDING_PHYSICAL,
-PHYS-007,CMAltimeter unavail,CMAltimeter unavailable fallback,Manual/import only; no auto sea-level,PENDING_PHYSICAL,N/A,PENDING_PHYSICAL,
-PHYS-008,CMAltimeter denied,Permission denied fail-closed,No start from sensor,PENDING_PHYSICAL,N/A,PENDING_PHYSICAL,
-PHYS-009,Sensor stable,Stable sensor proposal window,5 samples within spread,PENDING_PHYSICAL,Sample dump,PENDING_PHYSICAL,Software PASS WatchCMAltimeterLifecycleTests
-PHYS-010,Sensor unstable,Unstable proposal rejected,pending cleared; prior authority,PENDING_PHYSICAL,N/A,PENDING_PHYSICAL,
-PHYS-011,Sensor accept,Explicit accept promotes proposal,confirmedEnvironment updated,PENDING_PHYSICAL,UI flow log,PENDING_PHYSICAL,
-PHYS-012,Sensor reject,Reject preserves manual/import,unchanged authority,PENDING_PHYSICAL,UI flow log,PENDING_PHYSICAL,
-PHYS-013,Background sampling,Background during sampling,clean cancel/restart,PENDING_PHYSICAL,N/A,PENDING_PHYSICAL,
-PHYS-014,Relaunch predive,Relaunch before dive start,no stale proposal authority,PENDING_PHYSICAL,N/A,PENDING_PHYSICAL,
-PHYS-015,Checkpoint dry,Checkpoint/restore dry run,tissues+env preserved,PENDING_PHYSICAL,Checkpoint export,PENDING_PHYSICAL,Software PASS FullComputerRecoveryCheckpointTests
-PHYS-016,Paired sync,Paired iPhone sync during idle,no active dive mutation,PENDING_PHYSICAL,WC log,PENDING_PHYSICAL,
-PHYS-017,Logbook provenance,Completed dive preserves env source+sensor quality,Metadata complete,PENDING_PHYSICAL,Log export,PENDING_PHYSICAL,
-PHYS-018,Smallest display,Smallest Watch layout safety metrics visible,Depth/ceiling/NDL visible,PENDING_PHYSICAL,Screenshot,PENDING_PHYSICAL,SmallestWatchLayoutContractTests software PASS
-PHYS-019,VoiceOver,VoiceOver traversal logical order,Critical metrics announced,PENDING_PHYSICAL,VO audit,PENDING_PHYSICAL,
-PHYS-020,Haptic priority,Critical alert over reminder,No suppression,PENDING_PHYSICAL,Felt haptic log,PENDING_PHYSICAL,
-PHYS-021,Ascent warning,Wet ascent rate warning,Alarm fires,PENDING_PHYSICAL,Safe pool test,PENDING_PHYSICAL,
-PHYS-022,Multilevel wet,Controlled multilevel replay if possible,Deco tracks expectation,PENDING_PHYSICAL,Dive log compare,PENDING_PHYSICAL,
-PHYS-023,Battery thermal,Battery/thermal under 1Hz FC,No missed tick storm,PENDING_PHYSICAL,Instruments,PENDING_PHYSICAL,
-PHYS-024,Water Lock,Water Lock interaction with FC,No tissue corruption,PENDING_PHYSICAL,Wet test,PENDING_PHYSICAL,CONS-042
-PHYS-025,Action Button,Action Button underwater router-only,No unsafe FC start,PENDING_PHYSICAL,Wet test,PENDING_PHYSICAL,WatchUnderwaterActionRouterTests software PASS
-PHYS-026,Apnea P1/P2/P3,Apnea wet auto-detection field validation,Detection behaves as designed,PENDING_PHYSICAL,Field log,PENDING_PHYSICAL,Apnea @76f3703 software PASS only
-PHYS-027,Digital Crown,Crown clamp underwater,no GF/env mutation,PENDING_PHYSICAL,Wet test,PENDING_PHYSICAL,WatchUnderwaterNavigationClampPolicyTests software PASS
-PHYS-028,Shallow entitlement,Shallow-signed FC blocked without dev toggle,~6m scope enforced,PENDING_PHYSICAL,Shallow wet matrix,PENDING_PHYSICAL,CONS-006/042 software PASS
+Case_ID,Scenario,Status,Blocking,Evidence,Notes
+PHY-001,physical Watch target install,PENDING_PHYSICAL,YES,N/A,No physical execution in this run
+PHY-002,real depth sensor availability,PENDING_PHYSICAL,YES,N/A,Simulator cannot close wet gate
+PHY-003,dry-run FC start blocked without valid environment,PENDING_PHYSICAL,YES,N/A,Needs on-device confirmation
+PHY-004,manual Watch environment accepted,PENDING_PHYSICAL,YES,N/A,
+PHY-005,imported iPhone plan accepted,PENDING_PHYSICAL,YES,N/A,
+PHY-006,CMAltimeter available path,PENDING_PHYSICAL,YES,N/A,
+PHY-007,CMAltimeter unavailable/permission denied path,PENDING_PHYSICAL,YES,N/A,
+PHY-008,sensor accepted/rejected authority preservation,PENDING_PHYSICAL,YES,N/A,
+PHY-009,background/foreground during sampling,PENDING_PHYSICAL,YES,N/A,
+PHY-010,relaunch before dive start,PENDING_PHYSICAL,YES,N/A,
+PHY-011,checkpoint/restore dry run on device,PENDING_PHYSICAL,YES,N/A,
+PHY-012,paired iPhone sync provenance,PENDING_PHYSICAL,YES,N/A,
+PHY-013,smallest Watch display + VoiceOver,PENDING_PHYSICAL,NO,N/A,
+PHY-014,haptic priority validation,PENDING_PHYSICAL,NO,N/A,
+PHY-015,depth sensor wet test,PENDING_PHYSICAL,YES,N/A,
+PHY-016,controlled multilevel replay,PENDING_PHYSICAL,YES,N/A,
+PHY-017,battery/thermal observation,PENDING_PHYSICAL,NO,N/A,

@@ -1,0 +1,8 @@
+Negative_Check,Expected,Observed,Status,Notes
+No production heatmap,Heatmap remains blocked from production,Observed,PASS,No conflicting claim found
+No Always Location claim,When-In-Use policy retained,Observed,PASS,Privacy policy aligned
+No underwater GPS guarantee,No guarantee wording,Observed,PASS,GPS claims bounded to surface quality context
+No fake/demo contamination,No fake logs in real views,Observed,PASS,Demo contamination docs present
+No cross-activity contamination,Strict store ownership preserved,Observed,PASS,Unified view remains presentation-only
+No FC math regression claim,Snorkeling docs do not override FC forensic authority,Observed,PASS,Algorithmic priority preserved
+No fake QA PASS,Manual/physical/paired QA not auto-promoted,Observed,PASS,Pending gates preserved

@@ -1,23 +1,17 @@
 QA_ID,Area,Platform,Required_For,Current_Status,Evidence_File,Physical_Device_Required,External_Reviewer_Required,Safe_Test_Setup_Required,Blocks_Internal_TestFlight,Blocks_External_TestFlight,Blocks_App_Store,Notes
-PHY-001,Watch Full Computer wet depth + CMAltimeter,Watch,FC physical release claims,PENDING — 0% executed,MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,CONS-010; WFC-P2-002; do not claim physical PASS
-PHY-002,Shallow vs full depth entitlement wet separation,Watch,Shallow depth release gate,PENDING — 0% executed,MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,CONS-042; developer toggles default OFF
-PHY-003,Water auto-open end-to-end wet routing,Watch,System auto-launch claims,PENDING — 0% executed,MASTER_WATER_AUTO_OPEN_PHYSICAL_QA_GATE_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,CONS-021; SOFTWARE_READY in code
-PHY-004,Underwater Digital Crown + Action Button + Water Lock,Watch,Hardware interaction claims,PENDING — 0% executed,MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,CONS-022; software clamp PASS
-PHY-005,Paired Watch↔iPhone sync security + UI,Watch+iOS,External TestFlight sync trust,PENDING — 0% executed,MASTER_PHYSICAL_DEVICE_QA_MATRIX_CURRENT.csv;PAIRED_WATCH_IOS_UI_QA_TEMPLATE.md,Yes,No,Yes,No,Yes,Yes,CONS-011; static HMAC tests PASS
-PHY-006,Accessibility VoiceOver + Dynamic Type manual,Watch+iOS,External TestFlight a11y,PENDING — 0% executed,ACCESSIBILITY_MANUAL_QA_TEMPLATE.md,Yes,No,No,No,Yes,Yes,CONS-012; contract script PASS
-PHY-007,PDF physical render golden, iOS,App Store assets,PENDING — 0% executed,PDF_PHYSICAL_RENDER_QA_TEMPLATE.md,Yes,No,No,No,No,Yes,CONS-013
-PHY-008,iPhone logbook scroll at session cap,iOS,Performance UX,PENDING — not profiled,MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md,Yes,No,No,No,No,No,CONS-025; cap 40 sessions
-PHY-009,Snorkeling long-route map FPS,Watch+iOS,Snorkeling navigation UX,PENDING — not profiled,MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md,Yes,No,Yes,No,Yes,No,CONS-026
-PHY-010,Snorkeling field GPS + battery 12 procedures,Snorkeling,Watch+iOS,Snorkeling release claims,PENDING — 0/12 executed,Docs/QA_EVIDENCE/SNORKELING_*,Yes,No,Yes,No,Yes,Yes,CONS-048; software PASS
-PHY-011,Apnea wet auto-detection + session physical,Watch,Apnea field claims,PENDING — 0% executed,MASTER_APNEA_PHYSICAL_WET_QA_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,APNEA-PHY-001; INTERNAL_READY software
-PHY-012,Watch Ultra long-session FC battery/thermal,Watch,Long dive confidence,PENDING — no Instruments log,MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md,Yes,No,Yes,No,Yes,No,CONS-023
-PHY-013,Physical pixel-diff baselines 59 mockups,Watch+iOS,Visual regression external gate,PENDING — 0/59,PIXEL_DIFF_EXECUTION_LOG_TEMPLATE.md,Yes,No,No,No,Yes,No,CONS-032
-PHY-014,iCloud two-device tombstone merge,iOS,Cloud backup trust,PENDING — not field-tested,Docs/QA_EVIDENCE/ICLOUD_TWO_DEVICE/,Yes,No,Yes,No,Yes,Yes,CONS-029; software merge tests PASS
-PHY-015,Planner briefing PNG paired transfer,iOS+Watch,Briefing card integrity,PENDING — not paired-tested,Docs/QA_EVIDENCE/WATCH_IOS_SYNC/,Yes,No,Yes,No,Yes,No,CONS-011 overlap; referenceOnly enforced
-EXT-001,External Bühlmann decompression validation,Watch+iOS,App Store algorithm claims,PENDING — 0% executed,MASTER_EXTERNAL_VALIDATION_GAPS_CURRENT.md,No,Yes,Yes,No,Yes,Yes,WFC-P1-001; CONS-009
-EXT-002,Subsurface CSV desktop round-trip,iOS,Interoperability claims,PENDING — not executed,Docs/QA_EVIDENCE/SUBSURFACE_EXTERNAL/,No,Yes,No,No,Yes,Yes,CONS-030
-EXT-003,CCR reference external validation,iOS,CCR reference-only positioning,PENDING — reference only,CCR_REBREATHER_VALIDATION_EVIDENCE,No,Yes,No,No,No,Yes,CONS-033; no controller claim
-EXT-004,GF preset external spot-check,Watch,GF release narrative,PENDING — not executed,MASTER_GF_PRESET_RELEASE_EVIDENCE_MATRIX_CURRENT.csv,No,Yes,No,No,Yes,Yes,CONS-043; software presets PASS
-EXT-005,Altitude multilevel oracle at elevation,Watch,High-altitude FC confidence,PARTIAL — software gap,MASTER_WATCH_FULL_COMPUTER_ALTITUDE_MATRIX_CURRENT.csv,Yes,Yes,Yes,No,Yes,Yes,CONS-015; WFC-P2-003
-LEG-001,Legal marketing counsel sign-off,All,App Store metadata,PENDING — counsel not signed,MASTER_APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md,No,Yes,No,No,Yes,Yes,CONS-044
-LEG-002,P0 legacy documentation false claims,All,Documentation truthfulness,OPEN — 2 docs,MASTER_DOCUMENTATION_TRUTHFULNESS_MATRIX_CURRENT.csv,No,No,No,No,Yes,Yes,CONS-053; Mission Mode + CCR doc
+QA-001,physical Apple Watch install and paired runtime,Watch+iPhone,device deployment confidence,PENDING,MASTER_PHYSICAL_DEVICE_QA_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,Required baseline physical gate
+QA-002,depth sensor entitlement and capability validation,Watch,depth capability claims,PENDING,MASTER_PLATFORM_ENTITLEMENT_CAPABILITY_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,Must match entitlement posture
+QA-003,wet depth sensor validation,Watch,field depth behavior claims,PENDING,MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,No simulator substitution allowed
+QA-004,CMAltimeter physical validation,Watch,altitude and pressure confidence,PENDING,MASTER_WATCH_FULL_COMPUTER_ALTITUDE_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,Needed for physical claims
+QA-005,paired Watch iPhone sync campaign,Watch+iOS,sync trust and evidence,PENDING,MASTER_PHYSICAL_DEVICE_QA_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,Supports CF-003
+QA-006,physical iPhone performance profiling,iOS,performance release confidence,PENDING,MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md,Yes,No,No,No,Yes,No,Manual instrumentation required
+QA-007,Instruments profiling campaign,Watch+iOS,performance and thermal evidence,PENDING,MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md,Yes,No,Yes,No,Yes,No,Attach trace artifacts
+QA-008,controlled multilevel dive validation,Watch,FC behavior in controlled profiles,PENDING,MASTER_WATCH_FULL_COMPUTER_MULTILEVEL_DECO_TRANSITION_MATRIX_CURRENT.csv,Yes,No,Yes,No,Yes,Yes,Safety-sensitive physical gate
+QA-009,external Buhlmann validation,Watch+iOS,algorithm external claims,PENDING,MASTER_EXTERNAL_VALIDATION_GAPS_CURRENT.md,No,Yes,Yes,No,Yes,Yes,Supports CF-001
+QA-010,external Schreiner validation,Watch+iOS,algorithm external claims,PENDING,MASTER_EXTERNAL_VALIDATION_GAPS_CURRENT.md,No,Yes,Yes,No,Yes,Yes,Companion external gate
+QA-011,Subsurface comparison campaign,iOS,interop and claim consistency,PENDING,MASTER_EXTERNAL_VALIDATION_GAPS_CURRENT.md,No,Yes,No,No,Yes,Yes,External interop evidence needed
+QA-012,CCR external validation if claimed,iOS,CCR wording compliance,PENDING,MASTER_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv,No,Yes,No,No,Yes,Yes,Aligned with CF-009
+QA-013,App Store legal review,All,store readiness,PENDING,MASTER_APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md,No,Yes,No,Yes,Yes,Yes,Supports CF-011
+QA-014,privacy review and disclosure audit,All,privacy claim readiness,PENDING,MASTER_PRIVACY_MANIFEST_DISCLOSURE_MATRIX_CURRENT.csv,No,Yes,No,Yes,Yes,Yes,Required compliance lane
+QA-015,accessibility manual QA,Watch+iOS,public quality claims,PENDING,MASTER_UI_UX_EXTERNAL_PHYSICAL_QA_PENDING_CURRENT.md,Yes,No,No,No,Yes,Yes,Manual evidence required
+QA-016,localization manual QA,Watch+iOS,copy and parity confidence,PENDING,MASTER_UI_UX_GAP_REMEDIATION_PLAN_CURRENT.md,Yes,No,No,Yes,Yes,Yes,Must close after CF-002

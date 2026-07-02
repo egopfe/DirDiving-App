@@ -1,56 +1,32 @@
 # Cursor / Codex Remediation Command Sequence — CURRENT
 
-**Baseline:** `main` @ `2c30412`  
-**Orchestrator:** V1.5 — planning only; **does not launch Command 10/11**
+**Baseline:** `main` @ `7ae527b`  
+**Orchestrator scope:** V1.7 planning only; do not execute 07/10/11/12 from orchestrator 00
 
 ---
 
 ## Recommended sequence
 
-| Command | Name | Purpose | Input findings | Allowed files | Forbidden | Audits to rerun |
-|---------|------|---------|----------------|---------------|-----------|-----------------|
-| **R01** | Baseline and test-gate hardening | Lock clean main; verify gates G-001..G-009 | Batch-0 | Scripts/; CI configs | Production algorithms | 05 |
-| **R09** | UI/UX truthfulness + WAO test alignment | Close CONS-050 WFC-P2-005; CONS-051; a11y contracts | CONS-050; CONS-051; CONS-012 | Tests/WatchAlgorithmTests/*WAO*; Utils/WatchLaunchRoutingPolicy.swift; Docs WAO policy | BühlmannCore; FC engine timing | 01;03;04;05 |
-| **R10** | QA evidence + physical-test scaffolding | Execute physical/external matrices; no false closure | CONS-009; CONS-010; CONS-021; CONS-022; CONS-042; CONS-048; APNEA-PHY-001 | Docs/QA_EVIDENCE/**; templates only until field run | Production code unless blocker | 01;02;03;05 |
-| **R11** | Release / legal / App Store wording | CONS-044; CONS-013; demote false claims | CONS-053; CONS-044; CONS-013 | Legal docs; TestFlight notes; marketing copy | Algorithm changes | 05;06 |
-| **R12** | Documentation + feature-matrix alignment | CONS-054 INDEX/README; feature matrix rows | CONS-053; CONS-054 | Docs/INDEX.md; README.md; DIR_DIVING_Feature_Comparison.csv | Production code | 06 |
-| **R02** | Watch FC P0/P1 remediation | Only if audit 01 finds new FC defects | None open @ 2c30412 | Watch FC paths per finding | Convenience refactors | 01;03;04;05 |
-| **R03** | Watch FC oracle regression | Altitude oracle extension CONS-015 | CONS-015; WFC-P2-003 | Tests/WatchAlgorithmTests; BuhlmannCore tests | Constants without reference | 01;05 |
-| **R05** | Activity Settings / Logbook isolation | CONS-028; CONS-040; Apnea cloud decision | P3 settings findings | iOSApp/Services/*Settings*; iOSApp/Views | Cross-activity stores | 02;03;04;06 |
+| Command_Number | Command_Name | Purpose | Input findings | Allowed files | Forbidden files | Required safeguards | Implementation scope | Tests to add/update | Validation commands | Audits to rerun | Acceptance criteria | Rollback strategy |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| R01 | Baseline and command integrity hardening | Stabilize command-chain lifecycle and continuation rules | CF-006, CF-012 | `Scripts/`, `Docs/MASTER_ORCHESTRATOR_*`, command inventory docs | production runtime code | keep orchestrator boundaries explicit | docs/process only | command integrity checks | `./Scripts/validate_commands_for_cursor_integrity.sh` | 04,06 | command map complete and reproducible | revert docs-only patch |
+| R09 | Snorkeling localization parity remediation | Close failing localization key parity tests | CF-002 | localization files, related tests, truthfulness docs | FC math core, decompression engine | keep no cross-activity contamination | focused software fixes | Watch+iOS localization parity tests | localization audit + algorithm tests | 01,02,03,04 | 0 parity test failures | revert localization/test edits |
+| R12 | Docs truthfulness and claims repair | Close stale baseline and unsupported claim docs | CF-008, CF-009, CF-014 | `Docs/INDEX.md`, claims docs, alignment docs | production code and tests | claims must map to evidence | docs-only | docs truthfulness matrix checks | release claims/doc checks | 05,06 | no unsupported claims, baseline aligned | revert docs-only edits |
+| R11 | Release rollback and readiness evidence repair | Resolve rollback fail and release evidence blockers | CF-007, CF-011 | release/legal evidence docs and matrices | algorithm/runtime code | preserve truthful partial status until closed | release docs/process | rollback rehearsal evidence | release gate checks | 05,06 | SUPPORT_ROLLBACK PASS + evidence | revert release docs |
+| R10 | Physical/manual QA evidence campaigns | Close physical/manual pending gates | CF-003, CF-004, CF-010, CF-013 | `Docs/QA_EVIDENCE/**`, QA matrices | production code unless separately approved | no simulator-to-physical overclaims | evidence execution | QA procedures and completion logs | QA matrix validations | 01,02,03,05 | signed artifacts for pending gates | retain pending status if incomplete |
+| R13 | External validation closure | Complete third-party Buhlmann and legal external closure | CF-001, CF-011 | external validation and legal evidence docs | runtime code and test rewrites | independent evidence required | external evidence only | external comparison protocol updates | external evidence verification | 01,02,05,06 | external validation marked complete | revert claims status if evidence rejected |
 
 ---
 
-## Next command (orchestrator recommendation)
+## Orchestrator boundary note
 
-**Do not launch Command 10/11 automatically.**
-
-**Recommended next:** **R09 — WAO routing test alignment (CONS-050 / WFC-P2-005)**
-
-### R09 scope outline
-
-- **Purpose:** Align `WatchWaterAutoOpenPolicyTests` and `WatchLaunchRoutingPolicyTests` with intentional post-Apnea `divingModeSelection` routing **or** document and adjust policy if regression confirmed.
-- **Input findings:** CONS-050; WFC-P2-005; MAIN-P2-003; MUIUX-P2-005; MAIN-APNEA-002; CONS-051 (Snorkeling progress test).
-- **Allowed files:** `Tests/WatchAlgorithmTests/WatchWaterAutoOpenPolicyTests.swift`; `WatchLaunchRoutingPolicyTests.swift`; `Utils/DIRStartupSelectionPolicy.swift`; `Utils/WatchWaterAutoOpenPolicy.swift`; `Docs/WATCH_WATER_AUTO_OPEN_POLICY.md`.
-- **Forbidden:** `Shared/BuhlmannCore/*`; `FullComputerRuntimeEngine`; sync schemas; Apnea store isolation logic without audit rerun.
-- **Required safeguards:** Preserve DepthCapabilityPolicy gate (CONS-019); Apnea architecture isolation tests must remain PASS.
-- **Validation:** G-009 Watch Algorithm Tests 1152/1152; G-028 WAO tests; G-010 FC oracle suites unchanged PASS.
-- **Audits to rerun:** 01; 03; 04; 05.
-- **Acceptance:** 1152/1152 Watch tests green; 0 FC test regressions; WAO policy documented.
-- **Rollback:** Revert test-only changes; restore 1139/1152 baseline if policy change rejected.
-
----
-
-## Deferred until after R09 + physical scaffolding
-
-- **R10** physical QA campaigns (CONS-048 12 Snorkeling folders; CONS-010 wet FC).
-- **R11** legal review (CONS-044) — after CONS-053 P0 doc repair.
-- **R12** INDEX/README refresh @ `2c30412` — after technical truth stable.
-
----
-
-## Explicitly excluded from orchestrator 00
+The orchestrator `00` must not run:
 
 ```text
-07 — Post-remediation verification (after remediation complete)
-10/11 — Consolidated software remediation (already executed @ 7a429a7/6a0005b; do not re-launch from 00)
+07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.7.md
+10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md
+11-MASTER_2026_06_30_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_COMMAND_V1.0.md
+12-MASTER_SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_IMPLEMENTATION_COMMAND_V1.0.md
 ```
+
+Missing command 07 is recorded as manual continuation requirement, not as an execution target for orchestrator 00.
