@@ -1617,6 +1617,8 @@
 "snorkeling.watch.route_summary.return_alert_off" = "Avviso ritorno: non configurato";
 "snorkeling.watch.route_summary.off_route_configured" = "Soglia fuori rotta: %@ m";
 "snorkeling.watch.route_summary.off_route_default" = "Soglia fuori rotta: %@ m (predefinita)";
+"snorkeling.watch.micro_map" = "Anteprima rotta";
+"snorkeling.watch.micro_map.unavailable" = "Anteprima rotta non disponibile";
 "snorkeling.watch.ready.precheck" = "Pre-controllo";
 "snorkeling.watch.ready.precheck_gps" = "GPS";
 "snorkeling.watch.ready.precheck_depth" = "Profondità";

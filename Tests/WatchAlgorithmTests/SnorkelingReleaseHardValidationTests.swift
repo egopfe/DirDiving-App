@@ -169,7 +169,9 @@ final class SnorkelingReleaseHardValidationTests: XCTestCase {
             offRouteDistanceMeters: nil,
             isOffRoute: false,
             offRouteWarningPaused: false,
-            plannedReturnAlertActive: false, importedRoutePresentation: .missing
+            plannedReturnAlertActive: false,
+            importedRoutePresentation: .missing,
+            microMapPresentation: .unavailable
         )
     }
 

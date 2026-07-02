@@ -638,6 +638,8 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
             .compactMap(\.temperatureCelsius)
             .min()
 
+        let microMap = buildMicroMapPresentation(snapshot: snapshot)
+
         return SnorkelingWatchPresentationInput(
             phase: snapshot.phase,
             isSessionArmed: sessionArmed,
@@ -686,7 +688,47 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
             isOffRoute: snapshot.isOffRoute,
             offRouteWarningPaused: snapshot.offRouteWarningPaused,
             plannedReturnAlertActive: snapshot.plannedReturnAlertActive,
-            importedRoutePresentation: SnorkelingImportedRouteStore.shared.readyPresentation
+            importedRoutePresentation: SnorkelingImportedRouteStore.shared.readyPresentation,
+            microMapPresentation: microMap
+        )
+    }
+
+    private func buildMicroMapPresentation(snapshot: SnorkelingSessionEngineSnapshot) -> SnorkelingWatchMicroMapPresentation {
+        let routePlan = snapshot.session.activeRoutePlanID.flatMap { id in
+            snapshot.session.routePlans.first(where: { $0.id == id })
+        } ?? snapshot.session.routePlans.first
+        let nextWaypoint = snapshot.waypointNavigation.waypointID.flatMap { id in
+            routePlan?.waypoints.first(where: { $0.id == id })
+        }
+        let headingQuality: SnorkelingHeadingQuality = {
+            switch snapshot.phase {
+            case .navigation:
+                return snapshot.waypointNavigation.headingQuality
+            case .returnMode:
+                return snapshot.returnNavigation.headingQuality
+            default:
+                return .unavailable
+            }
+        }()
+        let heading: Double? = {
+            switch snapshot.phase {
+            case .navigation:
+                return snapshot.waypointNavigation.currentHeadingDegrees
+            case .returnMode:
+                return snapshot.returnNavigation.currentHeadingDegrees
+            default:
+                return nil
+            }
+        }()
+        return SnorkelingWatchMicroMapPresentationPolicy.make(
+            routeCoordinates: engine.presentationRouteCoordinates(),
+            current: engine.currentAcceptedSurfaceCoordinate(),
+            entry: snapshot.returnNavigation.entryPoint,
+            nextWaypoint: nextWaypoint,
+            headingDegrees: heading,
+            headingQuality: headingQuality,
+            gpsPresentationState: snapshot.gpsPresentationState,
+            isUnderwater: snapshot.isUnderwaterForPresentation
         )
     }
 
@@ -770,6 +812,7 @@ extension SnorkelingWatchPresentationInput {
         isOffRoute: false,
         offRouteWarningPaused: false,
         plannedReturnAlertActive: false,
-        importedRoutePresentation: .missing
+        importedRoutePresentation: .missing,
+        microMapPresentation: .unavailable
     )
 }
