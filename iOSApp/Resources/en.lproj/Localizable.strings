@@ -378,6 +378,8 @@
 /* Production readiness — planner safety */
 "planner.safety_ack.label" = "I understand the planner output is indicative only (not certified).";
 "planner.safety_ack.hint" = "Required before calculating a plan.";
+"planner.ccr.safety_ack.label" = "I understand that the CCR planner output is indicative only and not certified.";
+"planner.ccr.safety_ack.hint" = "Required to use CCR planner mode. It does not enable real-dive use, certification, or operational calculations.";
 "Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati." = "Indicative planner: always verify plan, gas and procedures with training, team and certified tools.";
 
 /* Production readiness — More / sync */
