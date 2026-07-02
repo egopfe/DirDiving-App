@@ -75,7 +75,8 @@ final class SnorkelingWatchBatteryPresentationTests: XCTestCase {
             isOffRoute: false,
             offRouteWarningPaused: false,
             plannedReturnAlertActive: false,
-            importedRoutePresentation: .missing
+            importedRoutePresentation: .missing,
+            microMapPresentation: .unavailable
         )
     }
 }

@@ -31,6 +31,15 @@ struct IOSSnorkelingSessionDetailView: View {
     private var detailPresentation: SnorkelingLogbookDetailPresentation {
         SnorkelingLogbookDetailPresentationPolicy.make(session: session)
     }
+    private var plannedVsActualPresentation: SnorkelingPlannedVsActualPresentation {
+        SnorkelingPlannedVsActualAnalyticsPolicy.make(session: session)
+    }
+    private var waypointReport: SnorkelingWaypointReachedReport {
+        SnorkelingWaypointReachedReportPolicy.make(session: session)
+    }
+    private var trackQualityAnalytics: SnorkelingTrackQualityAnalytics {
+        SnorkelingTrackQualityAnalyticsPolicy.make(session: session)
+    }
 
     var body: some View {
         DIRScreenContainer {
@@ -44,6 +53,9 @@ struct IOSSnorkelingSessionDetailView: View {
                     dipsSection
                     photosSection
                     markersSection
+                    plannedVsActualSection
+                    waypointReachedSection
+                    trackQualityAnalyticsSection
                     trackQualitySection
                     gpsTrackSection
                     runtimeSummarySection
@@ -296,7 +308,14 @@ struct IOSSnorkelingSessionDetailView: View {
 
     private var markersSection: some View {
         let categoryCounts = SnorkelingMarkerLogbookPresentationPolicy.categoryCounts(markers: session.markers)
-        let markerRows = SnorkelingMarkerLogbookPresentationPolicy.makeRows(markers: session.markers)
+        let photoMap = SnorkelingMarkerLogbookPresentationPolicy.photoAttachmentIDs(
+            for: session.id,
+            attachments: photoStore.attachments(for: session.id)
+        )
+        let markerRows = SnorkelingMarkerLogbookPresentationPolicy.makeRows(
+            markers: session.markers,
+            photoAttachmentIDsByMarkerID: photoMap
+        )
 
         return DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.markers.title"), icon: "mappin.and.ellipse", accent: DIRTheme.cyan) {
             if session.markers.isEmpty {
@@ -324,7 +343,21 @@ struct IOSSnorkelingSessionDetailView: View {
 
                 ForEach(markerRows) { row in
                     VStack(alignment: .leading, spacing: 4) {
-                        HStack(alignment: .top) {
+                        HStack(alignment: .top, spacing: 10) {
+                            if row.hasPhoto, let attachmentID = row.photoAttachmentID,
+                               let attachment = photoStore.attachments(for: session.id).first(where: { $0.id == attachmentID }),
+                               let image = photoStore.thumbnailImage(for: attachment) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 44, height: 44)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                    .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.marker.photo"))
+                            } else if row.hasPhoto {
+                                Image(systemName: "photo")
+                                    .foregroundStyle(DIRTheme.muted)
+                                    .frame(width: 44, height: 44)
+                            }
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(row.categoryLabel)
                                     .foregroundStyle(.white)
@@ -364,6 +397,95 @@ struct IOSSnorkelingSessionDetailView: View {
         case .photoSpot: return DIRIOSLocalizer.string("snorkeling.ios.marker.photo_spot")
         case .buoy: return DIRIOSLocalizer.string("snorkeling.ios.marker.buoy")
         case .custom: return DIRIOSLocalizer.string("snorkeling.ios.marker.custom")
+        }
+    }
+
+    @ViewBuilder
+    private var plannedVsActualSection: some View {
+        let presentation = plannedVsActualPresentation
+        DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.planned_vs_actual"), icon: "arrow.left.arrow.right", accent: DIRTheme.cyan) {
+            Text(DIRIOSLocalizer.string(presentation.comparisonSummaryKey))
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+            if let name = presentation.plannedRouteName {
+                detailRow(DIRIOSLocalizer.string("snorkeling.watch.ready.route_name"), name)
+            }
+            if let planned = presentation.plannedDistanceMeters {
+                detailRow(
+                    DIRIOSLocalizer.string("snorkeling.logbook.planned_distance"),
+                    String(format: "%.0f m", planned)
+                )
+            }
+            detailRow(
+                DIRIOSLocalizer.string("snorkeling.logbook.actual_distance"),
+                String(format: "%.0f m", presentation.actualDistanceMeters)
+            )
+            if let progress = presentation.routeProgressPercent {
+                detailRow(
+                    DIRIOSLocalizer.string("snorkeling.logbook.route_progress"),
+                    String(format: "%.0f%%", progress)
+                )
+            }
+            if let maxOff = presentation.maxOffRouteMeters {
+                detailRow(
+                    DIRIOSLocalizer.string("snorkeling.logbook.max_off_route"),
+                    String(format: "%.0f m", maxOff)
+                )
+            }
+            detailRow(
+                DIRIOSLocalizer.string("snorkeling.logbook.return_alert"),
+                presentation.returnAlertTriggered ? "✓" : "—"
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var waypointReachedSection: some View {
+        let report = waypointReport
+        if report.hasPlannedRoute {
+            DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.waypoints_reached"), icon: "flag.checkered", accent: DIRTheme.cyan) {
+                detailRow(DIRIOSLocalizer.string("snorkeling.logbook.waypoints_reached"), "\(report.reachedCount)")
+                if report.missedCount > 0 {
+                    detailRow(DIRIOSLocalizer.string("snorkeling.logbook.waypoints_missed"), "\(report.missedCount)")
+                }
+                if report.reachedWaypointNames.isEmpty {
+                    Text(DIRIOSLocalizer.string("snorkeling.ios.session.no_markers"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                } else {
+                    ForEach(report.reachedWaypointNames, id: \.self) { name in
+                        Text(name)
+                            .font(.caption)
+                            .foregroundStyle(.white)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var trackQualityAnalyticsSection: some View {
+        let analytics = trackQualityAnalytics
+        DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.track_quality_analysis"), icon: "waveform.path", accent: DIRTheme.cyan) {
+            detailRow(
+                DIRIOSLocalizer.string("snorkeling.logbook.track_quality"),
+                DIRIOSLocalizer.string(analytics.qualityKey)
+            )
+            detailRow(DIRIOSLocalizer.string("gps.track_points"), "\(analytics.totalPoints)")
+            detailRow(DIRIOSLocalizer.string("gps.measured_points"), "\(analytics.measuredPoints)")
+            detailRow(DIRIOSLocalizer.string("gps.stale_points"), "\(analytics.stalePoints)")
+            detailRow(DIRIOSLocalizer.string("gps.unavailable_points"), "\(analytics.unavailablePoints)")
+            detailRow(DIRIOSLocalizer.string("snorkeling.logbook.gps_gap"), "\(analytics.gpsGaps)")
+            if let longestGap = analytics.longestGapSeconds {
+                detailRow(
+                    DIRIOSLocalizer.string("snorkeling.logbook.gps_gap_longest"),
+                    Formatters.time(longestGap)
+                )
+            }
+            detailRow(
+                DIRIOSLocalizer.string("snorkeling.logbook.measured_percentage"),
+                String(format: "%.0f%%", analytics.measuredPercentage)
+            )
         }
     }
 
@@ -683,6 +805,14 @@ struct IOSSnorkelingSessionMapView: View {
             if model.isAvailable {
                 ZStack(alignment: .topTrailing) {
                     Map(initialPosition: mapPosition) {
+                    if model.plannedRouteCoordinates.count >= 2 {
+                        MapPolyline(
+                            coordinates: model.plannedRouteCoordinates.map {
+                                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                            }
+                        )
+                        .stroke(DIRTheme.muted.opacity(0.8), style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+                    }
                     ForEach(model.segments) { segment in
                         MapPolyline(
                             coordinates: segment.coordinates.map {

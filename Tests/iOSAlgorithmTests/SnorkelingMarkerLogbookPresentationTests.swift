@@ -23,4 +23,16 @@ final class SnorkelingMarkerLogbookPresentationTests: XCTestCase {
         XCTAssertNotNil(row.distanceFromEntryText)
         XCTAssertTrue(row.distanceFromEntryText?.contains("88") == true)
     }
+
+    func testRowIncludesPhotoReferenceWhenPresent() {
+        let photoID = UUID()
+        let marker = SnorkelingMarker(
+            category: .photoSpot,
+            monotonicRelativeTimestampSeconds: 10,
+            photoReferenceID: photoID
+        )
+        let row = SnorkelingMarkerLogbookPresentationPolicy.makeRow(marker: marker)
+        XCTAssertTrue(row.hasPhoto)
+        XCTAssertEqual(row.photoAttachmentID, photoID)
+    }
 }

@@ -1617,6 +1617,8 @@
 "snorkeling.watch.route_summary.return_alert_off" = "Return alert: not configured";
 "snorkeling.watch.route_summary.off_route_configured" = "Off-route threshold: %@ m";
 "snorkeling.watch.route_summary.off_route_default" = "Off-route threshold: %@ m (default)";
+"snorkeling.watch.micro_map" = "Route preview";
+"snorkeling.watch.micro_map.unavailable" = "Route preview unavailable";
 "snorkeling.watch.ready.precheck" = "Pre-check";
 "snorkeling.watch.ready.precheck_gps" = "GPS";
 "snorkeling.watch.ready.precheck_depth" = "Depth";
