@@ -17,6 +17,7 @@ struct LogbookView: View {
     @State private var showManualDiveEditor = false
     @State private var showImportCenter = false
     @State private var pendingDeleteID: UUID?
+    @State private var unifiedLogbookSelection: IOSUnifiedLogbookSelection?
 
     private var showsUnifiedLogbook: Bool {
         logbookVisibility.showAllActivitiesInDivingLogbook
@@ -73,7 +74,10 @@ struct LogbookView: View {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         header
                         if showsUnifiedLogbook {
-                            IOSUnifiedLogbookListView(hostActivity: .diving)
+                            IOSUnifiedLogbookListView(
+                                hostActivity: .diving,
+                                selection: $unifiedLogbookSelection
+                            )
                         } else {
                         if hasMixedDemoAndRealDives {
                             mixedDemoBanner
@@ -128,6 +132,7 @@ struct LogbookView: View {
                 .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
+            .iosUnifiedLogbookNavigationDestination(selection: $unifiedLogbookSelection)
             .navigationDestination(isPresented: $showManualDiveEditor) {
                 ManualDiveEditorView()
             }

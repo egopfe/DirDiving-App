@@ -2810,6 +2810,23 @@
 "snorkeling.logbook.time_off_route" = "Tempo fuori rotta";
 "snorkeling.logbook.return_alert" = "Alert ritorno attivato";
 "snorkeling.logbook.runtime_summary" = "Riepilogo runtime";
+"snorkeling.route_sync.status.title" = "Stato sincronizzazione rotta";
+"snorkeling.route_sync.sent" = "Ultimo invio";
+"snorkeling.route_sync.received" = "ACK Watch";
+"snorkeling.route_sync.activated" = "Attivata su Watch";
+"snorkeling.route_sync.pending" = "In attesa";
+"snorkeling.route_sync.rejected" = "Rifiutata";
+"snorkeling.route_sync.revision" = "Revisione";
+"snorkeling.logbook.track_quality" = "Qualità traccia";
+"snorkeling.logbook.track_quality.good" = "Buona";
+"snorkeling.logbook.track_quality.degraded" = "Degradata";
+"snorkeling.logbook.track_quality.sparse" = "Rada";
+"snorkeling.logbook.track_quality.unavailable" = "Non disponibile";
+"snorkeling.logbook.route_progress" = "Avanzamento rotta";
+"snorkeling.logbook.marker_count" = "Numero marker";
+"snorkeling.sync.status.pending" = "Sincronizzazione sessione in attesa";
+"snorkeling.sync.status.delivered" = "Sessione consegnata";
+"snorkeling.sync.status.failed" = "Sincronizzazione sessione non riuscita";
 
 /* Apnea P1/P2/P3 */
 "apnea.profile.static" = "Apnea statica";

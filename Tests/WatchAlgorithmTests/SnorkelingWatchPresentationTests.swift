@@ -319,7 +319,7 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
             offRouteDistanceMeters: nil,
             isOffRoute: false,
             offRouteWarningPaused: false,
-            plannedReturnAlertActive: false
+            plannedReturnAlertActive: false, importedRoutePresentation: .missing
         )
     }
 }

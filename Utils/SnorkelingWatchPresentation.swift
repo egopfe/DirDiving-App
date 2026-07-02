@@ -64,6 +64,7 @@ struct SnorkelingWatchPresentationInput: Equatable {
     var isOffRoute: Bool
     var offRouteWarningPaused: Bool
     var plannedReturnAlertActive: Bool
+    var importedRoutePresentation: SnorkelingWatchImportedRoutePresentation
 }
 
 enum SnorkelingWatchSessionSaveState: String, Equatable {
@@ -135,6 +136,14 @@ struct SnorkelingWatchPresentationOutput: Equatable {
     var offRouteText: String?
     var gpsQualityBandText: String?
     var plannedReturnAlertText: String?
+    var routeStatusText: String
+    var routeNameText: String?
+    var routeRevisionText: String?
+    var routePendingBannerText: String?
+    var routePlannedSummaryText: String?
+    var precheckSummaryText: String
+    var batteryText: String?
+    var batteryColorToken: SnorkelingWatchColorToken
 }
 
 enum SnorkelingWatchColorToken: String, Equatable {
@@ -164,6 +173,9 @@ enum SnorkelingWatchPresentation {
         let hero = heroPresentation(for: input, stage: stage)
         let overlay = resolveOverlay(input, stage: stage)
         let advisorText = returnAdvisorText(input)
+        let route = input.importedRoutePresentation
+        let battery = SnorkelingWatchReadyPresentationPolicy.batteryPresentation(fraction: input.batteryFraction)
+        let routePlannedSummary = routePlannedSummaryText(for: route)
 
         return SnorkelingWatchPresentationOutput(
             stage: stage,
@@ -238,8 +250,42 @@ enum SnorkelingWatchPresentation {
             gpsQualityBandText: input.gpsQualityBand.map { DIRWatchLocalizer.string($0.localizationKey) },
             plannedReturnAlertText: input.plannedReturnAlertActive
                 ? DIRWatchLocalizer.string("snorkeling.watch.time_to_return")
-                : nil
+                : nil,
+            routeStatusText: SnorkelingWatchReadyPresentationPolicy.routeStatusText(for: route),
+            routeNameText: route.routeName,
+            routeRevisionText: route.revision.map { "r\($0)" },
+            routePendingBannerText: SnorkelingWatchReadyPresentationPolicy.routePendingBannerText(for: route),
+            routePlannedSummaryText: routePlannedSummary,
+            precheckSummaryText: SnorkelingWatchReadyPresentationPolicy.precheckSummary(
+                gpsStatusText: gps.text,
+                gpsIsHealthy: SnorkelingWatchReadyPresentationPolicy.gpsIsHealthy(
+                    gpsState: input.gpsPresentationState,
+                    qualityBand: input.gpsQualityBand
+                ),
+                depthSensorHealthy: SnorkelingWatchReadyPresentationPolicy.depthSensorIsHealthy(
+                    depthState: input.depthPresentationState,
+                    sensorHealth: input.sensorHealth
+                ),
+                entryCaptured: input.entryPointCaptured,
+                route: route,
+                buddyEnabled: input.buddyReminderEnabled
+            ),
+            batteryText: battery.text,
+            batteryColorToken: battery.colorToken
         )
+    }
+
+    private static func routePlannedSummaryText(for route: SnorkelingWatchImportedRoutePresentation) -> String? {
+        guard route.status == .ready || route.status == .pending else { return nil }
+        var parts: [String] = []
+        if let distance = route.plannedDistanceMeters, distance.isFinite, distance > 0 {
+            parts.append("\(Formatters.zero(distance)) m")
+        }
+        if let duration = route.plannedDurationSeconds, duration.isFinite, duration > 0 {
+            parts.append(elapsedTimeText(duration))
+        }
+        guard !parts.isEmpty else { return nil }
+        return parts.joined(separator: " · ")
     }
 
     private static func overlayAccessibilityLabel(for overlay: SnorkelingWatchOverlayPresentation?) -> String? {
