@@ -465,9 +465,9 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
     private func updateBattery() {
         #if os(watchOS)
         let level = WKInterfaceDevice.current().batteryLevel
-        if level >= 0 {
-            lastBatteryFraction = Double(level)
-            engine.updateBatteryFraction(Double(level))
+        if let fraction = SnorkelingWatchBatteryFractionPolicy.fraction(fromBatteryLevel: level) {
+            lastBatteryFraction = fraction
+            engine.updateBatteryFraction(fraction)
         }
         #endif
     }

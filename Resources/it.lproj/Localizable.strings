@@ -1610,6 +1610,7 @@
 "snorkeling.watch.ready.route_missing" = "Assente";
 "snorkeling.watch.ready.route_name" = "Nome rotta";
 "snorkeling.watch.ready.route_pending_activation" = "Rotta in attesa — si attiva a fine sessione";
+"snorkeling.watch.ready.route_pending_activation.a11y" = "La rotta si attiverà su Apple Watch al termine della sessione corrente";
 "snorkeling.watch.route_summary" = "Riepilogo rotta";
 "snorkeling.watch.route_no_route" = "Nessuna rotta selezionata";
 "snorkeling.watch.route_summary.waypoints" = "%d waypoint";

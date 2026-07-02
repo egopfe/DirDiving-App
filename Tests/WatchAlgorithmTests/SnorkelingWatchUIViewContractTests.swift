@@ -1,6 +1,19 @@
 import XCTest
 
 final class SnorkelingWatchUIViewContractTests: XCTestCase {
+    func testSnorkelingViewWiresReturnPrimaryActionContract() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/SnorkelingView.swift"))
+        XCTAssertTrue(source.contains("returnIsPrimaryAction"))
+        XCTAssertTrue(source.contains("snorkeling.action.return.primary"))
+        XCTAssertTrue(source.contains("accessibilitySortPriority(ui.returnIsPrimaryAction"))
+    }
+
+    func testSnorkelingViewExposesReadyRouteSummaryContract() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/SnorkelingView.swift"))
+        XCTAssertTrue(source.contains("routeCompactSummaryText"))
+        XCTAssertTrue(source.contains("readyPanel"))
+    }
+
     func testSnorkelingViewIncludesDynamicTypeAndAccessibilityHooks() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/SnorkelingView.swift"))
         XCTAssertTrue(source.contains("dynamicTypeSize"))

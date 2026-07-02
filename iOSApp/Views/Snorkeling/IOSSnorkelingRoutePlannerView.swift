@@ -19,6 +19,7 @@ struct IOSSnorkelingRoutePlannerView: View {
     @State private var isResetMapConfirmationPresented = false
     @State private var isShareSheetPresented = false
     @State private var shareText = ""
+    @State private var dismissedStaleRevisionToken: String?
 
     private enum MapSelectionMode: String, CaseIterable, Identifiable {
         case entry, waypoint, exit
@@ -33,6 +34,7 @@ struct IOSSnorkelingRoutePlannerView: View {
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
 
+                    staleRouteRevisionBanner
                     mapSection
                     waypointList
                     profilesSection
@@ -683,6 +685,39 @@ struct IOSSnorkelingRoutePlannerView: View {
             validation: validation
         )
         isShareSheetPresented = true
+    }
+
+    private var staleRouteRevisionBanner: some View {
+        Group {
+            if transferService.lastErrorMessage == "snorkeling.ios.watch.stale_revision",
+               dismissedStaleRevisionToken != transferService.lastErrorMessage {
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(DIRTheme.orange)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(DIRIOSLocalizer.string("snorkeling.ios.watch.stale_revision"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text(DIRIOSLocalizer.string("snorkeling.route_sync.stale_revision_action"))
+                            .font(.caption)
+                            .foregroundStyle(DIRTheme.muted)
+                    }
+                    Spacer()
+                    Button {
+                        dismissedStaleRevisionToken = transferService.lastErrorMessage
+                    } label: {
+                        Image(systemName: "xmark")
+                            .foregroundStyle(DIRTheme.muted)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.route_sync.dismiss_banner"))
+                }
+                .padding(12)
+                .background(DIRTheme.orange.opacity(0.15))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .accessibilityIdentifier("snorkeling.ios.route_sync.stale_revision_banner")
+            }
+        }
     }
 
     private var transferStatusIcon: String {
