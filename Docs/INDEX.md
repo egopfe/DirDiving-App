@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-02  
-**Branch consigliato:** `main` @ `34b6925`
+**Branch consigliato:** `main` @ `b044cb8`
 
 ---
 
@@ -2811,4 +2811,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `origin/main` @ `34b6925`. Baseline orchestrator audit V1.7 2026-07-02 @ `34b6925` (scope `7ae527b`); consolidated readiness 64% PARTIAL. Baseline documentale storica: piano UI/UX readiness 100% 2026-06-05, audit full UI/UX @ `bdd3a43`.*
+*Indice per ripresa lavoro su `main` @ `origin/main` @ `b044cb8`. Baseline orchestrator audit V1.7 2026-07-02 @ `b044cb8` (scope `7ae527b`); consolidated readiness 64% PARTIAL. Baseline documentale storica: piano UI/UX readiness 100% 2026-06-05, audit full UI/UX @ `bdd3a43`.*
