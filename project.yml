@@ -459,6 +459,7 @@ targets:
       - iOSApp/Utils/Formatters.swift
       - iOSApp/Utils/PlannerInputValidator.swift
       - iOSApp/Utils/PlannerModePolicy.swift
+      - iOSApp/Utils/PlannerSafetyAcknowledgment.swift
       - iOSApp/Utils/ChecklistPlannerSyncMapper.swift
       - iOSApp/Utils/ChecklistRoleMigration.swift
       - iOSApp/Utils/ApneaCloudCapability.swift

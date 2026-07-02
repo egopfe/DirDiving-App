@@ -4,7 +4,7 @@ import Charts
 struct CCRPlannerView: View {
     @EnvironmentObject private var store: PlannerStore
     @EnvironmentObject private var equipment: EquipmentStore
-    @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
+    @AppStorage(CCRPlannerSafetyAcknowledgment.storageKey) private var ccrPlannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var showPlan = false
     @State private var pendingChecklistExportAfterCalculate = false
@@ -13,8 +13,8 @@ struct CCRPlannerView: View {
     @State private var ccrChecklistImportCandidates: [CCRChecklistImportCandidate] = []
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
-    private var plannerSafetyAcknowledged: Bool {
-        plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
+    private var ccrPlannerSafetyAcknowledged: Bool {
+        ccrPlannerSafetyAckRevision == CCRPlannerSafetyAcknowledgment.currentRevision
     }
 
     var body: some View {
@@ -24,25 +24,27 @@ struct CCRPlannerView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: 16) {
                             header
-                            plannerSafetySection
+                            ccrPlannerSafetyAcknowledgment
                             DIRWarningBox(text: DIRIOSLocalizer.string("ccr.safety.disclaimer"))
-                            profileCard
-                            if PlannerResultPresentation.presentation(for: .ccr).showsCNSDescentBottomSettings {
-                                PlannerCNSDescentBottomSettingsCard()
-                                    .id(PlannerCNSDescentBottomCheckSettings.scrollTargetID)
+                            Group {
+                                profileCard
+                                if PlannerResultPresentation.presentation(for: .ccr).showsCNSDescentBottomSettings {
+                                    PlannerCNSDescentBottomSettingsCard()
+                                        .id(PlannerCNSDescentBottomCheckSettings.scrollTargetID)
+                                }
+                                setpointCard
+                                diluentCard
+                                bailoutCard
+                                gfCard
+                                warningsCard
+                                calculateButton
                             }
-                            setpointCard
-                            diluentCard
-                            bailoutCard
-                            gfCard
-                            warningsCard
-                            calculateButton
+                            .disabled(!ccrPlannerSafetyAcknowledged)
+                            .opacity(ccrPlannerSafetyAcknowledged ? 1 : 0.45)
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 10)
                         .padding(.bottom, 18)
-                        .disabled(!plannerSafetyAcknowledged)
-                        .opacity(plannerSafetyAcknowledged ? 1 : 0.45)
                     }
                     .dirCompanionScrollSurface()
                     .onChange(of: store.scrollToCNSThresholdSettings) { _, shouldScroll in
@@ -118,20 +120,29 @@ struct CCRPlannerView: View {
         showChecklistImportSheet = false
     }
 
+    private var ccrPlannerSafetyAcknowledgment: some View {
+        Toggle(
+            isOn: Binding(
+                get: { ccrPlannerSafetyAcknowledged },
+                set: { ccrPlannerSafetyAckRevision = $0 ? CCRPlannerSafetyAcknowledgment.currentRevision : "" }
+            )
+        ) {
+            Text(DIRIOSLocalizer.string("planner.ccr.safety_ack.label"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .tint(DIRTheme.cyan)
+        .padding(.vertical, 4)
+        .accessibilityHint(DIRIOSLocalizer.string("planner.ccr.safety_ack.hint"))
+    }
+
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
             Text(DIRIOSLocalizer.string("planner.mode.ccr"))
                 .dirScreenTitleStyle()
             Text(DIRIOSLocalizer.string("ccr.planner.subtitle"))
                 .dirScreenSubtitleStyle()
-        }
-    }
-
-    private var plannerSafetySection: some View {
-        Group {
-            if !plannerSafetyAcknowledged {
-                DIRWarningBox(text: DIRIOSLocalizer.string("planner.safety_ack.label"))
-            }
         }
     }
 
