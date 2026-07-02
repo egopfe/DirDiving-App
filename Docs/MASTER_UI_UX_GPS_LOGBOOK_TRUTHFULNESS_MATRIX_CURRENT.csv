@@ -1,0 +1,7 @@
+Requirement_ID,Activity,Claim,Expected_Truthful_Position,Observed_Position,Status,Evidence,Pending_Gate,Notes
+GPS-UX-001,Diving,Entry/exit GPS metadata,Surface metadata only and no underwater authority,No contradictory authority claim found,PASS,Docs/MASTER_IOS_GPS_LOGBOOK_PRESENTATION_MATRIX_CURRENT.csv,PENDING_PHYSICAL,Physical field validation pending
+GPS-UX-002,Apnea,Start/end GPS metadata,Surface-only metadata and no runtime navigation guarantee,No runtime navigation authority claim found,PASS,Docs/MASTER_IOS_GPS_LOGBOOK_PRESENTATION_MATRIX_CURRENT.csv,PENDING_PHYSICAL,No recovery guarantee claim
+GPS-UX-003,Snorkeling,GPS track and return metadata,Snorkeling-owned track metadata without decompression authority,Snorkeling ownership policy remains documented,PASS,Docs/MASTER_V1_7_SNORKELING_NO_REGRESSION_MATRIX_CURRENT.csv,PENDING_PHYSICAL,Open-water QA pending
+GPS-UX-004,Unified logbook,Aggregated GPS display,Presentation-only aggregate must not become navigation authority,No authority promotion found in audited files,PASS,iOSApp/Utils/IOSUnifiedLogbookPresentationBuilder.swift,PENDING_MANUAL_QA,Manual UI walkthrough pending
+GPS-UX-005,Privacy,Location policy wording,When In Use policy unless changed by evidence,No Always Location promotion found,PASS,Docs/MASTER_V1_7_SNORKELING_NO_REGRESSION_MATRIX_CURRENT.csv,PENDING_PHYSICAL,Policy remains evidence-bound
+

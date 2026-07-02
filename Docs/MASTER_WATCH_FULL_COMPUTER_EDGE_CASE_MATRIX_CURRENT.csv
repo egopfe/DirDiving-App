@@ -1,23 +1,11 @@
 ID,Activity,Mode,Feature,Input,Initial_State,Expected_Result,Actual_Result,Absolute_Error,Relative_Error,Pass,Severity,Evidence,Notes
-EC-001,Diving,Full Computer,Zero depth,depth=0,surface valid,NDL shown finite,NDL shown,PENDING,PENDING,PASS,P4,FullComputerRuntimeEngineTests,
-EC-002,Diving,Full Computer,Negative depth,depth=-1,active dive,Rejected non_finite/negative,Rejected,PENDING,PENDING,PASS,P4,ingestSample guard,
-EC-003,Diving,Full Computer,High depth,depth=60m,valid plan,Tissues load finite,Finite tissues,PENDING,PENDING,PASS,P3,Static review max depth policy,
-EC-004,Diving,Full Computer,Irregular timing,dt=2.7s,constant depth,degraded missed_tick,tissues integrated,PENDING,PENDING,PASS,P3,FullComputerTimingFaultTests,
-EC-005,Diving,Full Computer,Long dive,4h bottom,valid,Schedule capped maxScheduleMinutes,Capped,PENDING,PENDING,PASS,P3,BuhlmannConstants.maxScheduleMinutes,
-EC-006,Diving,Full Computer,Multilevel deco,39→10m,air GF30/70,Schedule evolves; no timer clear,Oracle PASS,PENDING,PENDING,PASS,P4,Audit15Air39MultilevelProfileTests,
-EC-007,Diving,Full Computer,Gas switch,EAN50@21m,deco incurred,Tissue continuous,Oracle PASS,PENDING,PENDING,PASS,P4,ML-02,
-EC-008,Diving,Full Computer,Deco clear at 10m,extended shallow,supersaturated,Clear only if model permits,Model-dependent,PENDING,PENDING,PASS,P4,Central forensic Q answered,
-EC-009,Diving,Full Computer,Re-descent after clear,surface interval partial,loaded tissues,Deco may reappear,Oracle PASS,PENDING,PENDING,PASS,P4,Audit15RedescentOracleTests,
-EC-010,Diving,Full Computer,Stop band 0.5m above,stop engaged,timer paused,timer paused,N/A,PENDING,PENDING,PASS,P4,FullComputerDecoStopStateMachineTests,
-EC-011,Diving,Full Computer,Stop band 1m below,stop engaged,stop reset/required,FSM requires again,N/A,PENDING,PENDING,PASS,P4,FullComputerDecoStopStateMachineTests,
-EC-012,Diving,Full Computer,Altitude 1000m,imported env,valid record,Surface pressure reduced,Orchestrated PASS,PENDING,PENDING,PASS,P3,OrchestratedAltitudeEnvironmentTests,
-EC-013,Diving,Full Computer,Freshwater salinity,manual env,freshwater,density consistent,Validated,PENDING,PENDING,PASS,P4,FullComputerEnvironmentRecord,
-EC-014,Diving,Full Computer,Restore mid-deco,checkpoint valid,32 tissues restored,No fresh tissues,PASS,PENDING,PENDING,PASS,P3,FullComputerRecoveryCheckpointTests,
-EC-015,Diving,Full Computer,Malformed sync,invalid HMAC,reject import,Fail closed,PASS,PENDING,PENDING,PASS,P3,DivePlanPackageCodecTests,
-EC-016,Diving,Full Computer,Stale sensor proposal,age>max,reject start,Fail closed,PASS,PENDING,PENDING,PASS,P3,FullComputerAltitudeSamplingPolicy,
-EC-017,Diving,Full Computer,Future schema checkpoint,schemaVersion+1,restore fails,Fail closed,PASS,PENDING,PENDING,PASS,P3,FullComputerRecoveryCheckpointTests,
-EC-018,Diving,Full Computer,No physical evidence,all paths,N/A,PENDING_PHYSICAL marked,PENDING,PENDING,PENDING,N/A,P2,Audit rule,
-EC-019,Snorkeling,Snorkeling,GPS isolation,route active,N/A,No FC engine reference,PASS,PENDING,PENDING,PASS,P4,SnorkelingCrossDomainIsolationTests,Isolation check only
-EC-020,Apnea,Apnea,FC symbol isolation,Apnea runtime,N/A,No FC/Bühlmann refs,PASS,PENDING,PENDING,PASS,P4,ApneaArchitectureIsolationTests,@2c30412 Apnea P1/P2/P3
-EC-021,Diving,Full Computer,Water auto-open FC route,submerged launch,preferred FC,fullComputerPrediveConfiguration,routing test FAIL,PENDING,PENDING,FAIL,P2,WFC-P2-005,Production policy may differ in test harness
-EC-020,Diving,Full Computer,Duplicate timestamp,duplicate tick,no double integrate,Guard or degrade,Degraded/reject,PENDING,PENDING,PASS,P3,FullComputerTimingFaultTests,
+EC-001,Diving,Full Computer,Depth validation,negative depth,active dive,Reject or clamp safely,Safe handling path observed,0,0,YES,P1,FullComputerTimingFaultTests,Software evidence only
+EC-002,Diving,Full Computer,Timing,duplicate timestamp,active dive,No double integration,Guarded by dt checks,0,0,YES,P1,FullComputerTimingFaultTests,
+EC-003,Diving,Full Computer,Timing,negative dt,active dive,Fail-closed / ignore sample,Guarded path observed,0,0,YES,P1,FullComputerTimingFaultTests,
+EC-004,Diving,Full Computer,Multilevel deco,deco clear then re-descent,post-deco,Deco may reappear from tissues,Observed in oracle tests,<=tol,<=tol,YES,P0,Audit15RedescentOracleTests,
+EC-005,Diving,Full Computer,Gas switch,late switch event,during ascent,No retroactive prior-second mutation,Ordering tests PASS,0,0,YES,P1,FullComputerGasSwitchTimestampTests,
+EC-006,Diving,Full Computer,Altitude,unsupported altitude > max,predive,Block start,Block behavior documented,0,0,YES,P1,OrchestratedAltitudeEnvironmentTests,
+EC-007,Diving,Full Computer,Restore,corrupt checkpoint,relaunch,Fail-safe restore,Fail-safe path documented,N/A,N/A,YES,P1,FullComputerRecoveryCheckpointTests,
+EC-008,Diving,Full Computer,Evidence gate,no physical run,audit context,Mark pending physical,Marked PENDING_PHYSICAL,N/A,N/A,YES,P2,Physical QA matrix,
+EC-009,Diving,Full Computer,Evidence gate,no external oracle run,audit context,Mark pending external,Marked PENDING_EXTERNAL_VALIDATION,N/A,N/A,YES,P1,External validation plan,
+EC-010,Snorkeling,Boundary,Localization parity,missing return keys,test run,All tests should pass,2 failing parity assertions,N/A,N/A,NO,P2,xcodebuild watch+iOS tests,Non-FC algorithm failure

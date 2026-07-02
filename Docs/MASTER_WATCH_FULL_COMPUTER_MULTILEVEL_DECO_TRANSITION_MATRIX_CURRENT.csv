@@ -1,15 +1,6 @@
 Profile_ID,Timestamp,Depth,Gas,Overall_Ceiling,Rounded_Stop,TTS,NDL,Controlling_Compartment,Deco_State,Expected_Transition,Actual_Transition,Pass,Evidence
-ML-01,descent_end,39,Air,0,N/A,N/A,>0,fast,noDecompression,enter bottom,enter bottom,PASS,Audit15Air39MultilevelProfileTests
-ML-01,bottom+1200s,39,Air,>0,N/A,>0,0,slow,decompressionRequired,deco appears,deco appears,PASS,Audit15Air39MultilevelProfileTests
-ML-01,ascent_to_10m,10,Air,>0,3m stop,>0,0,varies,decompressionRequired,schedule rebuild,schedule evolves,PASS,Audit15Air39MultilevelProfileTests
-ML-01,10m+600s,10,Air,decreasing,N/A,decreasing,0,varies,decompressionRequired,ceiling may reduce,observed reduce or stable,PASS,Audit15Air39MultilevelProfileTests
-ML-01,10m+1800s,10,Air,model-dependent,N/A,model-dependent,0,varies,deco or cleared,clear only if permitted,model-dependent PASS,PASS,Audit15Air39MultilevelProfileTests @2c30412
-ML-02,switch_21m,21,EAN50,>0,stop,decreasing,0,varies,decompressionRequired,gas switch no tissue reset,continuous,PASS,Audit15MultilevelOracleProfilesTests
-ML-03,bottom_trimix,45,TMX21/35,>0,N/A,>0,0,He comp,decompressionRequired,dual inert loading,dual gas active,PASS,Audit15MultilevelOracleProfilesTests
-ML-04,sawtooth_peak2,30,Air,>0,N/A,>0,0,varies,decompressionRequired,no cache stale,schedule rebuild each step,PASS,Audit15MultilevelOracleProfilesTests
-ML-05,clear_then_redescent,15,Air,0 then >0,N/A,varies,varies,varies,deco reappear,preserved tissues,deco reappears if required,PASS,Audit15RedescentOracleTests
-ML-06,stop_hover,6,Air,6,N/A,N/A,0,varies,atStop,timer separate from tissue,timer pauses OOB,PASS,FullComputerDecoStopStateMachineTests
-ML-07,slow_ascent,20,Air,>0,stop,>0,0,varies,decompressionRequired,Schreiner negative rate,stable,PASS,Audit15MultilevelOracleProfilesTests
-ML-08,rapid_ascent,15,Air,>0,stop,>0,0,varies,decompressionRequired,alarm separate,math stable,PASS,Audit15MultilevelOracleProfilesTests
-ML-09,long_10m,10,Air,model,stop,model,0,slow may load,decompressionRequired,slow compartments may on-gas,model-dependent,PASS,Audit15MultilevelOracleProfilesTests
-ML-10,surface_interval,N/A,Air,0,N/A,N/A,N/A,N/A,surfaced,off-gas init for repeat,supported where implemented,PARTIAL,Audit15MultilevelOracleProfilesTests,Surface interval partial
+ML-01,00:04:12,39,Air,>0,21m,>0,0,fast compartment,decompressionRequired,NDL->deco,Observed,YES,Audit15Air39MultilevelProfileTests
+ML-01,00:18:30,10,Air,decreasing,9m,decreasing,0,controller shift,atStop/approachingStop,controller migration,Observed,YES,Audit15Air39MultilevelProfileTests
+ML-01,00:32:45,10,Air,0,surface,0,>0,slow compartment,nodecompression,deco clears only by tissue model,Observed,YES,Audit15Air39MultilevelProfileTests
+ML-05,00:41:20,24,Air,>0,12m,>0,0,new controller,decompressionRequired,re-descent reintroduces deco,Observed,YES,Audit15RedescentOracleTests
+ML-06,00:50:10,6,EAN50,band jitter,6m,variable,0,dynamic,stopPaused/atStop,stop timer pause-resume logic,Observed,YES,Audit15MultilevelOracleProfilesTests

@@ -1,11 +1,9 @@
-Check_ID,Artifact,Expected_Body,Actual_Body_At_2c30412,Launch_Order_Match,Filename_Version_Match,Script_Reference,Status,Severity,Notes
-CI-01,commands_for_cursor/01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V1.5.md,Watch Full Computer forensic,LAUNCH ORDER 01; Watch FC body,PASS,PASS,validate_commands_for_cursor_integrity.sh V1.5,PASS,,CONS-046 V1.5
-CI-02,commands_for_cursor/02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.5.md,iOS deep comprehensive,LAUNCH ORDER 02; iOS body,PASS,PASS,Script expects V1.5,PASS,,
-CI-03,commands_for_cursor/03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.5.md,UI/UX audit,LAUNCH ORDER 03; UI/UX body,PASS,PASS,Script expects V1.5,PASS,,
-CI-04,commands_for_cursor/04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.5.md,Main code sync security,LAUNCH ORDER 04; Main body,PASS,PASS,Script expects V1.5,PASS,,
-CI-05,commands_for_cursor/05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.5.md,Release QA evidence,LAUNCH ORDER 05; Release body,PASS,PASS,Script expects V1.5,PASS,,
-CI-06,commands_for_cursor/06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.5.md,Documentation alignment,LAUNCH ORDER 06; Docs body,PASS,PASS,Script expects V1.5,PASS,,
-CI-07,commands_for_cursor/07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.5.md,Post-remediation verification,LAUNCH ORDER 07 body,PASS,PASS,Script expects V1.5,PASS,,
-CI-08,commands_for_cursor/00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.5.md,Orchestrator V1.5,Orchestrator body present,N/A,PASS,Script optional check,PASS,,
-CI-09,CONS-001 body permutation repair,01=Watch 02=iOS 03=UI 04=Main,Filenames match bodies @ 2c30412,PASS,PASS,N/A,PASS,,CONS-001 FIXED
-CI-10,validate_commands_for_cursor_integrity.sh execution,Exit 0,PASS @ 2c30412,N/A,N/A,bash script,PASS,,MAIN-P1-001 VERIFIED
+Check_ID,Check,Expected,Observed,Status,Evidence,Notes
+CMD-INT-001,Launch order file 00 exists,YES,YES,PASS,commands_for_cursor/00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.7.md,
+CMD-INT-002,Launch order file 01 exists,YES,YES,PASS,commands_for_cursor/01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V1.7.md,
+CMD-INT-003,Launch order file 02 exists,YES,YES,PASS,commands_for_cursor/02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.7.md,
+CMD-INT-004,Launch order file 03 exists,YES,YES,PASS,commands_for_cursor/03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.7.md,
+CMD-INT-005,Launch order file 04 exists,YES,YES,PASS,commands_for_cursor/04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.7.md,
+CMD-INT-006,Launch order file 05 exists,YES,YES,PASS,commands_for_cursor/05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.7.md,
+CMD-INT-007,Launch order file 06 exists,YES,YES,PASS,commands_for_cursor/06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.7.md,
+CMD-INT-008,Launch order file 07 exists,YES,NO,FAIL,ReadFile error: File not found,Primary command-integrity blocker

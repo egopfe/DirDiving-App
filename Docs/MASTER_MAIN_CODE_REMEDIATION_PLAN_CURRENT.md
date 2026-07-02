@@ -1,35 +1,22 @@
-# DIR DIVING — Master Main Code Remediation Plan (Current)
+# Master Main Code Remediation Plan (CURRENT)
 
-**Audit:** 04 @ `2c30412` | **Date:** 2026-07-01
+## Prioritized backlog
 
-## Priority 0 — None
+1. **P1 - MAIN-CMD-001:** restore missing launch-order 07 command file; rerun command-integrity gate.
+2. **P1 - MAIN-TEST-001/002:** resolve Snorkeling localization parity test failures and rerun iOS+Watch suites.
+3. **P2 - MAIN-SYNC-001:** paired stress verification for large payload fallback and ACK cleanup.
+4. **P2 - MAIN-PRIV-001:** execute physical location-permission QA matrix.
+5. **P3 - MAIN-CONC-001:** tighten GPS confirmation task lifecycle guard if still reproducible.
 
-No open P0 software findings at `2c30412`. Audit 01 FC math: 0 P0.
+## Non-negotiable constraints
 
-## Priority 1 — None (software)
+- Keep Full Computer mathematical safety gate authoritative.
+- Preserve activity isolation for Diving/Apnea/Snorkeling stores and sync.
+- Do not promote pending physical/manual/external gates to PASS without artifacts.
 
-All P1 software remediations verified (CONS-003..007, CONS-046, CONS-049). Remaining P1 items are **PENDING_PHYSICAL** or **PENDING_EXTERNAL_VALIDATION** (WFC-P1-001, CONS-042).
+## Exit criteria for this plan
 
-## Priority 2 — Before full test suite green + TestFlight confidence
-
-| ID | Action | Owner lane | Acceptance |
-|----|--------|------------|------------|
-| MAIN-P2-003 | Align `WatchWaterAutoOpenPolicyTests` / `WatchLaunchRoutingPolicyTests` with post-Apnea `divingModeSelection` routing (WFC-P2-005) | Tests | 1152/1152 Watch tests PASS |
-| MAIN-P2-002 | Execute 12 `SNORKELING_*` physical QA folders with signed artifacts | QA | 12/12 PASS with device IDs |
-| MAIN-PERF-001..004 | Run `MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md` on hardware | QA | Instruments/Energy logs attached |
-| MAIN-SEC-001 | Paired-device tombstone/HMAC/large-payload field matrix | QA | SEC-NEG field pack signed |
-| MAIN-WAO-002 | Submerged cold-launch physical QA | QA | WATCH_WATER_AUTO_OPEN artifacts |
-| MAIN-APNEA-001 | Apnea wet auto-detection physical QA | QA | Signed Apnea field artifacts |
-
-## Priority 3 — Maintainability / observability
-
-| ID | Action | Acceptance |
-|----|--------|------------|
-| MAIN-P3-001 | Cancel DiveManager GPS confirmation Task on dive end | Lifecycle test |
-| MAIN-IOS-001/002 | Instruments startup/map profiling | BUD-IOS budgets measured |
-| MAIN-SYNC-004 | Document legacy diving tombstone bootstrap mirror policy | Docs only |
-| SnorkelingRouteProgressCalculatorTests | Fix `testProgressAtStartIsNearZero` tolerance or fixture | 1 test green |
-
-## Verified — do not regress
-
-CONS-001/046 command integrity, CONS-003 in-flight release, CONS-004 symmetric ACK, CONS-005 signed tombstones, CONS-006/007 depth gating, CONS-019 WAO policy, CONS-027 planner deinit, CONS-049 iOS test lane, Apnea sync/schema isolation.
+- P1 queue empty
+- automated suites green
+- integrity scanner PASS on full command set
+- physical/instruments/paired gates either evidenced or explicitly pending in release verdict

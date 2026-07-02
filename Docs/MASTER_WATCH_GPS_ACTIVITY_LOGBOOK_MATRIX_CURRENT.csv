@@ -1,0 +1,6 @@
+Case_ID,Activity,Runtime_Capture,Logbook_Owner,Sync_Codec,Cross_Activity_Isolation,Decompression_Authority,Status,Evidence,Notes
+GPS-001,Diving,entry/exit surface metadata,DiveLogStore,WatchDiveSyncCodec,YES,NO,PASS,GPS policy docs + tests,Surface-only metadata
+GPS-002,Apnea,start/end surface metadata,ApneaLogbookStore,ApneaSessionSyncCodec,YES,NO,PASS,Apnea GPS/logbook docs + tests,
+GPS-003,Snorkeling,track + route metadata,SnorkelingLogbookStore,SnorkelingSessionSyncCodec,YES,NO,PASS,Snorkeling GPS pipeline docs,
+GPS-004,Unified iOS presentation,read-only aggregate,N/A,N/A,YES,NO,PASS,Unified logbook docs,No canonical merged storage
+GPS-005,Manual/physical GPS QA evidence,device/open-water artifacts,N/A,N/A,N/A,NO,PENDING_PHYSICAL,QA pending docs,Do not claim physical PASS

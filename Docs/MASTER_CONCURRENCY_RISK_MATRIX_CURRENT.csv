@@ -1,21 +1,7 @@
 Risk_ID,Component,Platform,Pattern,Severity,Status,Root_Cause,Mitigation,Test_Evidence,Notes
-CONC-001,DiveManager,Watch,1Hz Timer → MainActor tick,P3,DOCUMENTED_ACCEPTED_RISK,Main run loop tissue tick,Solver budget 50ms + degraded state,FullComputerTimingFaultTests,MASTER-PERF-005
-CONC-002,PlannerStore,iOS,Task.detached background calc,P4,MITIGATED,MainActor planner blocking,PlannerBackgroundCalculation + generation guard,PerformanceConcurrencyBatteryRemediationTests,
-CONC-003,PlannerStore,iOS,planningGeneration stale guard,P4,MITIGATED,Async publish race,Generation token before @Published write,PlannerPresentationTests,
-CONC-004,WatchSyncService,Both,nonisolated delegate → MainActor,P4,MITIGATED,WC callback thread hop,@MainActor service + deferPublishedMutation,WatchSyncServiceIntegrationTests,
-CONC-005,ApneaWatchRuntimeStore,Watch,Cancellable tick Task,P4,MITIGATED,Session end leak,[weak self] + task cancel,Apnea lifecycle tests,
-CONC-006,SnorkelingWatchRuntimeStore,Watch,Cancellable tick + checkpoint debounce,P4,MITIGATED,Write storm,250ms debounce + fingerprint,SnorkelingWatchRuntimeStorePersistenceTests,
-CONC-007,GPSManager,Watch,Authorization callback no restart when inactive,P4,MITIGATED,Battery drain,maintainsLocationUpdates gate,Code review,
-CONC-008,DiveLogStore,iOS,Async initial load,P4,MITIGATED,Init blocking main,performInitialLoadIfNeeded Task,IOSCompanionStoreLifecycleTests,
-CONC-009,WatchSyncService,iOS,inFlightOutboundSessionIDs stuck,P1,PASS,releaseInFlightOutboundSession on ACK failure send error encode error,CONS-003 verified @ 5d757cc,validate_master_main_code_sync_security_performance_audit.sh,PC-05
-CONC-010,IOSExportCancellation,iOS,Export Task cancellation,P4,MITIGATED,Long export block,checkCancellation wrappers,PerformanceConcurrencyBatteryRemediationTests,
-CONC-011,TissueAnalyticsService,iOS,LRU cache 32 entries,P4,MITIGATED,Unbounded memory,LRU eviction,PerformanceConcurrencyBatteryRemediationTests,
-CONC-012,HapticService,Watch,@MainActor haptic coordination,P4,ACCEPTED,MainActor burst,Coordinated coordinators,AscentSafetyHapticCoordinator tests,
-CONC-013,CloudSyncStore,iOS,KVS sync on init,P3,MONITOR,Startup I/O,Generation token success delay,MainDeepCodeAnalysisRemediationV1Tests,
-CONC-014,FullComputerRuntimeEngine,Watch,Overlap guard on tick,P4,MITIGATED,Reentrant tick,tickInProgress flag,FullComputerRuntimeEngineTests,
-CONC-015,ActivitySyncSignedTransport,Both,Sendable DTOs,P4,PASS,Cross-actor payloads,Sendable conformance,Compile-time + tests,
-CONC-016,PlannerStore,iOS,deinit without task cancel,P2,PASS,planningUpdateTask/saveTask cancelled in deinit,Cancel in deinit,Code review @ 451f8fb,CONS-027 FIXED
-CONC-017,PlannerStore,iOS,refreshAnalysis on MainActor before detach,P3,MONITOR,Cache miss may still prefetch on main,Move into detached snapshot,Code review @ 451f8fb,Lower severity; deinit cancel mitigates leak
-CONC-018,iOS WatchSyncService,iOS,Unused retention/attempt budget,P2,OPEN,isRetentionExpired never checked in iOS queue,Enforce in normalization,IOSWatchSyncPendingTransfer definitions only,MASTER-PERF-007
-CONC-019,SnorkelingSessionMapPresentation,Both,Sync map build on caller thread,P2,OPEN,Large track blocks before downsample,Consider detached build,SnorkelingRoutePresentationSampling tests,MASTER-PERF-004 overlap
-CONC-020,DiveManager,Watch,GPS confirmation uncancelled Task,P2,OPEN,showGPSConfirmation Task without weak self,Add weak self + cancel,Code review 7dfefe2,PC-13
+CONC-001,DiveManager,Watch,Main run-loop 1Hz tick,P3,DOCUMENTED_ACCEPTED_RISK,Main-thread integration timing pattern,Keep strict solver budget + degraded mode,FullComputerTimingFaultTests,Observed in prior matrix set
+CONC-002,PlannerStore,iOS,Detached planner compute,P3,MITIGATED,Potential stale publish,Generation token + cancellation guards,PerformanceConcurrencyBatteryRemediationTests,
+CONC-003,WatchSyncService,iOS,In-flight outbound stuck,P1,VERIFIED,Historical error-path leak,releaseInFlightOutboundSession on error/ack paths,Main deep-code remediation tests,CONS-003 retained
+CONC-004,Snorkeling map presentation,Both,Large route preparation,P2,OPEN,Potential blocking on large paths,Use bounded downsampling and async prep where needed,Snorkeling route presentation tests,Physical profiling still pending
+CONC-005,DiveManager GPS confirmation,Watch,Task lifetime leak risk,P3,OPEN,Task cancellation not fully evidenced in this run,Add explicit cancel/weak capture + regression test,Code-read + finding carryover,Low-severity but open
+CONC-006,Unified logbook presentation,iOS,Aggregate read-model refresh,P3,MONITOR,Potential large-data recomposition pressure,Keep read-only builder and bounded list windows,Unified logbook tests,No cross-write side effects observed

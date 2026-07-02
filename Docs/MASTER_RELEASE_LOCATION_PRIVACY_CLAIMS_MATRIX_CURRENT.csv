@@ -1,0 +1,6 @@
+Claim_ID,Domain,Claim,Status,Evidence,Severity,Pending_Gate,Notes
+LOC-001,Diving,Surface-only entry/exit GPS metadata only,PASS,GPS presentation matrix,P1,PENDING_PHYSICAL,No underwater authority claim
+LOC-002,Apnea,Surface-only start/end metadata only,PASS,GPS presentation matrix,P1,PENDING_PHYSICAL,No runtime navigation claim
+LOC-003,Snorkeling,GPS route is snorkeling-owned and non-decompression authority,PASS,Snorkeling remediation docs,P1,PENDING_PHYSICAL,Open-water QA pending
+LOC-004,Unified,Aggregated location view does not change ownership,PASS,Unified logbook audits,P1,PENDING_MANUAL_QA,Presentation-only posture preserved
+LOC-005,Privacy policy,When-In-Use positioning retained,PASS,Main/UI UX audits,P1,PENDING_PHYSICAL,No Always Location promotion observed

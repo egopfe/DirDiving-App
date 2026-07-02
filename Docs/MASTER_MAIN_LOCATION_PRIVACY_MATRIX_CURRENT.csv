@@ -1,0 +1,6 @@
+Policy_ID,Policy,Observed_Status,Evidence,Risk,Gate
+LOC-001,When In Use permission key present (iOS),PASS,iOSApp/App/Info.plist,Low,
+LOC-002,When In Use permission key present (Watch app plist),PASS,App/Info.plist,Low,
+LOC-003,Always location permission key absent in inspected plist,PASS,plist inspection output,Low,
+LOC-004,No underwater GPS guarantee claim in software readiness docs,PASS,V1.7 docs consumed,Low,
+LOC-005,Physical permission-path and edge-case verification,NOT_EXECUTED,No field QA artifacts,PENDING_PHYSICAL,PENDING_PHYSICAL

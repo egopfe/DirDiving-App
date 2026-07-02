@@ -1,0 +1,11 @@
+Item_ID,Commit,Area,Description,Consumed_In_Consolidation,Status,Impacts_Findings,Notes
+V17-001,741aa37,CCR acknowledgement,Independent toggle and mode-aware CCR acknowledgement,YES,CONSUMED,CF-009,Claims still require truthfulness checks
+V17-002,fc781aa,Equipment gas UI,Generic GAS toggle removed and dedicated gas section retained,YES,CONSUMED,CF-014,No production changes from orchestrator
+V17-003,d362795,Snorkeling P1 visibility,Watch visibility and unified logbook navigation improvements,YES,CONSUMED,CF-004,Manual QA still pending
+V17-004,38bc09e,Snorkeling P2 premium runtime,iOS operational config and runtime wiring updates,YES,CONSUMED,CF-004|CF-013,Software applied not fully closed
+V17-005,e052903,Snorkeling P3 advanced preview,Navigation preview and analytics updates,YES,CONSUMED,CF-004|CF-013,Field QA pending
+V17-006,c982fe3,Snorkeling deep audit,Unified remediation planning baseline,YES,CONSUMED,CF-004,Planning artifact consumed
+V17-007,7c459cb,Snorkeling implementation,Unified remediation implementation wave,YES,CONSUMED,CF-004|CF-013,Explicitly consumed per user request
+V17-008,a9fc8a6,Docs index baseline,Docs baseline refresh for remediation wave,YES,CONSUMED,CF-008,Superseded by 7ae527b baseline
+V17-009,f90b671,Demo logbook fix,Demo/fake contamination fix,YES,VERIFIED,CF-005,Required DG-DEMO-001
+V17-010,7ae527b,Docs baseline update,Main baseline for this orchestrator consolidation,YES,ACTIVE_BASELINE,CF-008|CF-014,Requested consolidation baseline

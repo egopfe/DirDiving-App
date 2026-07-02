@@ -1,69 +1,14 @@
-QA_ID,Platform,Device_Class,Activity,Scenario,Evidence_Type,Evidence_Folder,Procedure_Doc,Status,Tester,Reviewer,Date,Notes
-PDQ-W-001,Watch,Ultra,Diving,Physical install + launch,physical Watch,QA_EVIDENCE/WATCH_ULTRA,WATCH_ULTRA_PHYSICAL_QA_MATRIX.md,NOT_PASSED,,,,PENDING_PHYSICAL
-PDQ-W-002,Watch,Ultra,Diving,Depth sensor entitlement behavior,physical Watch,QA_EVIDENCE/HARDWARE_ENTITLEMENT,HARDWARE_QA_MATRIX.md,NOT_PASSED,,,,Entitlement-signed build required
-PDQ-W-003,Watch,Ultra,Full Computer,Dry-run no environment start blocked,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_FULL_COMPUTER_INTERACTION_AUDIT_CURRENT.md,NOT_PASSED,,,,Software fail-closed PASS; field PENDING
-PDQ-W-004,Watch,Ultra,Full Computer,Manual Watch environment accepted,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/README.md,NOT_PASSED,,,,
-PDQ-W-005,Watch,Ultra,Full Computer,Imported iPhone plan accepted,physical Watch,QA_EVIDENCE/PLANNER_BRIEFING_WATCH,PLANNER_BRIEFING_WATCH/README.md,NOT_PASSED,,,,Paired transfer PENDING
-PDQ-W-006,Watch,Ultra,Full Computer,CMAltimeter available proposal,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/EVIDENCE_TEMPLATE.md,NOT_PASSED,,,,CoreMotion sample evidence required
-PDQ-W-007,Watch,Ultra,Full Computer,CMAltimeter unavailable fallback,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/README.md,NOT_PASSED,,,,
-PDQ-W-008,Watch,Ultra,Full Computer,Motion permission denied,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/README.md,NOT_PASSED,,,,
-PDQ-W-009,Watch,Ultra,Full Computer,Stable sensor proposal UI,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/EVIDENCE_TEMPLATE.md,NOT_PASSED,,,,
-PDQ-W-010,Watch,Ultra,Full Computer,Unstable sensor proposal rejected,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/EVIDENCE_TEMPLATE.md,NOT_PASSED,,,,
-PDQ-W-011,Watch,Ultra,Full Computer,Sensor accepted by diver,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/EVIDENCE_TEMPLATE.md,NOT_PASSED,,,,
-PDQ-W-012,Watch,Ultra,Full Computer,Sensor rejected preserving prior authority,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/EVIDENCE_TEMPLATE.md,NOT_PASSED,,,,
-PDQ-W-013,Watch,Ultra,Full Computer,Background/foreground during sampling,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/README.md,NOT_PASSED,,,,
-PDQ-W-014,Watch,Ultra,Full Computer,Relaunch before dive start,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/README.md,NOT_PASSED,,,,
-PDQ-W-015,Watch,Ultra,Full Computer,Checkpoint/restore mid-session,physical Watch,QA_EVIDENCE/WATCH_ULTRA,WATCH_ULTRA_PHYSICAL_QA_MATRIX.md,NOT_PASSED,,,,Software checkpoint tests PASS
-PDQ-W-016,Watch,Ultra,All,Paired sync smoke,paired-device,QA_EVIDENCE/WATCH_IOS_SYNC,WATCH_IOS_SYNC_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-W-017,Watch,Ultra,Full Computer,Logbook provenance after sensor accept,physical Watch,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL,WATCH_CMALTIMETER_PHYSICAL/EVIDENCE_TEMPLATE.md,NOT_PASSED,,,,
-PDQ-W-018,Watch,41mm,All,Smallest Watch layout clipping,physical Watch,QA_EVIDENCE/SNORKELING_WATCH_LAYOUTS,WATCH_ULTRA_PHYSICAL_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-W-019,Watch,Ultra,All,Ultra display layout,physical Watch,QA_EVIDENCE/WATCH_ULTRA,WATCH_ULTRA_PHYSICAL_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-W-020,Watch,Ultra,All,VoiceOver journey,physical Watch,QA_EVIDENCE/APNEA_VOICEOVER,IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-W-021,Watch,Ultra,All,Haptics ascent/depth warnings,physical Watch,QA_EVIDENCE/WATCH_ULTRA,HARDWARE_QA_MATRIX.md QA-006,NOT_PASSED,,,,Dry safe test only unless controlled wet
-PDQ-W-022,Watch,Ultra,Snorkeling,Mission Mode reminders,physical Watch,QA_EVIDENCE/SNORKELING_HAPTICS,SNORKELING_QA_EVIDENCE_INDEX.md,NOT_PASSED,,,,
-PDQ-W-023,Watch,Ultra,Diving,Briefing cards on wrist,physical Watch,QA_EVIDENCE/PLANNER_BRIEFING_WATCH,PLANNER_BRIEFING_WATCH/README.md,NOT_PASSED,,,,
-PDQ-W-024,Watch,Ultra,Diving,Image inventory/delete,physical Watch,QA_EVIDENCE/WATCH_IOS_SYNC,HARDWARE_QA_MATRIX.md QA-013,NOT_PASSED,,,,
-PDQ-W-025,Watch,Ultra,Diving,Depth sensor wet test,underwater,QA_EVIDENCE/HARDWARE_ENTITLEMENT,HARDWARE_QA_MATRIX.md QA-002,NOT_PASSED,,,,Ultra entitlement session
-PDQ-W-026,Watch,Ultra,Diving,Ascent warning wet/dry safe test,physical Watch,QA_EVIDENCE/WATCH_ULTRA,HARDWARE_QA_MATRIX.md QA-006,NOT_PASSED,,,,
-PDQ-W-027,Watch,Ultra,Diving,Controlled multilevel dive if possible,physical Watch,QA_EVIDENCE/WATCH_ULTRA,WATCH_ULTRA_PHYSICAL_QA_MATRIX.md,NOT_PASSED,,,,Optional field session
-PDQ-W-028,Watch,Ultra,All,Battery/thermal observation,physical Watch,QA_EVIDENCE/WATCH_ULTRA,PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md,NOT_PASSED,,,,
-PDQ-W-029,Watch,Ultra,Apnea,Battery/thermal long session,physical Watch,QA_EVIDENCE/APNEA_BATTERY_THERMAL,Apnea release checklist,NOT_PASSED,,,,
-PDQ-W-030,Watch,Ultra,Snorkeling,Battery/thermal long route,physical Watch,QA_EVIDENCE/SNORKELING_BATTERY_THERMAL,SNORKELING_BATTERY_THERMAL/PROCEDURE.md,NOT_PASSED,,,,
-PDQ-W-031,Watch,Ultra,Apnea,Wet interaction session,physical Watch,QA_EVIDENCE/APNEA_WET_INTERACTION,Apnea QA README,NOT_PASSED,,,,
-PDQ-I-001,iPhone,14+,All,Startup + activity selection,physical iPhone,QA_EVIDENCE/IOS_ACCESSIBILITY,RELEASE_CHECKLIST.md,NOT_PASSED,,,,
-PDQ-I-002,iPhone,15 Pro,All,Settings mode switch,physical iPhone,QA_EVIDENCE/MOD_SWITCH_DEPTH,IOS_MOD_SWITCH_DEPTH_VISUAL_QA.md,NOT_PASSED,,,,
-PDQ-I-003,iPhone,Standard,Apnea,Apnea Settings isolation,physical iPhone,QA_EVIDENCE/APNEA_IOS_WATCH_SYNC,Apnea QA README,NOT_PASSED,,,,
-PDQ-I-004,iPhone,Standard,Snorkeling,Snorkeling Settings isolation,physical iPhone,QA_EVIDENCE/SNORKELING_IOS_MAPS,Snorkeling QA index,NOT_PASSED,,,,
-PDQ-I-005,iPhone,Standard,Diving,Planner reference-only flow,physical iPhone,QA_EVIDENCE/IOS_ACCESSIBILITY,IOS_PLANNER_VISUAL_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-I-006,iPhone,Standard,Diving,Logbook 1k scroll,physical iPhone,QA_EVIDENCE/IOS_ACCESSIBILITY,PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md,NOT_PASSED,,,,
-PDQ-I-007,iPhone,Standard,Diving,Logbook 5k scroll,physical iPhone,QA_EVIDENCE/IOS_ACCESSIBILITY,PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md,NOT_PASSED,,,,
-PDQ-I-008,iPhone,Standard,Snorkeling,50k route map interaction,physical iPhone,QA_EVIDENCE/SNORKELING_IOS_MAPS,Snorkeling QA index,NOT_PASSED,,,,
-PDQ-I-009,iPhone,Standard,All,PDF export render/share,physical iPhone,QA_EVIDENCE/PDF_RENDER,PDF_SHARE_MANUAL_QA_CHECKLIST.md,NOT_PASSED,,,,
-PDQ-I-010,iPhone,Standard,All,CSV export share,physical iPhone,QA_EVIDENCE/SUBSURFACE_CSV,SUBSURFACE_CSV_ROUNDTRIP.md,NOT_PASSED,,,,
-PDQ-I-011,iPhone,Standard,All,Watch sync companion,paired-device,QA_EVIDENCE/WATCH_IOS_SYNC,WATCH_IOS_SYNC_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-I-012,iPhone,Standard,Diving,iCloud backup opt-in,paired-device,QA_EVIDENCE/ICLOUD_TWO_DEVICE,ICLOUD_TWO_DEVICE_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-I-013,iPhone,Standard,All,Privacy prompts (location/photos/motion),physical iPhone,QA_EVIDENCE/SNORKELING_PHOTO_PRIVACY,Snorkeling QA index,NOT_PASSED,,,,
-PDQ-I-014,iPhone,Standard,All,VoiceOver full journey,physical iPhone,QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER,IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-I-015,iPhone,Standard,All,Dynamic Type XL layouts,physical iPhone,QA_EVIDENCE/IOS_ACCESSIBILITY,DYNAMIC_TYPE_XL_PLANNER_TEMPLATE.md,NOT_PASSED,,,,
-PDQ-I-016,iPhone,Standard,All,Instruments profiling session,physical iPhone,QA_EVIDENCE/IOS_ACCESSIBILITY,PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md,NOT_PASSED,,,,Memory/CPU baseline PENDING
-PDQ-P-001,Paired,Watch+iPhone,Diving,Direct WC sync signed ACK,paired-device,QA_EVIDENCE/WATCH_IOS_SYNC,WATCH_IOS_SYNC_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-P-002,Paired,Watch+iPhone,Diving,Queued sync offline reconnect,paired-device,QA_EVIDENCE/WATCH_IOS_SYNC,HARDWARE_QA_MATRIX.md QA-009,NOT_PASSED,,,,
-PDQ-P-003,Paired,Watch+iPhone,Apnea,Session pull/push,paired-device,QA_EVIDENCE/APNEA_IOS_WATCH_SYNC,Apnea QA README,NOT_PASSED,,,,
-PDQ-P-004,Paired,Watch+iPhone,Snorkeling,Session/route sync,paired-device,QA_EVIDENCE/SNORKELING_IOS_WATCH_SYNC,SNORKELING_QA_EVIDENCE_INDEX.md,NOT_PASSED,,,,
-PDQ-P-005,Paired,Watch+iPhone,All,Pair/unpair trust lifecycle,paired-device,QA_EVIDENCE/SNORKELING_PAIR_UNPAIR,SNORKELING QA SNK-QA-018,NOT_PASSED,,,,
-PDQ-P-006,Paired,Two iPhones,Diving,iCloud tombstone propagation,paired-device,QA_EVIDENCE/ICLOUD_TWO_DEVICE,ICLOUD_TWO_DEVICE_QA_MATRIX.md,NOT_PASSED,,,,
-PDQ-P-007,Paired,Watch+iPhone,All,Low-battery sync under load,paired-device,QA_EVIDENCE/WATCH_IOS_SYNC,PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md,NOT_PASSED,,,,
-PDQ-P-008,Paired,Watch+iPhone,Diving,Photo transfer allowed/rejected,paired-device,QA_EVIDENCE/WATCH_IOS_SYNC,HARDWARE_QA_MATRIX.md QA-013,NOT_PASSED,,,,
-PDQ-E-001,External,N/A,Diving,Bühlmann third-party golden validation,external reference,QA_EVIDENCE/BUHLMANN_EXTERNAL,BUHLMANN external plan,NOT_PASSED,,,,
-PDQ-E-002,External,N/A,Diving,Schreiner third-party golden validation,external reference,QA_EVIDENCE/BUHLMANN_EXTERNAL,BUHLMANN external plan,NOT_PASSED,,,,Bundled campaign
-PDQ-E-003,External,N/A,Diving,CCR rebreather external validation,external reference,QA_EVIDENCE/CCR_EXTERNAL,CCR_REBREATHER_VALIDATION_EVIDENCE.md,NOT_PASSED,,,,
-PDQ-E-004,External,N/A,Diving,Subsurface CSV round-trip,external reference,QA_EVIDENCE/SUBSURFACE_EXTERNAL,SUBSURFACE_CSV_ROUNDTRIP.md,NOT_PASSED,,,,
-PDQ-E-005,External,N/A,All,App Store marketing/screenshots,legal/compliance review,QA_EVIDENCE/APP_STORE_MARKETING,RELEASE_CHECKLIST.md,NOT_PASSED,,,,
-PDQ-E-006,External,N/A,All,External legal counsel review,legal/compliance review,QA_EVIDENCE/LEGAL_REVIEW,IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md,NOT_PASSED,,,,PENDING_LEGAL_REVIEW
-PDQ-W-032,Watch,Ultra,Diving,Shallow depth wet Gauge session,underwater,QA_EVIDENCE/HARDWARE_ENTITLEMENT,HARDWARE_QA_MATRIX.md QA-002,NOT_PASSED,,,,PENDING_PHYSICAL; SDG-010
-PDQ-W-033,Watch,Ultra,Full Computer,Developer shallow FC internal wet test,underwater,QA_EVIDENCE/WATCH_ULTRA,Developer toggle + predive chain,NOT_PASSED,,,,PENDING_PHYSICAL; SDG-011 internal TF only
-PDQ-W-034,Watch,Ultra,All,Water auto-open end-to-end physical,physical Watch,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED,WAO-PHY-001,NOT_PASSED,,,,PENDING_PHYSICAL
-PDQ-W-035,Watch,Ultra,All,System Auto-Launch submerged listing,physical Watch,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_SYSTEM_LISTING,WAO-PHY-002,NOT_PASSED,,,,PENDING_PHYSICAL; WATCHOS_SYSTEM_AUTO_LAUNCH_LISTING_EVIDENCE
-PDQ-W-036,Watch,Ultra,All,Water Lock + Digital Crown paging,physical Watch,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK,HWC-PHY-004,NOT_PASSED,,,,PENDING_PHYSICAL; WATER_LOCK_PHYSICAL_QA
-PDQ-W-037,Watch,Ultra,All,Action Button underwater primary action,physical Watch,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_ACTION_BUTTON,HWC-PHY-003,NOT_PASSED,,,,PENDING_PHYSICAL; ACTION_BUTTON_PHYSICAL_QA
-PDQ-W-038,Watch,Ultra,Full Computer,GF preset Settings on wrist,physical Watch,QA_EVIDENCE/WATCH_ULTRA,GF-E-011,NOT_PASSED,,,,PENDING_PHYSICAL
+QA_ID,Platform,Scenario,Status,Severity,Evidence,Gap,Next_Action
+PHY-W-001,Watch,Physical install and launch,PENDING_PHYSICAL,P1,No run log attached,Unexecuted physical run,Execute install smoke on target watch devices
+PHY-W-002,Watch,CMAltimeter available/unavailable paths,PENDING_PHYSICAL,P1,Template-only,No real sensor captures,Run altitude acceptance/reject scenarios
+PHY-W-003,Watch,Water auto-open and launch listing,PENDING_PHYSICAL,P1,Template-only,System auto-launch not evidenced,Execute submerged launch physical protocol
+PHY-W-004,Watch,Action Button underwater policy,PENDING_PHYSICAL,P1,Template-only,No underwater hardware evidence,Execute action-button wet QA
+PHY-W-005,Watch,Digital Crown active-session clamp,PENDING_PHYSICAL,P1,Template-only,No wet/manual evidence,Execute crown wet QA
+PHY-W-006,Watch,Checkpoint/restore in field,PENDING_PHYSICAL,P2,None,No field interruption evidence,Run interruption/relaunch matrix
+PHY-W-007,Watch,VoiceOver/haptics smallest+Ultra,PENDING_PHYSICAL,P2,None,No manual accessibility runs,Run accessibility matrix on both form factors
+PHY-I-001,iPhone,Startup/activity switch paths,PENDING_PHYSICAL,P1,None,No physical logs,Run iPhone startup matrix on supported models
+PHY-I-002,iPhone,Planner/logbook/export/PDF/CSV,PENDING_PHYSICAL,P2,None,No physical export evidence,Run export evidence capture batch
+PHY-I-003,iPhone,Privacy prompts and settings,PENDING_PHYSICAL,P1,None,No physical prompt walkthrough,Execute permission QA on clean install
+PHY-I-004,iPhone,Instruments profiling physical run,PENDING_PHYSICAL,P2,None,No attached traces,Record Instruments profiles
+PHY-P-001,Paired,Watch+iPhone sync smoke,EVIDENCE_PENDING,P1,Template-only,No paired field session logs,Execute paired sync smoke protocol
+PHY-U-001,Underwater,Depth sensor and shallow wet QA,PENDING_PHYSICAL,P1,Template-only,No wet/chamber artifacts,Run controlled wet/chamber sessions

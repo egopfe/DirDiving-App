@@ -1,0 +1,7 @@
+Requirement_ID,Area,Feature,Entry_Point,Expected_Behavior,Observed_Behavior,Status,Evidence,Pending_Gate,Notes
+ULOG-001,Settings,Show all activities toggle per activity,Activity settings sections,Toggle exists in each activity settings scope,Toggle keys remain activity-scoped and default OFF,PASS,iOSApp/Views/Shared/IOSActivityLogbookVisibilitySettingsSection.swift,PENDING_MANUAL_QA,Presentation-only control
+ULOG-002,List,Unified list rendering,Logbook list route,Read-only aggregate list with activity badges,Unified rows built through presentation builder,PASS,iOSApp/Utils/IOSUnifiedLogbookPresentationBuilder.swift,PENDING_MANUAL_QA,No canonical merge
+ULOG-003,Detail,Activity-specific detail handoff,Unified entry tap,Tap routes to owning activity detail host,Detail host resolves by owning activity,PASS,iOSApp/Views/Shared/IOSUnifiedLogbookDetailHost.swift,PENDING_MANUAL_QA,No cross-write behavior
+ULOG-004,Safety,No watch sync mutation from unified view,Unified list/detail interaction,Presentation layer must not mutate watch/runtime state,No mutation path found in reviewed components,PASS,iOSApp/Views/Shared/IOSUnifiedLogbookListView.swift,PENDING_PAIRED_DEVICE_QA,Paired walkthrough pending
+ULOG-005,Ownership,No mixed canonical storage,All logbook routes,Canonical stores remain per activity,Separate stores still referenced by activity roots,PASS,iOSApp/Views/LogbookView.swift,PENDING_MANUAL_QA,Strict ownership preserved
+

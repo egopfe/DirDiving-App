@@ -1,31 +1,15 @@
 Rank,Consolidated_Finding_ID,Severity,Priority,Recommended_Batch,Recommended_Command,Dependency_Level,Safety_Critical,Release_Blocker,Quick_Win,High_Regression_Risk,Needs_Physical_QA,Needs_External_Validation,Reason_For_Rank,Acceptance_Gate,Notes
-1,CONS-053,P0,P0,Batch-9,R12,0,No,Yes,Yes,Low,No,No,P0 legacy docs contradict release truthfulness,Demote false App Store/CCR claims,2 P0 docs @ audit 06
-2,CONS-009,P1,P1,Batch-8,R10,0,Yes,Yes,No,Low,Yes,Yes,Highest algorithmic external gate per V1.5,Signed BUHLMANN_EXTERNAL evidence,WFC-P1-001 alias
-3,CONS-010,P1,P1,Batch-8,R10,1,Yes,Yes,No,Medium,Yes,No,Physical FC sensor path unverified,Signed Ultra wet FC artifacts,WFC-P2-002
-4,CONS-042,P1,P1,Batch-8,R10,1,Yes,Yes,No,Medium,Yes,Yes,Shallow/full depth wet separation unverified,Signed shallow wet matrix,Regulatory exposure if misclaimed
-5,CONS-048,P1,P1,Batch-8,R10,1,No,Yes,No,Low,Yes,No,12 Snorkeling field QA 0/12,12/12 SNORKELING_* folders PASS,Software PASS @2c30412
-6,CONS-021,P1,P1,Batch-8,R10,1,No,Yes,No,Medium,Yes,No,WAO physical end-to-end not executed,Signed WATCH_WATER_AUTO_OPEN artifacts,SOFTWARE_READY preserved
-7,CONS-022,P1,P1,Batch-8,R10,1,No,Yes,No,Medium,Yes,No,Water Lock Crown AB physical not executed,Signed underwater HW artifacts,Software clamp PASS
-8,CONS-011,P1,P1,Batch-8,R10,2,No,Yes,No,Medium,Yes,No,Paired sync security/UI not field-verified,Signed paired QA pack,Static codec PASS
-9,CONS-044,P1,P1,Batch-9,R11,3,No,Yes,No,Low,No,Yes,Legal/marketing counsel pending,Counsel approval artifacts,Blocks App Store
-10,CONS-012,P1,P1,Batch-6,R09,2,No,Yes,No,Low,Yes,No,Manual a11y not executed,VoiceOver manual notes + contract PASS,Contract script PASS
-11,CONS-013,P1,P1,Batch-9,R11,2,No,Yes,No,Low,Yes,Yes,PDF physical render + marketing evidence,Device PDF golden renders,Template present
-12,CONS-050,P2,P2,Batch-6,R09,0,No,No,Yes,Medium,No,No,Watch CI 1139/1152; routing test drift not FC safety,1152/1152 Watch tests PASS,WFC-P2-005 deduped
-13,CONS-051,P2,P2,Batch-6,R09,0,No,No,Yes,Low,No,No,Isolated Snorkeling progress test,SnorkelingRouteProgressCalculatorTests PASS,WFC-P2-006
-14,CONS-015,P2,P2,Batch-1,R02,1,Yes,No,No,High,Yes,Yes,Altitude ML oracle partial at elevation,Altitude matrix extended,P2 software gap
-15,CONS-016,P2,P2,Batch-1,R02,2,Yes,No,No,Medium,No,Yes,TTS 1-min quanta documented conservative,Oracle sweep within tolerance,Documented limitation
-16,CONS-020,P2,P2,Batch-8,R10,2,No,No,No,Low,Yes,No,Submersion probe timeout reachability,Physical submerged cold-launch QA,Not FC bypass
-17,CONS-023,P2,P2,Batch-8,R10,2,Yes,No,No,Low,Yes,No,Long-session FC battery unprofiled,Instruments Energy 2-4h dive,Simulator timing PASS
-18,CONS-024,P2,P2,Batch-8,R10,2,No,No,No,Low,Yes,No,Large payload paired sync unprofiled,Paired low-battery flush QA,Codec tests PASS
-19,CONS-030,P2,P2,Batch-8,R10,2,No,No,No,Low,No,Yes,Subsurface CSV round-trip not validated,Signed SUBSURFACE_EXTERNAL evidence,Malformed fail-closed OK
-20,CONS-032,P2,P2,Batch-6,R09,3,No,No,No,Low,Yes,No,Pixel-diff baselines 0/59,59/59 baselines captured,Structural PASS only
-21,CONS-043,P2,P2,Batch-8,R10,2,Yes,No,No,Low,No,Yes,GF preset external spot-check pending,Signed GF external comparison,Software presets PASS
-22,CONS-045,P2,P2,Batch-8,R10,0,No,Yes,No,Low,Yes,Yes,Aggregate physical/external 0%,Signed QA_EVIDENCE artifacts,Meta-finding
-23,CONS-054,P2,P2,Batch-9,R12,1,No,Yes,Yes,Low,No,No,INDEX/README stale vs 2c30412,INDEX header @2c30412; reconcile PARTIAL,Not safety defect
-24,CONS-028,P3,P3,Batch-3,R05,3,No,No,No,Medium,Yes,No,Navigation restoration partial,IOSCompanionNavigationRestorationTests,UX only
-25,CONS-039,P3,P3,Batch-3,R05,3,No,No,No,Low,No,No,Apnea cloud stub by design,ApneaCloudBackupStubTruthfulnessTests,Accepted risk
-26,CONS-040,P3,P3,Batch-3,R05,3,No,No,Yes,Low,No,No,Dual settings binding maintainability,IOSActivitySettingsCoherenceTests,No leak
-27,CONS-041,P3,P3,Batch-4,R06,3,No,No,No,Medium,No,No,Multigas tissue replay partial,Future-work doc implementation,Analytics gap
-28,CONS-046,P1,P1,Batch-0,R01,-,No,No,Yes,Low,No,No,FIXED — script V1.5 PASS,validate_commands_for_cursor_integrity.sh PASS,CLOSED @6a0005b
-29,CONS-049,P1,P1,Batch-0,R01,-,No,No,Yes,Low,No,No,FIXED — 1655 iOS tests PASS,xcodebuild iOS Algorithm Tests PASS,CLOSED @7a429a7
-30,CONS-047,P2,P2,Audit-rerun,n/a,-,No,No,n/a,Low,No,No,VERIFIED — audits 01-06 @2c30412,All six outputs current,Stale upstream closed
+1,CF-002,P1,P1,Batch-1,R09,0,No,Yes,Yes,Medium,No,No,Fails current Watch/iOS parity tests and is fastest software closure,All localization parity tests green,Required first batch quick win
+2,CF-008,P0,P0,Batch-1,R12,0,No,Yes,Yes,Low,No,No,Stale INDEX README can misstate readiness baseline,Docs baseline aligned to 7ae527b,Truthfulness repair in first batch
+3,CF-009,P0,P0,Batch-1,R12,0,No,Yes,Yes,Low,No,Yes,Unsupported CCR claims create legal and compliance exposure,Claims wording evidence-backed only,Truthfulness repair in first batch
+4,CF-007,P1,P1,Batch-2,R11,1,No,Yes,No,Medium,No,No,SUPPORT_ROLLBACK failed in release audit,Rollback gate PASS with artifacts,Release governance blocker
+5,CF-006,P1,P1,Batch-2,R01,1,No,No,No,Low,No,No,Missing command 07 and stale command references break lifecycle continuity,Command inventory fully aligned,Manual continuation dependency
+6,CF-001,P1,P1,Batch-4,R10,2,Yes,Yes,No,Low,No,Yes,External Buhlmann validation absent,Independent validation package signed,Blocks external and App Store claims
+7,CF-003,P1,P1,Batch-3,R10,2,No,Yes,No,Low,Yes,No,Cross-audit physical QA campaigns still pending,Signed physical evidence matrix entries,External readiness blocker
+8,CF-004,P1,P1,Batch-3,R10,2,No,Yes,No,Medium,Yes,No,Snorkeling field/manual QA pending after software remediation,Snorkeling QA pending matrix closed,Software applied but not field closed
+9,CF-011,P1,P1,Batch-4,R11,3,No,Yes,No,Low,Yes,Yes,Umbrella release readiness still NOT_READY,All dependent blockers closed,Depends on validation QA and docs
+10,CF-010,P2,P2,Batch-3,R10,3,No,No,No,Low,Yes,No,Unified logbook manual QA pending despite no contamination findings,Manual unified logbook checklist complete,Keep presentation-only boundary
+11,CF-013,P2,P2,Batch-3,R10,3,No,No,No,Medium,Yes,No,Snorkeling remediation consumed but closure evidence incomplete,All pending snorkeling QA rows closed,Tracks 7c459cb consumption
+12,CF-012,P2,P2,Batch-2,R01,3,No,No,No,Low,No,No,Manual continuation path must be explicit for missing command lifecycle,Manual continuation document complete and reproducible,Boundary clarity
+13,CF-014,P3,P3,Batch-4,R12,4,No,No,Yes,Low,No,No,Docs/repo alignment debt slows reruns,No stale references in mandatory docs,Non-blocking hygiene
+14,CF-005,P2,P2,Batch-2,R09,4,No,No,No,Low,No,No,Demo contamination fix already verified should stay closed,Regression check remains green,Verified at f90b671

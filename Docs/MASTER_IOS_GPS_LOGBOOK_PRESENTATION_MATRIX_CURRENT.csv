@@ -1,0 +1,6 @@
+GPS_ID,Activity,Requirement,Observed,Status,Evidence,Pending_Gate,Notes
+GPS-DIV-001,Diving,Surface-only entry/exit metadata and no underwater authority,Observed policy maintained,PASS,Docs/IOS_UNIFIED_ACTIVITY_LOGBOOK_VIEW.md,PENDING_PHYSICAL,No decompression authority claim
+GPS-APN-001,Apnea,Surface-only start/end metadata and no runtime navigation guarantee,Observed policy maintained,PASS,Docs/IOS_UNIFIED_ACTIVITY_LOGBOOK_VIEW.md,PENDING_PHYSICAL,No recovery guarantee wording
+GPS-SNK-001,Snorkeling,Route/GPS quality/off-route metadata remain snorkeling-owned,Observed policy maintained,PASS,Docs/MASTER_V1_7_SNORKELING_NO_REGRESSION_MATRIX_CURRENT.csv,PENDING_PHYSICAL,Open-water/paired QA still pending
+GPS-UNI-001,Unified logbook displays metadata only and does not become route authority,Observed presentation-only behavior,PASS,iOSApp/Utils/IOSUnifiedLogbookPresentationBuilder.swift,PENDING_MANUAL_QA,Manual UI evidence still pending
+GPS-PRIV-001,Location policy remains When In Use unless explicitly changed,No contradictory evidence found,PASS,Docs/MASTER_V1_7_SNORKELING_NO_REGRESSION_MATRIX_CURRENT.csv,PENDING_PHYSICAL,No Always Location claim promoted

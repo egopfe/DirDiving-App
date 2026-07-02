@@ -1,0 +1,8 @@
+Gate_ID,Area,Platform,Required_Manual_Evidence,Current_Status,Severity,Release_Impact,Notes
+MUIQA-001,Unified logbook list/detail walkthrough,iOS,Manual navigation capture for all activity toggles,PENDING_MANUAL_QA,P1,Blocks external/App Store readiness,Software policy present but no manual proof
+MUIQA-002,Water auto-open settings and route-now UX,Watch,On-device walkthrough under realistic states,PENDING_PHYSICAL_WATER_AUTO_OPEN_QA,P1,Blocks external/App Store readiness,Simulator evidence not sufficient
+MUIQA-003,Underwater crown clamp toast readability,Watch,Physical underwater/Water Lock interaction evidence,PENDING_PHYSICAL_WATER_LOCK_QA,P1,Blocks external/App Store readiness,Cannot infer from simulator-only
+MUIQA-004,Action Button shortcut behavior,Watch Ultra,Physical Action Button route and toast/haptic validation,PENDING_PHYSICAL_ACTION_BUTTON_QA,P1,Blocks external/App Store readiness,Requires configured shortcut
+MUIQA-005,Snorkeling GPS/open-water UX,Watch+iOS,Open-water paired-device trail capture,PENDING_PHYSICAL,P2,Blocks external readiness claims,Software non-regression only
+MUIQA-006,Accessibility manual VoiceOver sweep,Watch+iOS,Manual VO order/labels/hints verification,PENDING_PHYSICAL,P1,Blocks accessibility PASS for release,Automated checks are not enough
+

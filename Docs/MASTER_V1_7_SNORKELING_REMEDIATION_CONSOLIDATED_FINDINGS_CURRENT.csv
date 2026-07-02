@@ -1,0 +1,7 @@
+Snorkeling_Finding_ID,Source_Group,Severity,Status,Software_Commit,Manual_QA_Status,Physical_QA_Status,Release_Impact,Linked_Consolidated_Finding,Notes
+SNORK-V17-001,DG-LOC-001,P1,OPEN,,PENDING,PENDING,Blocks internal confidence uplift,CF-002,Localization key parity failures remain open
+SNORK-V17-002,DG-SNORK-001,P1,PARTIAL,7c459cb,PENDING,PENDING,Blocks external readiness,CF-004,Software remediation applied but QA not closed
+SNORK-V17-003,DG-SNORK-001,P2,PARTIAL,7c459cb,PENDING,PENDING,Blocks full closure narrative,CF-013,Consumption recorded with pending evidence
+SNORK-V17-004,DG-DEMO-001,P2,VERIFIED,f90b671,COMPLETE,N/A,Removes contamination risk,CF-005,Demo logbook contamination fix verified
+SNORK-V17-005,DG-PHY-001,P1,OPEN,,PENDING,PENDING,Blocks external and store claims,CF-003,Physical campaigns not executed
+SNORK-V17-006,DG-CMD-001,P2,OPEN,,N/A,N/A,Governance and continuity risk,CF-012,Manual continuation required due missing command 07

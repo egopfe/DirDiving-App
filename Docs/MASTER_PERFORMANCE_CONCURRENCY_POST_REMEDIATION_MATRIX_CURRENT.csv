@@ -1,9 +1,6 @@
-Consolidated_ID,Finding_ID,Component,Remediation,Verification_At_2c30412,Status,Automated_Evidence,Physical_Evidence,Notes
-CONS-027,MAIN-PERF-007,PlannerStore deinit,Cancel planningUpdateTask + saveTask,deinit cancels both tasks,PASS,PerformanceConcurrencyBatteryRemediationTests PASS,PENDING,Software fix verified
-CONS-023,MAIN-PERF-001,DiveManager FC tick,1Hz + solver budget + degraded policy,FullComputerTimingFaultTests,PASS,FullComputerTimingFaultTests @ 2c30412,PENDING,Field battery unknown
-CONS-024,MAIN-PERF-002,WatchSync large payload,ActivitySyncLargePayloadTransfer + flush policy,Codec + tests PASS,PASS,ActivitySyncLargePayloadTransferTests @ 2c30412,PENDING,Paired load unprofiled
-CONS-025,MAIN-PERF-003,iOS LogbookView,LazyVStack + session cap 40,Implemented,PASS,Synthetic decode tests @ 2c30412,PENDING,Scroll not profiled device
-CONS-026,MAIN-PERF-004,Snorkeling map,downsampledMeasuredPoints 4096 cap,Implemented,PASS,SnorkelingRoutePresentationSampling,PENDING,SnorkelingRouteProgressCalculatorTests 1 fail
-CONS-003,MAIN-PERF-006,iOS sync in-flight,releaseInFlightOutboundSession,Present + tests PASS,PASS,PerformanceConcurrencyBatteryRemediationTests,PENDING,Retry after failure
-CONC-016,MAIN-PERF-007,PlannerStore deinit,Same as CONS-027,Cancelled in deinit,PASS,Tests PASS,N/A,Closed
-CONC-019,MAIN-PERF-004,Snorkeling map build,Sync build on caller thread,Still sync before downsample,MONITOR,Unit tests,PENDING,Consider detached build P3 follow-up
+Check_ID,Domain,Expected,Status,Evidence,Pending_Gate,Notes
+PC-001,Planner stale-result guard,Generation-token gating retained,PASS,Planner remediation tests,,
+PC-002,Planner task lifecycle,cancel on deinit retained,PASS,Prior remediation evidence,,
+PC-003,Watch tick safety,degraded-on-miss policy retained,PASS,FC timing fault tests,,
+PC-004,Map scalability guard,bounded presentation downsampling,PARTIAL,Snorkeling map utilities,PENDING_INSTRUMENTS,Needs device profiling
+PC-005,Battery/thermal sustained sessions,physical evidence attached,NOT_EXECUTED,No artifacts this pass,PENDING_PHYSICAL,Tracked in QA plan

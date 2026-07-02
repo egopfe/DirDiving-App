@@ -1,0 +1,6 @@
+Pending_ID,Requirement,Status,Severity,Evidence,Notes
+SNK-PEN-001,R1-009 paired WatchConnectivity E2E,PENDING_PHYSICAL,P1,Status consumption matrix,Field paired run pending
+SNK-PEN-002,R3-003 QA template conversion to real evidence,PENDING_MANUAL_QA,P2,Status consumption matrix,Template-only evidence
+SNK-PEN-003,Open-water snorkeling route QA,PENDING_PHYSICAL,P1,No field pack attached,Needs real open-water captures
+SNK-PEN-004,Manual UI QA for remediation flows,PENDING_MANUAL_QA,P2,No full walkthrough attached,Needs manual checklist execution
+SNK-PEN-005,GPS quality/return messaging physical validation,PENDING_PHYSICAL,P2,No field log package,Needs physical evidence

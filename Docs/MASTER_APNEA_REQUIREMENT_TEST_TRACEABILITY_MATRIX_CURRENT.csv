@@ -1,26 +1,8 @@
-Requirement_ID,Domain,Requirement,Primary_Test_Method,Evidence_Type,Platform,Status,Software_Status,Evidence_Location,Notes
-APN-REQ-01,Apnea,Lifecycle engine state machine,ApneaLifecycleEngineTests,automated unit,Watch,PASS,SOFTWARE_READY,Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift,
-APN-REQ-02,Apnea,Recovery checkpoint integrity,ApneaTimeRecoveryCheckpointEngineTests,automated unit,Watch,PASS,SOFTWARE_READY,Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift,
-APN-REQ-03,Apnea,Release hard validation copy,ApneaReleaseHardValidationTests,automated unit,Both,PASS,SOFTWARE_READY,Tests/WatchAlgorithmTests/ApneaReleaseHardValidationTests.swift,No medical guarantee
-APN-REQ-04,Apnea,Architecture isolation from FC,ApneaArchitectureIsolationTests,automated unit,Watch,PASS,SOFTWARE_READY,Tests/WatchAlgorithmTests/ApneaArchitectureIsolationTests.swift,No tissue cross-contamination
-APN-REQ-05,Apnea,iOS companion routing,IOSApneaCompanionTests,automated unit,iOS,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests/IOSApneaCompanionTests.swift,
-APN-REQ-06,Apnea,Settings ownership isolation,IOSActivitySettingsRoutingTests,automated unit,iOS,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests/IOSActivitySettingsRoutingTests.swift,
-APN-REQ-07,Apnea,Logbook ownership isolation,IOSActivityLogbookRoutingTests,automated unit,iOS,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests/IOSActivityLogbookRoutingTests.swift,6/6 forbidden routes blocked
-APN-REQ-08,Apnea,Sync schema isolation,ApneaSyncCodec tests,automated unit,Both,PASS,SOFTWARE_READY,Shared/Utils/ApneaSyncCodec.swift,dirdiving_apnea_* namespace
-APN-REQ-09,Apnea,Cross-decode rejection,ActivitySyncCrossDecodeRejectionTests,automated unit,iOS,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests/ActivitySyncCrossDecodeRejectionTests.swift,
-APN-REQ-10,Apnea,Training P1/P2/P3 compound steps,ApneaSessionEngine tests,automated unit,Watch,PASS,SOFTWARE_READY,@76f3703 training compound,
-APN-REQ-11,Apnea,No decompression wording,ApneaReleaseHardValidationTests + grep,static audit,Both,PASS,SOFTWARE_READY,Apnea views/strings,
-APN-REQ-12,Apnea,No GF/gas/MOD/PPO2 settings,IOSActivitySettingsRoutingTests,automated unit,iOS,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests/,
-APN-REQ-13,Apnea,WAO does not auto-start session,WatchWaterAutoOpenPolicyTests + boundary audit,automated unit,Watch,PARTIAL,SOFTWARE_GAP,Tests/WatchAlgorithmTests/,11 WAO failures post-Apnea — WFC-P2-005
-APN-REQ-14,Apnea,Digital Crown live-only clamp,WatchUnderwaterPagePolicyTests,automated unit,Watch,PASS,SOFTWARE_READY,Tests/WatchAlgorithmTests/WatchUnderwaterPagePolicyTests.swift,
-APN-REQ-15,Apnea,Action Button unavailable on live,WatchUnderwaterActionResolverTests,automated unit,Watch,PASS,SOFTWARE_READY,Tests/WatchAlgorithmTests/WatchUnderwaterActionResolverTests.swift,
-APN-REQ-16,Apnea,iOS mode switch integration,IOSActivitySettingsCoherenceTests,automated unit,iOS,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests/IOSActivitySettingsCoherenceTests.swift,
-APN-REQ-17,Apnea,Watch in-mode Settings access,WatchInModeSettingsAccess tests,automated unit,Watch,PASS,SOFTWARE_READY,Watch UI static,
-APN-REQ-18,Apnea,Export disclaimers,IOSApneaSessionExportService tests,automated unit,iOS,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests/,
-APN-REQ-19,Apnea,Wet interaction physical,APNEA_WET_INTERACTION folder,physical Watch,Watch,NOT_PASSED,PENDING_PHYSICAL,Docs/QA_EVIDENCE/APNEA_WET_INTERACTION/,
-APN-REQ-20,Apnea,Auto-detection field validation,APNEA_WET_INTERACTION procedure,physical Watch,Watch,NOT_PASSED,PENDING_PHYSICAL,Docs/QA_EVIDENCE/APNEA_WET_INTERACTION/,Not claimed validated
-APN-REQ-21,Apnea,Battery/thermal long session,APNEA_BATTERY_THERMAL,physical Watch,Watch,NOT_PASSED,PENDING_PHYSICAL,Docs/QA_EVIDENCE/APNEA_BATTERY_THERMAL/,
-APN-REQ-22,Apnea,VoiceOver journey,APNEA_VOICEOVER procedure,physical Watch,Watch,NOT_PASSED,PENDING_PHYSICAL,Docs/QA_EVIDENCE/APNEA_VOICEOVER/,
-APN-REQ-23,Apnea,Paired iOS→Watch plan transfer,APNEA_IOS_WATCH_SYNC,paired-device,Both,NOT_PASSED,PENDING_PHYSICAL,Docs/QA_EVIDENCE/APNEA_IOS_WATCH_SYNC/,
-APN-REQ-24,Apnea,Privacy data flow,Apnea privacy matrix,static audit,Both,PASS,SOFTWARE_READY,MASTER_APNEA_PRIVACY_DISCLOSURE_MATRIX_CURRENT.csv,
-APN-REQ-25,Apnea,Localization/accessibility,DIRDivingCompleteLocalizationAuditTests,automated unit,Both,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests/DIRDivingCompleteLocalizationAuditTests.swift,Manual a11y PENDING
+Requirement_ID,Area,Automated_Evidence,Simulator_Evidence,Physical_Evidence,Status,Severity,Gap,Action
+APN-REQ-001,Apnea runtime lifecycle,Present,Present,PENDING_PHYSICAL,PARTIAL,P1,Wet evidence missing,Execute apnea wet lifecycle protocol
+APN-REQ-002,Apnea recovery countdown/state,Present,Present,PENDING_PHYSICAL,PARTIAL,P2,No physical UX confirmation,Manual+wet recovery walkthrough
+APN-REQ-003,Apnea settings ownership isolation,Present,Present,PENDING_MANUAL_QA,PARTIAL,P2,Manual settings UX pending,Run settings ownership manual suite
+APN-REQ-004,Apnea logbook ownership isolation,Present,Present,PENDING_MANUAL_QA,PARTIAL,P2,Manual contamination check pending,Run manual no-contamination suite
+APN-REQ-005,Apnea iOS mode-switch integration,Present,Present,PENDING_MANUAL_QA,PARTIAL,P2,No manual mode-switch evidence,Run mode-switch QA
+APN-REQ-006,Apnea sync/schema isolation,Present,Present,PENDING_PHYSICAL,PARTIAL,P2,No paired physical validation,Execute paired sync session evidence
+APN-REQ-007,Apnea claims truthfulness constraints,Present,Present,N/A,PASS,P1,None,Maintain wording gates

@@ -1,17 +1,8 @@
-QA_ID,Platform,Scenario,Expected_Behavior,Evidence_Type,Evidence_Folder,Procedure_Doc,Status,Software_Status,Physical_Status,Severity,Notes
-APN-PQ-001,Watch,Physical install + Apnea launch,Apnea dashboard reachable,physical Watch,QA_EVIDENCE/APNEA_WET_INTERACTION,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P1,
-APN-PQ-002,Watch,Automatic session detection wet,Wet detection triggers session proposal not auto-start without user,physical Watch,QA_EVIDENCE/APNEA_WET_INTERACTION,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P1,Not claimed validated in copy
-APN-PQ-003,Watch,Manual Apnea session start,Session records depth/time profile,physical Watch,QA_EVIDENCE/APNEA_WET_INTERACTION,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P1,
-APN-PQ-004,Watch,Recovery countdown display,Countdown shown; no medical guarantee copy,physical Watch,QA_EVIDENCE/APNEA_WET_INTERACTION,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-005,Watch,Training P1/P2/P3 compound wet,Compound steps execute on wrist,physical Watch,QA_EVIDENCE/APNEA_WET_INTERACTION,@76f3703,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-006,Watch,Targets/alarms haptics,Alarm triggers haptic underwater policy,physical Watch,QA_EVIDENCE/APNEA_WET_INTERACTION,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-007,Watch,Digital Crown live-only clamp,Crown blocked off live page,physical Watch,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_CROWN,HWC matrix,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-008,Watch,Water Lock during Apnea,No spurious navigation,physical Watch,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK,HWC matrix,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-009,Watch,WAO routes Apnea ready not live,WAO opens Apnea predive/ready not active session,physical Watch,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED,WAO matrix,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P1,Does not auto-start session
-APN-PQ-010,Watch,Battery/thermal 60+ min session,Thermal observation logged,physical Watch,QA_EVIDENCE/APNEA_BATTERY_THERMAL,Apnea release checklist,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-011,Watch,VoiceOver Apnea journey,All controls labeled,physical Watch,QA_EVIDENCE/APNEA_VOICEOVER,IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-012,iPhone,Apnea Settings isolation,No newline,physical iPhone,QA_EVIDENCE/APNEA_IOS_WATCH_SYNC,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-013,iPhone,Apnea logbook browse/import,Completed sessions display,physical iPhone,QA_EVIDENCE/APNEA_IOS_WATCH_SYNC,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,
-APN-PQ-014,Paired,Plan transfer iOS→Watch,Session plan arrives on Watch,paired-device,QA_EVIDENCE/APNEA_IOS_WATCH_SYNC,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P1,
-APN-PQ-015,Paired,Completed session Watch→iOS,Profile imports to iOS logbook,paired-device,QA_EVIDENCE/APNEA_IOS_WATCH_SYNC,Apnea QA README,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P1,
-APN-PQ-016,Watch,Shallow wet Apnea depth sampling,Depth samples within shallow entitlement,underwater,QA_EVIDENCE/HARDWARE_ENTITLEMENT,HARDWARE_QA_MATRIX.md QA-002,NOT_PASSED,SOFTWARE_PASS,PENDING_PHYSICAL,P1,CONS-042
+QA_ID,Scenario,Status,Severity,Evidence,Notes
+APN-PHY-001,Apnea wet interaction start/stop,PENDING_PHYSICAL,P1,None,No open-water/chamber artifacts
+APN-PHY-002,Apnea auto-detection physical behavior,PENDING_PHYSICAL,P1,None,No physical capture set
+APN-PHY-003,Apnea recovery UX in wet condition,PENDING_PHYSICAL,P2,None,No field UX evidence
+APN-PHY-004,Apnea Action Button policy in session,PENDING_PHYSICAL,P2,None,Template-only
+APN-PHY-005,Apnea Digital Crown policy in session,PENDING_PHYSICAL,P2,None,Template-only
+APN-PHY-006,Apnea paired iPhone/watch sync in field,PENDING_PHYSICAL,P1,None,No paired field logs
+APN-PHY-007,Apnea battery/thermal observation,PENDING_PHYSICAL,P2,None,No instruments traces

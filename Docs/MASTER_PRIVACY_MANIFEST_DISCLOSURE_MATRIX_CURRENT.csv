@@ -1,24 +1,12 @@
-Data_Category,Activity,Collected,Stored,Synced,Exported,Shared,Backed_Up,Encrypted_Protected,User_Controllable,Privacy_Policy,Privacy_Manifest,Release_Risk,Status,Software_Status,Physical_Status,Notes
-Dive profiles depth samples,Diving,yes,yes,yes,yes,no,opt-in iCloud diving,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,PENDING_PHYSICAL,Samples capped; shallow depth tagged when applicable
-Entry exit GPS,Diving,yes,yes,yes,optional CSV,no,opt-in if in session,yes,yes,yes,yes,High,PASS,SOFTWARE_READY,PENDING_PHYSICAL,Default export omits GPS
-Snorkeling route track,Snorkeling,yes,yes,yes,yes,no,no,yes,yes,yes,yes,High,PASS,SOFTWARE_READY,PENDING_PHYSICAL,Local-only cloud
-Snorkeling dip events,Snorkeling,yes,yes,yes,yes,no,no,yes,yes,yes,yes,Low,PASS,SOFTWARE_READY,N/A,
-Session photos,Snorkeling,yes,yes,yes,share sheet,no,no,yes,yes,yes,yes,High,PARTIAL,SOFTWARE_READY,PENDING_PHYSICAL,SNK photo privacy field QA pending
-Apnea timings stats,Apnea,yes,yes,yes,yes,no,stub opt-in,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,IOS-P3-002 iCloud stub documented @2c30412
-Apnea buddy notes,Apnea,yes,yes,yes,redacted export,no,no,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,
-Equipment gas data,Diving,yes,yes,yes,PDF export,no,opt-in diving,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,
-CCR bailout data,Diving,yes,yes,plan package only,PDF export,no,opt-in diving,yes,yes,yes,yes,High,PASS,SOFTWARE_READY,N/A,Reference-only posture
-User notes,All,yes,yes,activity scoped,export per policy,no,diving opt-in,yes,yes,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,
-Sync identifiers,Cross,yes,yes,WC only,no,no,no,yes,resetPeerTrust,yes,yes,Critical,PASS,SOFTWARE_READY,PENDING_PHYSICAL,TOFU pinning tests PASS
-Device identifiers,Cross,no,no,no,no,no,no,N/A,N/A,yes,yes,Low,PASS,SOFTWARE_READY,N/A,No IDFA; no tracking
-Diagnostics logs,Cross,limited,ephemeral,none,no,no,no,N/A,N/A,yes,partial,Low,PASS,SOFTWARE_READY,N/A,Prefer os.Logger private
-iCloud KVS dive snapshot,Diving,yes,iCloud,yes,no,Apple iCloud,opt-in,yes,user toggle,yes,yes,High,PASS,SOFTWARE_READY,PENDING_PHYSICAL,Two-device QA pending
-Exported CSV PDF files,All,yes,tmp,user initiated,share sheet,user share,no,yes,user share,yes,yes,Medium,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,Manual render QA pending
-Briefing card PNG,Diving,yes,yes,WC transfer,no,no,no,yes,delete card,yes,yes,Low,PASS,SOFTWARE_READY,PENDING_PHYSICAL,Path traversal blocked
-App Intents metadata,Cross,yes,UserDefaults,no,no,no,no,standard UD,re-onboard,yes,yes,Low,PASS,SOFTWARE_READY,N/A,Gated by legal acceptance
-Planner plans GF presets,Diving,yes,yes,WC file transfer,none,no,opt-in planner state,yes,user delete,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,GF import CONS-002 closed @451f8fb
-Full Computer checkpoint,Diving,yes,yes,no,no,no,no,yes,overwrite,yes,yes,High,PASS,SOFTWARE_READY,N/A,Isolated namespace
-Legal acceptance flag,Cross,yes,UserDefaults,no,no,no,no,standard UD,re-onboard,yes,yes,Low,PASS,SOFTWARE_READY,N/A,
-Developer unlock shallow flags,Cross,yes,UserDefaults,no,no,no,no,standard UD,clear defaults,yes,yes,Low,PASS,SOFTWARE_READY,N/A,TestFlight shallow toggles
-Simulation sensor mode,Cross,yes,UserDefaults,no,no,no,no,standard UD,migrate on launch,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,TestFlight acknowledgment
-Water auto-open preferences,Cross,yes,UserDefaults,no,no,no,no,standard UD,user settings,yes,yes,Low,PASS,SOFTWARE_READY,N/A,Default disabled
+Data_Category,Collected,Stored,Synced,Exported,Shared,Backed_Up,Protected,User_Controllable,Policy_Disclosed,Manifest_Declared,Release_Risk,Notes
+Dive profiles,YES,YES,YES,YES,NO,YES,PARTIAL,YES,YES,YES,MEDIUM,Physical export/backup evidence pending
+Depth samples,YES,YES,YES,YES,NO,YES,PARTIAL,PARTIAL,YES,YES,HIGH,Underwater physical QA pending
+Location/GPS metadata,YES,YES,YES,YES,NO,YES,PARTIAL,PARTIAL,YES,YES,HIGH,Field validation pending; keep surface-only claims
+Snorkeling routes,YES,YES,YES,YES,NO,YES,PARTIAL,PARTIAL,YES,YES,HIGH,Open-water QA pending
+Photos/images,CONDITIONAL,YES,YES,YES,NO,YES,PARTIAL,YES,YES,YES,MEDIUM,Permission and export physical checks pending
+Equipment/gas data,YES,YES,YES,YES,NO,YES,PARTIAL,YES,YES,YES,MEDIUM,Manual QA pending
+CCR/bailout references,YES,YES,YES,YES,NO,YES,PARTIAL,YES,YES,YES,MEDIUM,Reference-only claim constraints preserved
+Notes/free text,YES,YES,YES,YES,NO,YES,PARTIAL,YES,YES,YES,MEDIUM,No external sharing evidence in this audit
+Sync identifiers,YES,YES,YES,NO,NO,YES,PARTIAL,NO,YES,YES,LOW,Namespace isolation covered by prior audits
+Device identifiers,YES,YES,YES,NO,NO,YES,PARTIAL,PARTIAL,YES,YES,MEDIUM,Physical privacy-path validation pending
+Diagnostics/logs,YES,YES,CONDITIONAL,YES,NO,YES,PARTIAL,PARTIAL,YES,YES,MEDIUM,Support/incident process evidence incomplete
