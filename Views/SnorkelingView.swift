@@ -231,6 +231,7 @@ struct SnorkelingView: View {
                     .font(DiveUI.Typography.hintCaption)
                     .foregroundStyle(DiveUI.yellow)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityHint(Text(String(localized: "snorkeling.watch.ready.route_pending_activation.a11y")))
             }
 
             if let planned = ui.routePlannedSummaryText {
@@ -549,7 +550,14 @@ struct SnorkelingView: View {
                 runtime.enterReturnMode()
             }
             .disabled(!ui.returnPrimaryActionEnabled)
-            .accessibilityIdentifier("snorkeling.action.return.primary")
+            .accessibilityIdentifier(
+                ui.returnIsPrimaryAction
+                    ? "snorkeling.action.return.primary"
+                    : "snorkeling.action.return.secondary"
+            )
+            .accessibilitySortPriority(ui.returnIsPrimaryAction ? 100 : 0)
+            .font(ui.returnIsPrimaryAction ? DiveUI.Typography.sectionHeading : DiveUI.Typography.rowTitle)
+            .frame(maxWidth: .infinity)
 
             HStack(spacing: 6) {
                 if input.phase == .paused {

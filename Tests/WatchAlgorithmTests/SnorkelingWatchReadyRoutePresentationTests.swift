@@ -29,7 +29,7 @@ final class SnorkelingWatchReadyRoutePresentationTests: XCTestCase {
         )
     }
 
-    func testPendingRouteDuringActiveSessionShowsPendingBanner() {
+    func testPendingRouteDuringActiveSessionShowsPendingBannerAndAccessibilityHint() {
         let route = SnorkelingWatchImportedRoutePresentation(
             status: .pending,
             routeName: "Stage route",
@@ -47,7 +47,13 @@ final class SnorkelingWatchReadyRoutePresentationTests: XCTestCase {
             SnorkelingWatchReadyPresentationPolicy.routeStatusText(for: route),
             DIRWatchLocalizer.string("snorkeling.route_sync.pending")
         )
-        XCTAssertNotNil(SnorkelingWatchReadyPresentationPolicy.routePendingBannerText(for: route))
+        XCTAssertEqual(
+            SnorkelingWatchReadyPresentationPolicy.routePendingBannerText(for: route),
+            DIRWatchLocalizer.string("snorkeling.watch.ready.route_pending_activation")
+        )
+        XCTAssertFalse(
+            DIRWatchLocalizer.string("snorkeling.watch.ready.route_pending_activation.a11y").isEmpty
+        )
     }
 
     func testStaleRevisionRejectedShowsRejectedStatus() {
