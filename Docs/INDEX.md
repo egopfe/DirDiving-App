@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-07-02  
-**Branch consigliato:** `main` = `origin/main` @ `d362795`
+**Aggiornato:** 2026-06-17  
+**Branch consigliato:** `main` (post P2 commit)
+
+---
+
+## Aggiornamento indice 2026-06-17 — Snorkeling Watch P2 Premium Runtime + iOS Config
+
+Return-to-entry primary Watch action, iOS operational thresholds, route summary, marker logbook, GPX/KML export; 11 P2 tests.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`SNORKELING_WATCH_P2_PREMIUM_RUNTIME_AUDIT_CURRENT.md`](SNORKELING_WATCH_P2_PREMIUM_RUNTIME_AUDIT_CURRENT.md) |
+| **Report** | [`SNORKELING_WATCH_P2_IMPLEMENTATION_REPORT_CURRENT.md`](SNORKELING_WATCH_P2_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Completeness** | [`SNORKELING_WATCH_P2_COMPLETENESS_AUDIT_CURRENT.md`](SNORKELING_WATCH_P2_COMPLETENESS_AUDIT_CURRENT.md) |
+| **Verdict** | **SNORKELING_WATCH_P2_INTERNAL_READY** · **NO_ALGORITHM_REGRESSION** · **MANUAL_UI_QA_PENDING** |
 
 ---
 

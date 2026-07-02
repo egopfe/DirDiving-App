@@ -141,6 +141,10 @@ struct SnorkelingWatchPresentationOutput: Equatable {
     var routeRevisionText: String?
     var routePendingBannerText: String?
     var routePlannedSummaryText: String?
+    var routeCompactSummaryText: String
+    var returnPrimaryActionTitle: String
+    var returnPrimaryActionEnabled: Bool
+    var returnIsPrimaryAction: Bool
     var precheckSummaryText: String
     var batteryText: String?
     var batteryColorToken: SnorkelingWatchColorToken
@@ -176,6 +180,13 @@ enum SnorkelingWatchPresentation {
         let route = input.importedRoutePresentation
         let battery = SnorkelingWatchReadyPresentationPolicy.batteryPresentation(fraction: input.batteryFraction)
         let routePlannedSummary = routePlannedSummaryText(for: route)
+        let routeCompactSummary = SnorkelingWatchRouteSummaryPresentationPolicy.compactSummary(for: route)
+        let returnAvailable = SnorkelingWatchReturnPrimaryActionPolicy.isReturnAvailable(returnNavigation: input.returnNavigation)
+        let returnPrimaryTitle = SnorkelingWatchReturnPrimaryActionPolicy.returnButtonTitle(isAvailable: returnAvailable)
+        let returnIsPrimary = SnorkelingWatchReturnPrimaryActionPolicy.returnIsPrimaryAction(
+            isAvailable: returnAvailable,
+            isSessionStarted: input.isSessionStarted
+        )
 
         return SnorkelingWatchPresentationOutput(
             stage: stage,
@@ -256,6 +267,10 @@ enum SnorkelingWatchPresentation {
             routeRevisionText: route.revision.map { "r\($0)" },
             routePendingBannerText: SnorkelingWatchReadyPresentationPolicy.routePendingBannerText(for: route),
             routePlannedSummaryText: routePlannedSummary,
+            routeCompactSummaryText: routeCompactSummary,
+            returnPrimaryActionTitle: returnPrimaryTitle,
+            returnPrimaryActionEnabled: returnAvailable,
+            returnIsPrimaryAction: returnIsPrimary,
             precheckSummaryText: SnorkelingWatchReadyPresentationPolicy.precheckSummary(
                 gpsStatusText: gps.text,
                 gpsIsHealthy: SnorkelingWatchReadyPresentationPolicy.gpsIsHealthy(

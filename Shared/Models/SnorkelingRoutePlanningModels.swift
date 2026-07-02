@@ -141,10 +141,17 @@ struct SnorkelingRoutePlanningMetadata: Codable, Hashable, Sendable {
     var returnAlertPolicy: SnorkelingReturnAlertPolicy
     var routeProfileKind: SnorkelingRouteProfileKind?
     var checklistCompletedCount: Int
+    var waypointCount: Int?
+    var offRouteThresholdMeters: Double?
+    var maxSessionDurationSeconds: TimeInterval?
+    var maxDistanceMeters: Double?
+    var gpsQualityWarningAccuracyMeters: Double?
+    var buddyReminderEnabled: Bool?
 
     static func make(
         from draft: SnorkelingRoutePlannerDraft,
-        profile: SnorkelingCompanionProfile?
+        profile: SnorkelingCompanionProfile?,
+        operational: SnorkelingOperationalThresholds? = nil
     ) -> SnorkelingRoutePlanningMetadata {
         let distance = SnorkelingDistanceCalculator.distanceMeters(points: draft.routingPoints)
         let duration = SnorkelingDurationEstimator.estimatedDurationSeconds(
@@ -152,14 +159,24 @@ struct SnorkelingRoutePlanningMetadata: Codable, Hashable, Sendable {
             draft: draft,
             profile: profile
         )
-        return SnorkelingRoutePlanningMetadata(
+        var metadata = SnorkelingRoutePlanningMetadata(
             routeType: draft.resolvedRouteType,
             estimatedDistanceMeters: distance,
             estimatedDurationSeconds: duration,
             returnAlertPolicy: draft.resolvedReturnAlertPolicy,
             routeProfileKind: draft.routeProfileKind,
-            checklistCompletedCount: draft.resolvedChecklist.completedCount
+            checklistCompletedCount: draft.resolvedChecklist.completedCount,
+            waypointCount: draft.waypoints.count,
+            offRouteThresholdMeters: operational?.offRouteThresholdMeters,
+            maxSessionDurationSeconds: operational?.maxSessionDurationSeconds,
+            maxDistanceMeters: operational?.maxDistanceMeters,
+            gpsQualityWarningAccuracyMeters: operational?.gpsQualityWarningAccuracyMeters,
+            buddyReminderEnabled: operational?.buddyReminderEnabled
         )
+        if metadata.returnAlertPolicy == .off, let operational {
+            metadata.returnAlertPolicy = operational.defaultReturnAlertPolicy
+        }
+        return metadata
     }
 }
 

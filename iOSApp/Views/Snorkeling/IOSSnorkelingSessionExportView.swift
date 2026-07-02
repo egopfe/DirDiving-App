@@ -64,10 +64,12 @@ struct IOSSnorkelingSessionExportView: View {
                 }
 
                 Section(DIRIOSLocalizer.string("snorkeling.ios.export.formats")) {
+                    exportRow("snorkeling.export.summary", icon: "doc.text", format: .summary)
                     exportRow("snorkeling.ios.export.pdf", icon: "doc.fill", format: .pdf)
                     exportRow("snorkeling.ios.export.csv", icon: "tablecells", format: .csv)
                     exportRow("snorkeling.ios.export.json", icon: "curlybraces", format: .json)
-                    exportRow("snorkeling.ios.export.gpx", icon: "map", format: .gpx)
+                    exportRow("snorkeling.export.gpx", icon: "map", format: .gpx)
+                    exportRow("snorkeling.export.kml", icon: "globe.americas.fill", format: .kml)
                     exportRow("snorkeling.ios.export.chart", icon: "chart.xyaxis.line", format: .chartImage)
                 }
 
@@ -124,7 +126,9 @@ struct IOSSnorkelingSessionExportView: View {
            !sensitiveAcknowledged {
             return false
         }
-        if format == .gpx, needsLocationConfirmation, !SnorkelingExportPrivacyPolicy.canExportLocation(options: privacyOptions, session: session) {
+        if format == .gpx || format == .kml,
+           needsLocationConfirmation,
+           !SnorkelingExportPrivacyPolicy.canExportLocation(options: privacyOptions, session: session) {
             return false
         }
         return true
@@ -147,6 +151,10 @@ struct IOSSnorkelingSessionExportView: View {
                 errorMessage = DIRIOSLocalizer.string("snorkeling.ios.export.error.privacy")
             } catch IOSSnorkelingSessionExportError.gpxUnavailable {
                 errorMessage = DIRIOSLocalizer.string("snorkeling.ios.export.error.gpx")
+            } catch IOSSnorkelingSessionExportError.kmlUnavailable {
+                errorMessage = DIRIOSLocalizer.string("snorkeling.ios.export.error.gpx")
+            } catch IOSSnorkelingSessionExportError.summaryUnavailable {
+                errorMessage = DIRIOSLocalizer.string("snorkeling.ios.export.error.empty")
             } catch IOSSnorkelingSessionExportError.emptyDataset {
                 errorMessage = DIRIOSLocalizer.string("snorkeling.ios.export.error.empty")
             } catch {

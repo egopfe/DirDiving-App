@@ -77,6 +77,7 @@ enum SnorkelingRoutePackageBuilder {
         profile: SnorkelingCompanionProfile?,
         packageID: UUID,
         revision: Int,
+        operational: SnorkelingOperationalThresholds? = nil,
         now: Date = Date()
     ) throws -> SnorkelingRouteSyncPackage {
         let routePlan = draft.asRoutePlan()
@@ -92,7 +93,11 @@ enum SnorkelingRoutePackageBuilder {
             routePlan: routePlan,
             profile: profile,
             maxDistanceLimitMeters: draft.maxDistanceLimitMeters,
-            planningMetadata: SnorkelingRoutePlanningMetadata.make(from: draft, profile: profile),
+            planningMetadata: SnorkelingRoutePlanningMetadata.make(
+                from: draft,
+                profile: profile,
+                operational: operational
+            ),
             capabilities: .current
         )
         return try SnorkelingRouteSyncCodec.seal(body)
