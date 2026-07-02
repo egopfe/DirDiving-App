@@ -988,6 +988,7 @@ struct SnorkelingSessionEngine {
 
         switch tracker.phase {
         case .navigation:
+            let previousCompleted = Set(navigationRuntime.completedWaypointIDs)
             let (_, updated) = SnorkelingNavigationEngine.evaluateWaypointNavigation(
                 routePlan: routePlan,
                 state: navigationRuntime,
@@ -996,6 +997,23 @@ struct SnorkelingSessionEngine {
                 configuration: navigationConfiguration
             )
             navigationRuntime = updated
+            let newlyCompleted = Set(updated.completedWaypointIDs).subtracting(previousCompleted)
+            if !newlyCompleted.isEmpty {
+                for waypointID in newlyCompleted {
+                    guard let waypoint = routePlan?.waypoints.first(where: { $0.id == waypointID }) else { continue }
+                    session.events.append(
+                        SnorkelingEvent(
+                            kind: .waypointReached,
+                            monotonicRelativeTimestampSeconds: sessionElapsed,
+                            wallClockTimestamp: wallClock,
+                            latitude: position.latitude,
+                            longitude: position.longitude,
+                            note: waypoint.name,
+                            relatedWaypointID: waypointID
+                        )
+                    )
+                }
+            }
         case .returnMode:
             let (_, updated) = SnorkelingReturnAdvisor.evaluateReturnNavigation(
                 state: navigationRuntime,
@@ -1016,6 +1034,19 @@ struct SnorkelingSessionEngine {
     private func activeRoutePlan() -> SnorkelingRoutePlan? {
         guard let id = session.activeRoutePlanID else { return nil }
         return session.routePlans.first(where: { $0.id == id })
+    }
+
+    func presentationRouteCoordinates() -> [SnorkelingCoordinate] {
+        routeCoordinates
+    }
+
+    func currentAcceptedSurfaceCoordinate() -> SnorkelingCoordinate? {
+        guard let fix = gpsFeedState.lastAcceptedFix,
+              fix.gpsQuality.isMeasuredSurfaceFix,
+              SnorkelingDomainSupport.isValidCoordinate(latitude: fix.latitude, longitude: fix.longitude) else {
+            return nil
+        }
+        return SnorkelingCoordinate(latitude: fix.latitude, longitude: fix.longitude)
     }
 
     private mutating func syncEntryPointFromSessionIfNeeded() {
