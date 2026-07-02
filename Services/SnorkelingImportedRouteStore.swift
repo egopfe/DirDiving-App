@@ -46,6 +46,45 @@ final class SnorkelingImportedRouteStore: ObservableObject {
         (activatedPackage ?? pendingPackage)?.body.planningMetadata
     }
 
+    var readyPresentation: SnorkelingWatchImportedRoutePresentation {
+        let package = activatedPackage ?? pendingPackage
+        let plan = package?.body.routePlan
+        let metadata = package?.body.planningMetadata
+        let isPending = pendingPackage != nil && activatedPackage == nil
+        let status: SnorkelingWatchRouteReadyStatus
+        if staleRevisionRejected {
+            status = .missing
+        } else if isPending {
+            status = .pending
+        } else if plan != nil {
+            status = .ready
+        } else {
+            status = .missing
+        }
+        return SnorkelingWatchImportedRoutePresentation(
+            status: status,
+            routeName: plan?.name,
+            revision: package?.body.revision,
+            plannedDistanceMeters: metadata?.estimatedDistanceMeters,
+            plannedDurationSeconds: metadata?.estimatedDurationSeconds,
+            isPendingWhileSessionActive: isPending,
+            staleRevisionRejected: staleRevisionRejected,
+            lastImportErrorCode: lastImportError.map(importErrorCode)
+        )
+    }
+
+    private func importErrorCode(_ error: SnorkelingRouteSyncValidationError) -> String {
+        switch error {
+        case .futureSchema: return "futureSchema"
+        case .unsupportedSchema: return "unsupportedSchema"
+        case .checksumMismatch: return "checksumMismatch"
+        case .expired: return "invalidRoute"
+        case .invalidRoute: return "invalidRoute"
+        case .unsupportedCapabilities: return "unsupportedSchema"
+        case .decodeFailed: return "decodeFailed"
+        }
+    }
+
     func importPayload(_ package: SnorkelingRouteSyncPackage, source: String, sessionInProgress: Bool) -> Bool {
         staleRevisionRejected = false
         let fingerprint = "\(package.body.packageID.uuidString)|\(package.body.revision)|\(package.payloadChecksumSHA256)"
