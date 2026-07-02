@@ -64,7 +64,14 @@ struct SnorkelingView: View {
             watchSync.isSnorkelingSessionInProgress = active
             if !active {
                 importedRoute.activatePendingIfNeeded()
+                runtime.reloadImportedRoute()
             }
+        }
+        .onChange(of: importedRoute.activatedRevision) { _, _ in
+            runtime.reloadImportedRoute()
+        }
+        .onChange(of: importedRoute.hasPendingActivation) { _, _ in
+            runtime.reloadImportedRoute()
         }
         .onChange(of: hapticsEnabled) { _, enabled in
             runtime.configureRuntimePreferences(
@@ -199,13 +206,53 @@ struct SnorkelingView: View {
     }
 
     private var readyGrid: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: DiveUI.spaceS) {
-            readyCell(String(localized: "snorkeling.ready.gps"), ui.gpsStatusText, color(for: ui.gpsStatusColorToken))
-            readyCell(String(localized: "snorkeling.ready.depth_sensor"), ui.depthSensorText, DiveUI.green)
-            readyCell(String(localized: "snorkeling.ready.entry"), ui.entryPointText, DiveUI.blue)
-            readyCell(String(localized: "snorkeling.ready.duration"), ui.targetDurationText, DiveUI.blue)
-            readyCell(String(localized: "snorkeling.ready.distance"), ui.maxDistanceText, DiveUI.blue)
-            readyCell(String(localized: "snorkeling.ready.mission"), ui.missionModeText, DiveUI.yellow)
+        VStack(alignment: .leading, spacing: DiveUI.spaceS) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: DiveUI.spaceS) {
+                readyCell(String(localized: "snorkeling.ready.gps"), ui.gpsStatusText, color(for: ui.gpsStatusColorToken))
+                readyCell(String(localized: "snorkeling.ready.depth_sensor"), ui.depthSensorText, DiveUI.green)
+                readyCell(String(localized: "snorkeling.ready.entry"), ui.entryPointText, DiveUI.blue)
+                readyCell(String(localized: "snorkeling.watch.ready.route"), ui.routeStatusText, routeStatusColor)
+                if let routeName = ui.routeNameText {
+                    readyCell(String(localized: "snorkeling.watch.ready.route_name"), routeName, DiveUI.cyan)
+                }
+                if let revision = ui.routeRevisionText {
+                    readyCell(String(localized: "snorkeling.route_sync.revision"), revision, DiveUI.cyan)
+                }
+                if let battery = ui.batteryText {
+                    readyCell(String(localized: "snorkeling.watch.ready.battery_label"), battery, color(for: ui.batteryColorToken))
+                }
+                readyCell(String(localized: "snorkeling.ready.duration"), ui.targetDurationText, DiveUI.blue)
+                readyCell(String(localized: "snorkeling.ready.distance"), ui.maxDistanceText, DiveUI.blue)
+                readyCell(String(localized: "snorkeling.ready.mission"), ui.missionModeText, DiveUI.yellow)
+            }
+
+            if let pending = ui.routePendingBannerText {
+                Text(pending)
+                    .font(DiveUI.Typography.hintCaption)
+                    .foregroundStyle(DiveUI.yellow)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            if let planned = ui.routePlannedSummaryText {
+                Text(planned)
+                    .font(DiveUI.Typography.hintCaption)
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Text(ui.precheckSummaryText)
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.cyan)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("snorkeling.watch.ready.precheck")
+        }
+    }
+
+    private var routeStatusColor: Color {
+        switch input.importedRoutePresentation.status {
+        case .ready: return DiveUI.green
+        case .pending: return DiveUI.yellow
+        case .missing: return DiveUI.secondaryText
         }
     }
 

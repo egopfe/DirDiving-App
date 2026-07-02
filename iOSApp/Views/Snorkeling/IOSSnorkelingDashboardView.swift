@@ -187,7 +187,10 @@ struct IOSSnorkelingDashboardView: View {
     }
 
     private var syncStatusCard: some View {
-        DIRCard(DIRIOSLocalizer.string("snorkeling.ios.dashboard.sync_status"), icon: "arrow.triangle.2.circlepath", accent: presentation.syncStatusIsPositive ? DIRTheme.green : DIRTheme.orange) {
+        let watchSyncPresentation = SnorkelingWatchSyncStatusPresentationPolicy.make(
+            sessionSyncState: sessionSyncService.state
+        )
+        return DIRCard(DIRIOSLocalizer.string("snorkeling.ios.dashboard.sync_status"), icon: "arrow.triangle.2.circlepath", accent: presentation.syncStatusIsPositive ? DIRTheme.green : DIRTheme.orange) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(presentation.syncStatusText)
                     .font(.subheadline.weight(.semibold))
@@ -195,6 +198,9 @@ struct IOSSnorkelingDashboardView: View {
                 Text(sessionSyncStatusText)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(sessionSyncIsPositive ? DIRTheme.green : DIRTheme.orange)
+                Text(DIRIOSLocalizer.string(watchSyncPresentation.statusKey))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(syncDeliveryColor(watchSyncPresentation.deliveryStatus))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -270,6 +276,14 @@ struct IOSSnorkelingDashboardView: View {
 
     private var sessionSyncIsPositive: Bool {
         sessionSyncService.isPositive
+    }
+
+    private func syncDeliveryColor(_ status: SnorkelingWatchSyncDeliveryStatus) -> Color {
+        switch status {
+        case .failed: return DIRTheme.red
+        case .pending: return DIRTheme.orange
+        case .delivered, .none: return DIRTheme.cyan
+        }
     }
 
     private var syncStatusIsPositive: Bool {

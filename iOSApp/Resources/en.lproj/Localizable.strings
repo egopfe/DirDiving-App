@@ -2812,6 +2812,23 @@
 "snorkeling.logbook.time_off_route" = "Time off-route";
 "snorkeling.logbook.return_alert" = "Return alert triggered";
 "snorkeling.logbook.runtime_summary" = "Runtime summary";
+"snorkeling.route_sync.status.title" = "Route sync status";
+"snorkeling.route_sync.sent" = "Last sent";
+"snorkeling.route_sync.received" = "Watch ACK";
+"snorkeling.route_sync.activated" = "Activated on Watch";
+"snorkeling.route_sync.pending" = "Pending";
+"snorkeling.route_sync.rejected" = "Rejected";
+"snorkeling.route_sync.revision" = "Revision";
+"snorkeling.logbook.track_quality" = "Track quality";
+"snorkeling.logbook.track_quality.good" = "Good";
+"snorkeling.logbook.track_quality.degraded" = "Degraded";
+"snorkeling.logbook.track_quality.sparse" = "Sparse";
+"snorkeling.logbook.track_quality.unavailable" = "Unavailable";
+"snorkeling.logbook.route_progress" = "Route progress";
+"snorkeling.logbook.marker_count" = "Marker count";
+"snorkeling.sync.status.pending" = "Session sync pending";
+"snorkeling.sync.status.delivered" = "Session delivered";
+"snorkeling.sync.status.failed" = "Session sync failed";
 
 /* Apnea P1/P2/P3 */
 "apnea.profile.static" = "Static Apnea";

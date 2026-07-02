@@ -28,13 +28,17 @@ struct IOSApneaSessionsListView: View {
     private var hasRealLogs: Bool { !logbook.sessions.isEmpty }
     private var hasDemoLogs: Bool { !demoEntries.isEmpty }
     private var isEmpty: Bool { !hasRealLogs && !hasDemoLogs }
+    @State private var unifiedLogbookSelection: IOSUnifiedLogbookSelection?
 
     var body: some View {
         NavigationStack {
             DIRScreenContainer {
                 if showsUnifiedLogbook {
                     ScrollView(showsIndicators: false) {
-                        IOSUnifiedLogbookListView(hostActivity: .apnea)
+                        IOSUnifiedLogbookListView(
+                            hostActivity: .apnea,
+                            selection: $unifiedLogbookSelection
+                        )
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                     }
@@ -75,6 +79,7 @@ struct IOSApneaSessionsListView: View {
                 }
             }
             .navigationTitle(DIRIOSLocalizer.string("apnea.ios.sessions.title"))
+            .iosUnifiedLogbookNavigationDestination(selection: $unifiedLogbookSelection)
         }
     }
 

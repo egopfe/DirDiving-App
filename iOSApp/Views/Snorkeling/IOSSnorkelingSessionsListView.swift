@@ -28,13 +28,17 @@ struct IOSSnorkelingSessionsListView: View {
     private var hasRealLogs: Bool { !logbook.sessions.isEmpty }
     private var hasDemoLogs: Bool { !demoEntries.isEmpty }
     private var isEmpty: Bool { !hasRealLogs && !hasDemoLogs }
+    @State private var unifiedLogbookSelection: IOSUnifiedLogbookSelection?
 
     var body: some View {
         NavigationStack {
             DIRScreenContainer {
                 if showsUnifiedLogbook {
                     ScrollView(showsIndicators: false) {
-                        IOSUnifiedLogbookListView(hostActivity: .snorkeling)
+                        IOSUnifiedLogbookListView(
+                            hostActivity: .snorkeling,
+                            selection: $unifiedLogbookSelection
+                        )
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                     }
@@ -75,6 +79,7 @@ struct IOSSnorkelingSessionsListView: View {
                 }
             }
             .navigationTitle(DIRIOSLocalizer.string("snorkeling.ios.sessions.title"))
+            .iosUnifiedLogbookNavigationDestination(selection: $unifiedLogbookSelection)
         }
         .accessibilityIdentifier("snorkeling.ios.logbook")
     }

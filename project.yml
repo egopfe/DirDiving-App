@@ -139,6 +139,7 @@ targets:
       - Utils/WatchSyncPendingFlushPolicy.swift
       - Utils/ApneaWatchPresentation.swift
       - Utils/SnorkelingWatchPresentation.swift
+      - Utils/SnorkelingWatchReadyPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - path: Shared
       - path: iOSApp
@@ -274,6 +275,7 @@ targets:
       - Utils/MonotonicElapsedClock.swift
       - Utils/ApneaWatchPresentation.swift
       - Utils/SnorkelingWatchPresentation.swift
+      - Utils/SnorkelingWatchReadyPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
@@ -589,6 +591,10 @@ targets:
       - iOSApp/Utils/IOSFirstLaunchLocationPermissionPolicy.swift
       - iOSApp/Utils/IOSSnorkelingDashboardPresentation.swift
       - iOSApp/Utils/IOSSnorkelingLogbookPresentation.swift
+      - iOSApp/Utils/SnorkelingRouteSyncStatusPresentation.swift
+      - iOSApp/Utils/SnorkelingLogbookDetailPresentation.swift
+      - iOSApp/Utils/SnorkelingWatchSyncStatusPresentation.swift
+      - iOSApp/Services/IOSSnorkelingWatchTransferService.swift
       - iOSApp/Utils/IOSSnorkelingLocationPermission.swift
       - iOSApp/Utils/IOSSnorkelingLocalizationCatalog.swift
       - Tests/WatchAlgorithmTests/ApneaDomainModelTests.swift
@@ -601,6 +607,7 @@ targets:
       - Tests/WatchAlgorithmTests/SnorkelingCommand04FoundationGateTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchPresentationTests.swift
       - Utils/SnorkelingWatchPresentation.swift
+      - Utils/SnorkelingWatchReadyPresentationPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchLayoutContractTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingPersistenceRecoveryTests.swift
