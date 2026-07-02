@@ -93,10 +93,75 @@ final class IOSUnifiedLogbookPresentationBuilderTests: XCTestCase {
         let entries = IOSUnifiedLogbookPresentationBuilder.build(
             divingSessions: [demoDive],
             snorkelingSessions: [demoSnorkel],
-            apneaSessions: [demoApnea],
-            includeDemo: false
+            apneaSessions: [demoApnea]
         )
         XCTAssertTrue(entries.isEmpty)
+    }
+
+    func testIncludesDivingDemoSessionsWhenIncludeDivingDemoTrue() {
+        let demoDive = makeDiveSession(id: DemoDiveCatalog.sessionIDs[0], start: Date(timeIntervalSince1970: 1_000), isDemo: true)
+        let realDive = makeDiveSession(start: Date(timeIntervalSince1970: 2_000))
+        let entries = IOSUnifiedLogbookPresentationBuilder.build(
+            divingSessions: [demoDive, realDive],
+            snorkelingSessions: FakeSnorkelingLogbookProvider.entries(),
+            apneaSessions: FakeApneaLogbookProvider.entries(),
+            includeDivingDemo: true
+        )
+        XCTAssertEqual(entries.filter { $0.activity == .diving }.count, 2)
+        XCTAssertTrue(entries.contains { $0.isDemo && $0.sourceID == demoDive.id })
+        XCTAssertTrue(entries.contains { !$0.isDemo && $0.sourceID == realDive.id })
+        XCTAssertFalse(entries.contains { $0.activity == .snorkeling })
+        XCTAssertFalse(entries.contains { $0.activity == .apnea })
+    }
+
+    func testIncludeDivingDemoDoesNotExposeSnorkelingOrApneaFakeEntries() {
+        let demoDive = makeDiveSession(id: DemoDiveCatalog.sessionIDs[0], start: Date(timeIntervalSince1970: 1_000), isDemo: true)
+        let entries = IOSUnifiedLogbookPresentationBuilder.build(
+            divingSessions: [demoDive],
+            snorkelingSessions: FakeSnorkelingLogbookProvider.entries(),
+            apneaSessions: FakeApneaLogbookProvider.entries(),
+            includeDivingDemo: true,
+            includeSnorkelingDemo: false,
+            includeApneaDemo: false
+        )
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertEqual(entries.first?.activity, .diving)
+    }
+
+    func testIncludeApneaDemoOnlyWhenApneaFlagTrue() {
+        let demoApnea = FakeApneaLogbookProvider.entries().first!
+        let entries = IOSUnifiedLogbookPresentationBuilder.build(
+            divingSessions: [],
+            snorkelingSessions: [],
+            apneaSessions: [demoApnea],
+            includeApneaDemo: true
+        )
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertEqual(entries.first?.activity, .apnea)
+        XCTAssertTrue(entries.first?.isDemo ?? false)
+    }
+
+    func testIncludeSnorkelingDemoOnlyWhenSnorkelingFlagTrue() {
+        let demoSnorkel = FakeSnorkelingLogbookProvider.entries().first!
+        let entries = IOSUnifiedLogbookPresentationBuilder.build(
+            divingSessions: [],
+            snorkelingSessions: [demoSnorkel],
+            apneaSessions: [],
+            includeSnorkelingDemo: true
+        )
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertEqual(entries.first?.activity, .snorkeling)
+        XCTAssertTrue(entries.first?.isDemo ?? false)
+    }
+
+    func testUnifiedLogbookListViewUsesActivitySpecificDemoFlags() throws {
+        let source = try String(
+            contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/Shared/IOSUnifiedLogbookListView.swift")
+        )
+        XCTAssertTrue(source.contains("includeDivingDemo: coordinator.logStore.includeDemoLogbook"))
+        XCTAssertTrue(source.contains("includeSnorkelingDemo: coordinator.demoLogbookSettings.isSnorkelingFakeLogbookEnabled"))
+        XCTAssertTrue(source.contains("includeApneaDemo: coordinator.demoLogbookSettings.isApneaFakeLogbookEnabled"))
+        XCTAssertFalse(source.contains("includeDemo: false"))
     }
 
     func testSelectionMappingFromEntries() {
@@ -117,6 +182,13 @@ final class IOSUnifiedLogbookPresentationBuilderTests: XCTestCase {
         } else {
             XCTFail("Expected diving selection")
         }
+    }
+
+    private func repositoryRoot() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
     }
 
     private func makeDiveSession(
