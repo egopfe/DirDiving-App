@@ -374,8 +374,10 @@
 "import.summary.date_fallback" = "data sorgente mancante, usata data file";
 
 /* Production readiness — planner safety */
-"planner.safety_ack.label" = "Comprendo che l'output del planner e solo indicativo (non certificato).";
+"planner.safety_ack.label" = "Comprendo che l'output del planner è solo indicativo (non certificato).";
 "planner.safety_ack.hint" = "Obbligatorio prima di calcolare un piano.";
+"planner.ccr.safety_ack.label" = "Comprendo che l'output del planner CCR è solo indicativo e non certificato.";
+"planner.ccr.safety_ack.hint" = "Richiesto per usare la modalità CCR del planner. Non abilita immersioni reali, certificazione o calcoli operativi.";
 "Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati." = "Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati.";
 
 /* Production readiness — More / sync */

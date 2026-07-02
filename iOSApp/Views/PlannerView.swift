@@ -5,6 +5,7 @@ struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
     @EnvironmentObject private var equipment: EquipmentStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
+    @AppStorage(CCRPlannerSafetyAcknowledgment.storageKey) private var ccrPlannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
     @State private var showPlan = false
@@ -47,6 +48,18 @@ struct PlannerView: View {
         plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
     }
 
+    private var ccrPlannerSafetyAcknowledged: Bool {
+        ccrPlannerSafetyAckRevision == CCRPlannerSafetyAcknowledgment.currentRevision
+    }
+
+    private var effectivePlannerSafetyAcknowledged: Bool {
+        PlannerSafetyGatePolicy.isAcknowledged(
+            mode: store.mode,
+            genericAcknowledged: plannerSafetyAcknowledged,
+            ccrAcknowledged: ccrPlannerSafetyAcknowledged
+        )
+    }
+
     var body: some View {
         NavigationStack {
             DIRScreenContainer {
@@ -59,7 +72,7 @@ struct PlannerView: View {
                                 Text(DIRIOSLocalizer.string("planner.header.subtitle"))
                                     .dirScreenSubtitleStyle()
                             }
-                            plannerSafetyAcknowledgment
+                            activePlannerSafetyAcknowledgment
                             DIRWarningBox(text: DIRIOSLocalizer.string("planner.reference_only.warning"))
                             plannerReferenceDetailsSection
                             Group {
@@ -93,8 +106,8 @@ struct PlannerView: View {
                                 plannerWarnings
                                 calculateButton
                             }
-                            .disabled(!plannerSafetyAcknowledged)
-                            .opacity(plannerSafetyAcknowledged ? 1 : 0.45)
+                            .disabled(!effectivePlannerSafetyAcknowledged)
+                            .opacity(effectivePlannerSafetyAcknowledged ? 1 : 0.45)
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 10)
@@ -1044,7 +1057,7 @@ struct PlannerView: View {
     }
 
     private var canCalculatePlan: Bool {
-        plannerSafetyAcknowledged && liveValidation.isValid && liveMODIssues.isEmpty
+        effectivePlannerSafetyAcknowledged && liveValidation.isValid && liveMODIssues.isEmpty
     }
 
     @ViewBuilder
@@ -1189,6 +1202,32 @@ struct PlannerView: View {
         .tint(DIRTheme.cyan)
         .padding(.vertical, 4)
         .accessibilityHint(DIRIOSLocalizer.string("planner.safety_ack.hint"))
+    }
+
+    private var ccrPlannerSafetyAcknowledgment: some View {
+        Toggle(
+            isOn: Binding(
+                get: { ccrPlannerSafetyAcknowledged },
+                set: { ccrPlannerSafetyAckRevision = $0 ? CCRPlannerSafetyAcknowledgment.currentRevision : "" }
+            )
+        ) {
+            Text(DIRIOSLocalizer.string("planner.ccr.safety_ack.label"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .tint(DIRTheme.cyan)
+        .padding(.vertical, 4)
+        .accessibilityHint(DIRIOSLocalizer.string("planner.ccr.safety_ack.hint"))
+    }
+
+    @ViewBuilder
+    private var activePlannerSafetyAcknowledgment: some View {
+        if store.mode.isCCR {
+            ccrPlannerSafetyAcknowledgment
+        } else {
+            plannerSafetyAcknowledgment
+        }
     }
 
     private var plannerReferenceDetailsSection: some View {
