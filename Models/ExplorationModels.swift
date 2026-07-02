@@ -100,8 +100,12 @@ struct GPSInterestMarker: Identifiable, Hashable, Codable {
     var latitude: Double?
     var longitude: Double?
     var depthMeters: Double
+    var temperatureCelsius: Double?
     var distanceFromEntryMeters: Double
     var bearingDegrees: Double
+    var activeWaypointName: String?
+    var sessionID: String?
+    var isEnriched: Bool
 
     init(
         id: UUID = UUID(),
@@ -110,8 +114,12 @@ struct GPSInterestMarker: Identifiable, Hashable, Codable {
         latitude: Double?,
         longitude: Double?,
         depthMeters: Double,
+        temperatureCelsius: Double? = nil,
         distanceFromEntryMeters: Double,
-        bearingDegrees: Double
+        bearingDegrees: Double,
+        activeWaypointName: String? = nil,
+        sessionID: String? = nil,
+        isEnriched: Bool = false
     ) {
         self.id = id
         self.category = category
@@ -119,8 +127,43 @@ struct GPSInterestMarker: Identifiable, Hashable, Codable {
         self.latitude = latitude
         self.longitude = longitude
         self.depthMeters = depthMeters
+        self.temperatureCelsius = temperatureCelsius
         self.distanceFromEntryMeters = distanceFromEntryMeters
         self.bearingDegrees = bearingDegrees
+        self.activeWaypointName = activeWaypointName
+        self.sessionID = sessionID
+        self.isEnriched = isEnriched
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case category
+        case timestamp
+        case latitude
+        case longitude
+        case depthMeters
+        case temperatureCelsius
+        case distanceFromEntryMeters
+        case bearingDegrees
+        case activeWaypointName
+        case sessionID
+        case isEnriched
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        category = try container.decodeIfPresent(GPSMarkerCategory.self, forKey: .category) ?? .reef
+        timestamp = try container.decodeIfPresent(Date.self, forKey: .timestamp) ?? Date()
+        latitude = try container.decodeIfPresent(Double.self, forKey: .latitude)
+        longitude = try container.decodeIfPresent(Double.self, forKey: .longitude)
+        depthMeters = try container.decodeIfPresent(Double.self, forKey: .depthMeters) ?? 0
+        temperatureCelsius = try container.decodeIfPresent(Double.self, forKey: .temperatureCelsius)
+        distanceFromEntryMeters = try container.decodeIfPresent(Double.self, forKey: .distanceFromEntryMeters) ?? 0
+        bearingDegrees = try container.decodeIfPresent(Double.self, forKey: .bearingDegrees) ?? 0
+        activeWaypointName = try container.decodeIfPresent(String.self, forKey: .activeWaypointName)
+        sessionID = try container.decodeIfPresent(String.self, forKey: .sessionID)
+        isEnriched = try container.decodeIfPresent(Bool.self, forKey: .isEnriched) ?? false
     }
 }
 

@@ -1,7 +1,9 @@
 # DIR DIVING - Specifica Apnea (integration `main`)
 
 **Aggiornato:** 2026-06-17  
-**Branch:** `main`  
+**Production:** `main` (Apnea merged)  
+**Experimental UI:** `codex/experimental-features` (legacy `ExplorationStore` prototype — see appendice)  
+**Branch:** `main`
 **Architettura:** [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md)  
 **Release-hard:** [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md)
 
@@ -20,7 +22,7 @@ Apnea su `main` usa modelli condivisi (`Shared/Models/Apnea*`), motore lifecycle
 - iOS: companion chiaro con accenti teal/cyan, tab Dashboard / Sessioni / Statistiche / Profilo.
 - Localizzazione **EN + IT** obbligatoria per tutte le stringhe Apnea.
 
-## Workflow Apple Watch (target integrazione)
+## Workflow Apple Watch (production `main`)
 
 1. Ready — piano importato da iOS o sessione autonoma; allarmi profondità; gate sensore.
 2. Dive / Ascent — profondità, velocità verticale, timer apnea, overlay marker/target.

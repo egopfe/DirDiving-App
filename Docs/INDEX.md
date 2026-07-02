@@ -1547,6 +1547,24 @@ Audit read-only **iOS Companion MAIN** (`DIRDiving iOS` only), post-P2/P3 Bühlm
 | [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) | Audit post-hardening storico |
 | [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | Audit parallelo Watch MAIN |
 
+
+## Aggiornamento indice 2026-06-05 — sync rami experimental
+
+Aggiornamento **solo documentazione** per registrare che i rami experimental sono stati verificati sui rispettivi ultimi remote e fast-forwardati prima delle modifiche docs.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md) |
+| **MAIN verificato** | `origin/main` @ `5fd821b` |
+| **Watch/iOS experimental** | `origin/codex/experimental-features` (merged `origin/main`) |
+| **iOS-named experimental** | `origin/codex/ios-experimental-features` (merged `origin/main`) |
+| **Scope** | Apnea + Snorkeling experimental; Buddy/BLE resta lab-only |
+| **Tipo modifica** | Docs-only; nessuna modifica runtime |
+
+Nota: `codex/experimental-features` resta il ramo experimental combinato canonico; `codex/ios-experimental-features` resta allineato per i path app/progetto ma conserva i documenti specifici iOS.
+
+---
+
 **Esclusi da scope audit iOS:** file experimental in `project.yml` (`Exploration*`, `BuddyExperimental*`, …). Apple Watch runtime fuori scope salvo modelli/codec condivisi.
 
 ---

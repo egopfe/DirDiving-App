@@ -19,6 +19,7 @@ struct BuddyAssistView: View {
                 VStack(spacing: 10) {
                     header
                     warning
+                    labOnlyPanel
                     pairingPanel
                     buddyLinkPanel
                     compassPanel
@@ -77,6 +78,21 @@ struct BuddyAssistView: View {
             .foregroundStyle(DiveUI.yellow)
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var labOnlyPanel: some View {
+        DivePanel(stroke: ExperimentalFeatures.buddyAssistEnabled ? DiveUI.yellow : DiveUI.red) {
+            VStack(spacing: 4) {
+                Text(ExperimentalFeatures.buddyAssistEnabled ? "LAB SPERIMENTALE" : "BUDDY ASSIST DISABILITATO")
+                    .font(.caption.bold())
+                    .foregroundStyle(ExperimentalFeatures.buddyAssistEnabled ? DiveUI.yellow : DiveUI.red)
+                Text(ExperimentalFeatures.buddyAssistEnabled ? "Usare solo in test controllato." : ExperimentalFeatures.buddyAssistDisabledReason)
+                    .font(.caption2.bold())
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
@@ -244,6 +260,13 @@ struct BuddyAssistView: View {
                     .disabled(!buddyAssist.canSend)
                     .opacity(buddyAssist.canSend ? 1.0 : 0.42)
                 }
+            }
+            if !buddyAssist.canSend {
+                Text(ExperimentalFeatures.buddyAssistEnabled ? "Invio disponibile solo dopo pairing trusted e link online." : ExperimentalFeatures.buddyAssistDisabledReason)
+                    .font(.caption2.bold())
+                    .foregroundStyle(DiveUI.yellow)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

@@ -163,6 +163,8 @@ final class DiveManager: ObservableObject {
     @Published var developerSensorSourceWarning: String?
     @Published var apneaOperationalOverlay: ApneaOperationalOverlay?
     @Published private(set) var isSimulationDepthActive = false
+    /// Experimental Apnea/Snorkeling surfaces use this legacy name for sensor availability.
+    var isDepthSensorAvailable: Bool { isDepthAutomationAvailable }
     @Published private(set) var isDepthAutomationMockFallbackActive = false
     @Published private(set) var depthSensorSourceResolution: DepthSensorSourceResolution = .unavailable
     @Published private(set) var draftRecoveryDiagnostic: String?

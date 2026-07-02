@@ -79,15 +79,17 @@ extension IOSTab: Identifiable {
     var id: Self { self }
 
     static let companionOrder: [IOSTab] = [
-        .planner, .logbook, .analysis, .gear, .checklist, .settings
+        .planner, .explore, .logbook, .analysis, .gear, .buddy, .checklist, .settings
     ]
 
     var labelKey: String {
         switch self {
         case .planner: "tab.planner"
+        case .explore: "Explore"
         case .logbook: "tab.logbook"
         case .analysis: "tab.analysis"
         case .gear: "tab.gear"
+        case .buddy: "Buddy"
         case .checklist: "tab.checklist"
         case .settings: "tab.settings"
         }
@@ -96,9 +98,11 @@ extension IOSTab: Identifiable {
     var systemImage: String {
         switch self {
         case .planner: "point.topleft.down.curvedto.point.bottomright.up"
+        case .explore: "map.fill"
         case .logbook: "list.bullet.rectangle.portrait.fill"
         case .analysis: "chart.xyaxis.line"
         case .gear: "shippingbox.fill"
+        case .buddy: "person.2.wave.2.fill"
         case .checklist: "checklist"
         case .settings: "gearshape.fill"
         }
