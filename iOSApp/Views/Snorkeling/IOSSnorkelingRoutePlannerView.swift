@@ -430,14 +430,76 @@ struct IOSSnorkelingRoutePlannerView: View {
     }
 
     private var transferSection: some View {
-        DIRCard(DIRIOSLocalizer.string("snorkeling.ios.planner.watch_transfer"), icon: "applewatch", accent: DIRTheme.cyan) {
-            HStack(spacing: 10) {
-                Image(systemName: transferStatusIcon)
-                    .foregroundStyle(transferStatusColor)
-                Text(transferMessage ?? transferStatusText(transferService.state))
-                    .foregroundStyle(DIRTheme.muted)
-                    .font(.caption)
+        let presentation = SnorkelingRouteSyncStatusPresentationPolicy.make(
+            state: transferService.state,
+            routeName: {
+                let name = plannerStore.draft.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                return name.isEmpty ? nil : name
+            }(),
+            lastSuccessfulSyncAt: transferService.lastSuccessfulSyncAt,
+            lastErrorMessage: transferService.lastErrorMessage
+        )
+        return DIRCard(DIRIOSLocalizer.string("snorkeling.route_sync.status.title"), icon: "applewatch", accent: DIRTheme.cyan) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 10) {
+                    Image(systemName: transferStatusIcon)
+                        .foregroundStyle(transferStatusColor)
+                    Text(transferMessage ?? DIRIOSLocalizer.string(presentation.statusSummaryKey))
+                        .foregroundStyle(DIRTheme.muted)
+                        .font(.caption)
+                }
+                if let routeName = presentation.routeName {
+                    detailLine(DIRIOSLocalizer.string("snorkeling.watch.ready.route_name"), routeName)
+                }
+                if let revision = presentation.revision {
+                    detailLine(DIRIOSLocalizer.string("snorkeling.route_sync.revision"), "r\(revision)")
+                }
+                if let sentAt = presentation.lastSentAt {
+                    let formatter = DateFormatter()
+                    let _ = formatter.dateStyle = .short
+                    let _ = formatter.timeStyle = .short
+                    detailLine(
+                        DIRIOSLocalizer.string("snorkeling.route_sync.sent"),
+                        formatter.string(from: sentAt)
+                    )
+                }
+                detailLine(
+                    DIRIOSLocalizer.string("snorkeling.route_sync.received"),
+                    ackStatusText(presentation.ackStatus)
+                )
+                if presentation.pendingActivation {
+                    Text(DIRIOSLocalizer.string("snorkeling.route_sync.pending"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(DIRTheme.orange)
+                }
             }
+        }
+    }
+
+    private func detailLine(_ label: String, _ value: String) -> some View {
+        HStack {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+            Spacer()
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white)
+        }
+    }
+
+    private func ackStatusText(_ status: SnorkelingRouteSyncAckPresentationStatus) -> String {
+        switch status {
+        case .notAvailable:
+            return DIRIOSLocalizer.string("snorkeling.ios.sync.none")
+        case .pending:
+            return DIRIOSLocalizer.string("snorkeling.route_sync.pending")
+        case .delivered:
+            return DIRIOSLocalizer.string("snorkeling.route_sync.received")
+        case .imported:
+            return DIRIOSLocalizer.string("snorkeling.route_sync.activated")
+        case .rejected(let key):
+            return DIRIOSLocalizer.string(key)
         }
     }
 

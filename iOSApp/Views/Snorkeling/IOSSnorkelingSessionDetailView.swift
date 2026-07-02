@@ -28,6 +28,9 @@ struct IOSSnorkelingSessionDetailView: View {
         SnorkelingSessionMapPresentation.make(from: session, permission: locationPermission.permissionState)
     }
     private var dipMetrics: [SnorkelingDipMetrics] { logbook.dipMetrics(for: session) }
+    private var detailPresentation: SnorkelingLogbookDetailPresentation {
+        SnorkelingLogbookDetailPresentationPolicy.make(session: session)
+    }
 
     var body: some View {
         DIRScreenContainer {
@@ -41,6 +44,7 @@ struct IOSSnorkelingSessionDetailView: View {
                     dipsSection
                     photosSection
                     markersSection
+                    trackQualitySection
                     gpsTrackSection
                     runtimeSummarySection
                     equipmentSection
@@ -313,6 +317,39 @@ struct IOSSnorkelingSessionDetailView: View {
                             .foregroundStyle(DIRTheme.muted)
                     }
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var trackQualitySection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.runtime_summary"), icon: "map", accent: DIRTheme.cyan) {
+            detailRow(
+                DIRIOSLocalizer.string("snorkeling.logbook.track_quality"),
+                DIRIOSLocalizer.string(detailPresentation.trackQualityKey)
+            )
+            if let gpsQuality = detailPresentation.gpsQualityText {
+                detailRow(DIRIOSLocalizer.string("snorkeling.logbook.gps_quality"), gpsQuality)
+            }
+            detailRow(
+                DIRIOSLocalizer.string("snorkeling.logbook.track_points"),
+                "\(detailPresentation.trackPointCount)"
+            )
+            detailRow(
+                DIRIOSLocalizer.string("snorkeling.logbook.marker_count"),
+                "\(detailPresentation.markerCount)"
+            )
+            if let progress = detailPresentation.routeProgressPercent {
+                detailRow(
+                    DIRIOSLocalizer.string("snorkeling.logbook.route_progress"),
+                    String(format: "%.0f%%", progress)
+                )
+            }
+            if detailPresentation.isOffRoute, let distance = detailPresentation.offRouteDistanceMeters {
+                detailRow(
+                    DIRIOSLocalizer.string("snorkeling.logbook.max_off_route"),
+                    String(format: "%.0f m", distance)
+                )
             }
         }
     }
