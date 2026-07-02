@@ -1454,4 +1454,5 @@ extension WatchSyncService {
 }
 #endif
 
+extension WatchSyncService: DiveLogWatchSyncing {}
 extension WatchSyncService: SnorkelingSessionTombstonePublishing {}

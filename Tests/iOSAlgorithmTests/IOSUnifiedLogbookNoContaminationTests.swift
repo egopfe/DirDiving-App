@@ -52,8 +52,7 @@ final class IOSUnifiedLogbookNoContaminationTests: XCTestCase {
         let entries = IOSUnifiedLogbookPresentationBuilder.build(
             divingSessions: [demoDive, realDive],
             snorkelingSessions: FakeSnorkelingLogbookProvider.entries(),
-            apneaSessions: FakeApneaLogbookProvider.entries(),
-            includeDemo: false
+            apneaSessions: FakeApneaLogbookProvider.entries()
         )
         XCTAssertEqual(entries.count, 1)
         XCTAssertEqual(entries.first?.activity, .diving)
