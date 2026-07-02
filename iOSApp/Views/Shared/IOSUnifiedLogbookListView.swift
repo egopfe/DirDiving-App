@@ -2,10 +2,10 @@ import SwiftUI
 
 struct IOSUnifiedLogbookListView: View {
     let hostActivity: DIRActivityMode
+    @Binding var selection: IOSUnifiedLogbookSelection?
 
     @EnvironmentObject private var coordinator: IOSCompanionStoreCoordinator
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
-    @State private var selection: IOSUnifiedLogbookSelection?
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
 
@@ -38,9 +38,6 @@ struct IOSUnifiedLogbookListView: View {
         }
         .onAppear {
             coordinator.ensureStoresForUnifiedLogbook()
-        }
-        .navigationDestination(item: $selection) { item in
-            IOSUnifiedLogbookDetailHost(selection: item)
         }
     }
 
@@ -100,6 +97,16 @@ struct IOSUnifiedLogbookListView: View {
         case .diving: return .diving(entry.sourceID)
         case .snorkeling: return .snorkeling(entry.sourceID)
         case .apnea: return .apnea(entry.sourceID)
+        }
+    }
+}
+
+extension View {
+    func iosUnifiedLogbookNavigationDestination(
+        selection: Binding<IOSUnifiedLogbookSelection?>
+    ) -> some View {
+        navigationDestination(item: selection) { item in
+            IOSUnifiedLogbookDetailHost(selection: item)
         }
     }
 }

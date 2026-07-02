@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-07-02  
-**Branch consigliato:** `main` = `origin/main` @ `fc781aa`
+**Branch consigliato:** `main` = `origin/main` @ `d362795`
+
+---
+
+## Aggiornamento indice 2026-07-02 — Snorkeling Watch P1 iOS ↔ Watch integration
+
+Route sync status, Watch ready route/pre-check/battery, iOS logbook track quality, session sync visibility; 17 P1 tests PASS.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`SNORKELING_WATCH_P1_INTEGRATION_AUDIT_CURRENT.md`](SNORKELING_WATCH_P1_INTEGRATION_AUDIT_CURRENT.md) |
+| **Report** | [`SNORKELING_WATCH_P1_IMPLEMENTATION_REPORT_CURRENT.md`](SNORKELING_WATCH_P1_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Completeness** | [`SNORKELING_WATCH_P1_COMPLETENESS_AUDIT_CURRENT.md`](SNORKELING_WATCH_P1_COMPLETENESS_AUDIT_CURRENT.md) |
+| **Verdict** | **SNORKELING_WATCH_P1_INTERNAL_READY** · **NO_ALGORITHM_REGRESSION** · **MANUAL_UI_QA_PENDING** |
 
 ---
 

@@ -14,6 +14,7 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
     @Published var showSaveMarker = false
     @Published var selectedMarkerCategory: SnorkelingMarkerCategory = .reef
     @Published private(set) var sessionSaveState: SnorkelingWatchSessionSaveState = .notSaved
+    private var lastBatteryFraction: Double?
     @Published private(set) var lastMarkerSavedConfirmation: String?
     @Published private(set) var isRecoveredSession = false
     @Published private(set) var checkpointRestoreWarning: String?
@@ -213,7 +214,11 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
         session.depthCapabilityMode = activeDepthSensorMetadata.depthCapabilityMode
         logbook.add(session)
         if logbook.lastSavedSessionID == session.id {
+#if os(watchOS)
+            sessionSaveState = .syncPending
+#else
             sessionSaveState = .saved
+#endif
             return true
         }
         sessionSaveState = .failed
@@ -276,6 +281,11 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
     #endif
 
     // MARK: - Private
+
+    func reloadImportedRoute() {
+        applyImportedRouteIfAvailable()
+        refreshPresentation()
+    }
 
     private func configureDefaultSession() {
         engine.configureWatchDefaultsIfNeeded()
@@ -440,6 +450,7 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
         #if os(watchOS)
         let level = WKInterfaceDevice.current().batteryLevel
         if level >= 0 {
+            lastBatteryFraction = Double(level)
             engine.updateBatteryFraction(Double(level))
         }
         #endif
@@ -639,7 +650,7 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
             missionModeEnabled: missionModeEnabled,
             hapticsEnabled: hapticsEnabled,
             buddyReminderEnabled: buddyReminderEnabled,
-            batteryFraction: nil,
+            batteryFraction: lastBatteryFraction,
             markerCount: session.markers.count,
             minimumWaterTemperatureCelsius: minTemp,
             waypointNavigation: snapshot.waypointNavigation,
@@ -658,7 +669,8 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
             offRouteDistanceMeters: snapshot.offRouteDistanceMeters,
             isOffRoute: snapshot.isOffRoute,
             offRouteWarningPaused: snapshot.offRouteWarningPaused,
-            plannedReturnAlertActive: snapshot.plannedReturnAlertActive
+            plannedReturnAlertActive: snapshot.plannedReturnAlertActive,
+            importedRoutePresentation: SnorkelingImportedRouteStore.shared.readyPresentation
         )
     }
 
@@ -741,6 +753,7 @@ extension SnorkelingWatchPresentationInput {
         offRouteDistanceMeters: nil,
         isOffRoute: false,
         offRouteWarningPaused: false,
-        plannedReturnAlertActive: false
+        plannedReturnAlertActive: false,
+        importedRoutePresentation: .missing
     )
 }
