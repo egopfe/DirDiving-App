@@ -22,7 +22,7 @@ Implemented unified remediation R1 (required + optional safe), R2 (required + re
 
 - **Branch:** `main`
 - **Audit baseline:** `1272885`
-- **Remediation commit:** (recorded at push — see git log)
+- **Remediation commit:** `7c459cb`
 
 ## D. Development Policies Preserved
 
