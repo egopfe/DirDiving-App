@@ -41,6 +41,7 @@ final class IOSSnorkelingWatchTransferService: ObservableObject {
     func send(
         draft: SnorkelingRoutePlannerDraft,
         profile: SnorkelingCompanionProfile?,
+        operational: SnorkelingOperationalThresholds? = nil,
         connectivity: SnorkelingWatchTransferConnectivityContext
     ) -> Bool {
         lastErrorMessage = nil
@@ -72,7 +73,8 @@ final class IOSSnorkelingWatchTransferService: ObservableObject {
                 draft: draft,
                 profile: profile,
                 packageID: packageID,
-                revision: nextRevision
+                revision: nextRevision,
+                operational: operational
             )
             let data = try SnorkelingRouteSyncCodec.encode(package)
             currentPackage = package

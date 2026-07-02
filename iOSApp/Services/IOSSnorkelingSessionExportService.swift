@@ -6,6 +6,8 @@ enum IOSSnorkelingSessionExportError: Error, Equatable {
     case emptyDataset
     case writeFailed
     case gpxUnavailable
+    case kmlUnavailable
+    case summaryUnavailable
 }
 
 @MainActor
@@ -33,9 +35,22 @@ enum IOSSnorkelingSessionExportService {
             let document = try SnorkelingSessionExportEngine.buildJSON(for: session, options: options)
             return try write(document: document)
         case .gpx:
-            guard let document = SnorkelingSessionExportEngine.buildGPX(for: session, options: options) else {
+            guard let document = SnorkelingTrackGPXExportService.buildDocument(for: session, options: options) else {
                 throw IOSSnorkelingSessionExportError.gpxUnavailable
             }
+            return try write(document: document)
+        case .kml:
+            guard let document = SnorkelingTrackKMLExportService.buildDocument(for: session, options: options) else {
+                throw IOSSnorkelingSessionExportError.kmlUnavailable
+            }
+            return try write(document: document)
+        case .summary:
+            let summary = SnorkelingSessionShareSummaryBuilder.build(for: session, options: options)
+            let document = SnorkelingExportDocument(
+                filename: SnorkelingExportFileNaming.filename(for: session, format: .summary),
+                mimeType: "text/plain",
+                data: Data(summary.utf8)
+            )
             return try write(document: document)
         case .chartImage:
             return try writeChartSummary(session: session)

@@ -47,6 +47,30 @@ struct IOSSnorkelingSettingsContent: View {
                     formattedValue: String(format: DIRIOSLocalizer.string("snorkeling.ios.settings.return_distance"), Int(settingsStore.settings.returnToEntryDistanceMeters)),
                     identifier: "snorkeling.settings.return_distance"
                 )
+                IOSCompanionSettingsIntStepperRow(
+                    title: DIRIOSLocalizer.string("snorkeling.settings.max_distance"),
+                    value: maxDistanceBinding,
+                    range: 100...3_000,
+                    step: 50,
+                    formattedValue: String(format: "%.0f m", settingsStore.settings.maxDistanceMeters),
+                    identifier: "snorkeling.settings.max_distance"
+                )
+                IOSCompanionSettingsIntStepperRow(
+                    title: DIRIOSLocalizer.string("snorkeling.settings.off_route_threshold"),
+                    value: offRouteThresholdBinding,
+                    range: 10...200,
+                    step: 5,
+                    formattedValue: String(format: "%.0f m", settingsStore.settings.offRouteThresholdMeters),
+                    identifier: "snorkeling.settings.off_route_threshold"
+                )
+                IOSCompanionSettingsIntStepperRow(
+                    title: DIRIOSLocalizer.string("snorkeling.settings.gps_quality_threshold"),
+                    value: gpsQualityThresholdBinding,
+                    range: 15...100,
+                    step: 5,
+                    formattedValue: String(format: "±%.0f m", settingsStore.settings.gpsQualityWarningAccuracyMeters),
+                    identifier: "snorkeling.settings.gps_quality_threshold"
+                )
             }
 
             DIRCard(DIRIOSLocalizer.string("snorkeling.map_type.title"), icon: "map.fill", accent: DIRTheme.cyan) {
@@ -77,6 +101,21 @@ struct IOSSnorkelingSettingsContent: View {
                     formattedValue: String(format: DIRIOSLocalizer.string("snorkeling.ios.settings.session_duration_alert"), settingsStore.settings.sessionDurationAlertMinutes),
                     identifier: "snorkeling.settings.session_duration_alert"
                 )
+                IOSCompanionSettingsIntStepperRow(
+                    title: DIRIOSLocalizer.string("snorkeling.settings.max_duration"),
+                    value: maxSessionDurationBinding,
+                    range: 30...360,
+                    step: 15,
+                    formattedValue: String(format: DIRIOSLocalizer.string("snorkeling.ios.settings.session_duration_alert"), settingsStore.settings.maxSessionDurationMinutes),
+                    identifier: "snorkeling.settings.max_duration"
+                )
+                Picker(DIRIOSLocalizer.string("snorkeling.settings.return_alert"), selection: returnAlertPolicyBinding) {
+                    Text(DIRIOSLocalizer.string("snorkeling.alert.return.off")).tag(SnorkelingReturnAlertPolicy.off)
+                    Text(DIRIOSLocalizer.string("snorkeling.alert.return.time_50")).tag(SnorkelingReturnAlertPolicy.halfPlannedTime)
+                    Text(DIRIOSLocalizer.string("snorkeling.alert.return.distance_50")).tag(SnorkelingReturnAlertPolicy.halfPlannedDistance)
+                }
+                .pickerStyle(.menu)
+                .accessibilityIdentifier("snorkeling.settings.return_alert")
             }
 
             DIRCard(DIRIOSLocalizer.string("snorkeling.ios.settings.companion"), icon: "person.2.fill", accent: DIRTheme.cyan) {
@@ -106,6 +145,11 @@ struct IOSSnorkelingSettingsContent: View {
                     title: DIRIOSLocalizer.string("snorkeling.ios.settings.mission_mode"),
                     isOn: missionModeBinding,
                     identifier: "snorkeling.settings.mission_mode"
+                )
+                IOSCompanionSettingsToggleRow(
+                    title: DIRIOSLocalizer.string("snorkeling.ios.buddy.nav_title"),
+                    isOn: buddyReminderBinding,
+                    identifier: "snorkeling.settings.buddy_reminder"
                 )
             }
 
@@ -169,6 +213,48 @@ struct IOSSnorkelingSettingsContent: View {
         Binding(
             get: { Int(settingsStore.settings.returnToEntryDistanceMeters) },
             set: { settingsStore.settings.returnToEntryDistanceMeters = Double($0) }
+        )
+    }
+
+    private var maxDistanceBinding: Binding<Int> {
+        Binding(
+            get: { Int(settingsStore.settings.maxDistanceMeters) },
+            set: { settingsStore.settings.maxDistanceMeters = Double($0) }
+        )
+    }
+
+    private var offRouteThresholdBinding: Binding<Int> {
+        Binding(
+            get: { Int(settingsStore.settings.offRouteThresholdMeters) },
+            set: { settingsStore.settings.offRouteThresholdMeters = Double($0) }
+        )
+    }
+
+    private var gpsQualityThresholdBinding: Binding<Int> {
+        Binding(
+            get: { Int(settingsStore.settings.gpsQualityWarningAccuracyMeters) },
+            set: { settingsStore.settings.gpsQualityWarningAccuracyMeters = Double($0) }
+        )
+    }
+
+    private var maxSessionDurationBinding: Binding<Int> {
+        Binding(
+            get: { settingsStore.settings.maxSessionDurationMinutes },
+            set: { settingsStore.settings.maxSessionDurationMinutes = $0 }
+        )
+    }
+
+    private var returnAlertPolicyBinding: Binding<SnorkelingReturnAlertPolicy> {
+        Binding(
+            get: { settingsStore.settings.defaultReturnAlertPolicy },
+            set: { settingsStore.settings.defaultReturnAlertPolicy = $0 }
+        )
+    }
+
+    private var buddyReminderBinding: Binding<Bool> {
+        Binding(
+            get: { settingsStore.settings.buddyReminderEnabled },
+            set: { settingsStore.settings.buddyReminderEnabled = $0 }
         )
     }
 
