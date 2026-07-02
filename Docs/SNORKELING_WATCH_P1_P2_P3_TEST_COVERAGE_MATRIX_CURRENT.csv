@@ -1,0 +1,37 @@
+TestFile,Target,Priority,Feature,PositiveCoverage,NegativeCoverage,RegressionCoverage,MissingCoverage,Verdict,RequiredTest
+SnorkelingRouteSyncCodecTests,iOS,P1,Route package encode/decode,Valid package round trip,Invalid schema rejection,Cross-activity decode rejection,WC live transfer,PARTIAL,Optional WC integration
+SnorkelingRouteAckRoundTripTests,iOS,P1,Route ACK iOS side,ACK state transitions,Stale checksum rejection,N/A,Device ACK timing,PARTIAL,WC integration
+SnorkelingRouteSyncStatusPresentationTests,iOS,P1,iOS route sync UI labels,Awaiting ack acknowledged rejected,N/A,N/A,Planner live binding,WIRED_BUT_UNTESTED,UI contract optional
+SnorkelingRouteAckWatchTests,Watch,P1,Watch route ACK delivery,ACK payload generation,Invalid package,Namespace isolation,WC round trip,PARTIAL,WC integration
+SnorkelingImportedRouteCompatibilityTests,Watch,P1,Route import pending stale,Legacy metadata pending hold,Stale revision reject,Checkpoint namespace,Live session activate,PARTIAL,Session-end activation E2E
+SnorkelingWatchReadyRoutePresentationTests,Watch,P1,Ready panel route text,Route name revision pending,No route graceful,N/A,Physical layout,WIRED_BUT_UNTESTED,Watch UI contract
+SnorkelingWatchBatteryPresentationTests,Watch,P1,Battery in presentation input,Fraction formatting color,Nil fraction unknown,N/A,WKInterfaceDevice to store path,MISSING,SnorkelingWatchRuntimeStore battery test
+SnorkelingWatchPrecheckPresentationTests,Watch,P1,Ready precheck summary,GPS depth entry healthy,Degraded blocks start,N/A,N/A,IMPLEMENTED,None
+SnorkelingSessionSyncCodecTests,iOS,P1,Session sync codec,Encode decode merge,Dedup ignore duplicate,Signed envelope,N/A,IMPLEMENTED,None
+SnorkelingSessionSyncTransportNegativeTests,iOS+Watch,P1,Session sync failures,Corrupt payload reject,Wrong signature reject,Cross-activity reject,WC live,IMPLEMENTED,Optional WC
+SnorkelingWatchPendingQueueTests,Watch,P1,Pending session queue,Enqueue flush,Interrupted transfer,Apnea key isolation,WC live,PARTIAL,WC integration
+SnorkelingLogbookStoreTests,Watch,P1,Watch logbook save,Add completed triggers sync,N/A,N/A,Physical save UI,IMPLEMENTED,None
+SnorkelingWatchSyncStatusPresentationTests,iOS,P1,Dashboard session sync line,Pending synced failed,N/A,N/A,Per-session detail,IMPLEMENTED,R1-006 detail sync row test
+SnorkelingLogbookTrackQualityPresentationTests,iOS,P1,Logbook track quality keys,Good degraded sparse,Unavailable empty,N/A,N/A,IMPLEMENTED,None
+SnorkelingWatchReturnPrimaryActionTests,Watch,P2,Return primary policy,Available unavailable titles,No entry disabled,N/A,returnIsPrimaryAction UI binding,PARTIAL,R2-001 UI uses primary flag
+SnorkelingOperationalSettingsPersistenceTests,iOS,P2,iOS settings v2 persistence,Defaults round trip,N/A,N/A,Watch apply without resend,PARTIAL,R2-002 settings push test
+SnorkelingOperationalSettingsRouteSyncTests,iOS,P2,Thresholds in route metadata,All thresholds embedded,N/A,N/A,Live Watch apply,PARTIAL,Watch receives updated thresholds
+SnorkelingWatchRouteSummaryPresentationTests,Watch,P2,Route summary before start,Waypoints return alert off-route,N/A,N/A,Ready panel visibility,WIRED_BUT_UNTESTED,R2-005 UI contract
+SnorkelingMarkerLogbookPresentationTests,iOS,P2,Marker logbook rows,Category counts distance photo,N/A,N/A,N/A,IMPLEMENTED,None
+SnorkelingTrackGPXExportTests,iOS,P2/P3,GPX export,Valid XML markers,Invalid coords stripped,N/A,N/A,IMPLEMENTED,None
+SnorkelingTrackKMLExportTests,iOS,P2/P3,KML export,Valid KML,Invalid coords stripped,N/A,N/A,IMPLEMENTED,None
+SnorkelingWatchMicroMapPresentationTests,Watch,P3,Micro-map policy,GPS unavailable hide underwater,Downsample route,N/A,Canvas render contract,IMPLEMENTED,Optional UI contract
+SnorkelingPlannedVsActualAnalyticsTests,iOS,P3,Planned vs actual,No route no track available,N/A,N/A,Map overlay binding,PARTIAL,UI integration test
+SnorkelingWaypointReachedReportTests,iOS,P3,Waypoint reached report,Events only no invention,No events zero reached,N/A,N/A,IMPLEMENTED,None
+SnorkelingTrackQualityAnalyticsTests,iOS,P3,Track quality analytics,Measured stale gap counts,Empty track unavailable,N/A,N/A,IMPLEMENTED,None
+SnorkelingPhotoMarkerIntegrationTests,iOS,P3,Photo marker refs,JSON encode attachment map,N/A,N/A,Thumbnail file missing,IMPLEMENTED,None
+SnorkelingP3NoRegressionTests,iOS,P3,P3 regression guards,Namespace isolation micro-map unavailable,Waypoint no invent,N/A,N/A,IMPLEMENTED,None
+SnorkelingArchitectureIsolationTests,Watch,P1/P2/P3,Cross-activity code isolation,No FC Apnea Dive refs in Snorkeling sources,N/A,Production corpus scan,N/A,IMPLEMENTED,Maintain on new files
+SnorkelingCrossDomainIsolationTests,Watch,P1/P2/P3,Sync key isolation,Distinct payload keys,N/A,Apnea FC dive keys,N/A,IMPLEMENTED,None
+SnorkelingLocalizationParityTests,Watch,P1/P2/P3,EN/IT parity,All production keys present,Raw key fallback,N/A,N/A,IMPLEMENTED,None
+SnorkelingReleaseHardValidationTests,Watch,P1/P2/P3,Release self-check,Self-check passes mockup gate,N/A,N/A,N/A,IMPLEMENTED,None
+IOSSnorkelingReleaseHardValidationTests,iOS,P1/P2/P3,iOS release self-check,Self-check passes iOS keys,N/A,N/A,N/A,IMPLEMENTED,None
+SnorkelingQAEvidenceCatalogTests,iOS,P1/P2/P3,QA catalog gate,All folders exist PENDING,N/A,N/A,PASS evidence,IMPLEMENTED,Execute manual QA
+SnorkelingNavigationReturnEngineTests,Watch,P1/P2,Navigation return engines,Waypoint reach return advise,N/A,N/A,N/A,IMPLEMENTED,None
+SnorkelingAlarmsMarkersHapticsMissionModeTests,Watch,P2,Markers haptics,Marker save haptic,N/A,N/A,UI layout,IMPLEMENTED,R2-004 optional UI test
+IOSSnorkelingExportServiceE2ETests,iOS,P2/P3,Export E2E,GPX KML summary flow,Privacy gate,N/A,N/A,IMPLEMENTED,None
