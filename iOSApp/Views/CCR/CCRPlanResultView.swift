@@ -6,7 +6,7 @@ struct CCRPlanResultView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     @EnvironmentObject private var plannerBriefingTransfer: PlannerBriefingWatchTransferService
     var pendingChecklistExportPrompt: Bool = false
-    @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
+    @AppStorage(CCRPlannerSafetyAcknowledgment.storageKey) private var ccrPlannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var shareablePDF: ShareablePDFItem?
     @State private var pdfExportAlertMessage: String?
@@ -17,8 +17,8 @@ struct CCRPlanResultView: View {
 
     private var plan: CCRPlanResult { store.ccrPlan }
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
-    private var plannerSafetyAcknowledged: Bool {
-        plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
+    private var ccrPlannerSafetyAcknowledged: Bool {
+        ccrPlannerSafetyAckRevision == CCRPlannerSafetyAcknowledgment.currentRevision
     }
 
     var body: some View {
@@ -134,7 +134,7 @@ struct CCRPlanResultView: View {
     private func ccrPDFContext() -> PDFExportCCRPlannerContext {
         PDFShareActions.ccrContext(
             store: store,
-            safetyAcknowledged: plannerSafetyAcknowledged,
+            safetyAcknowledged: ccrPlannerSafetyAcknowledged,
             unitPreference: unitPreference
         )
     }
