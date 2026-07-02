@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` @ `e052903`
+**Aggiornato:** 2026-07-02  
+**Branch consigliato:** `main` @ `c982fe3`
+
+---
+
+## Aggiornamento indice 2026-07-02 — Snorkeling Watch P1/P2/P3 Deep Audit + Unified Remediation Plan
+
+Audit profondo non regressivo P1/P2/P3; matrici feature/risk/test; piano remediation unificato R1→R2→R3.
+
+| Campo | Valore |
+|-------|--------|
+| **Deep audit** | [`SNORKELING_WATCH_P1_P2_P3_DEEP_AUDIT_CURRENT.md`](SNORKELING_WATCH_P1_P2_P3_DEEP_AUDIT_CURRENT.md) |
+| **Remediation plan** | [`SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_PLAN_CURRENT.md`](SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_PLAN_CURRENT.md) |
+| **Feature matrix** | [`SNORKELING_WATCH_P1_P2_P3_FEATURE_COMPLETENESS_MATRIX_CURRENT.csv`](SNORKELING_WATCH_P1_P2_P3_FEATURE_COMPLETENESS_MATRIX_CURRENT.csv) |
+| **Verdict** | **P1_PARTIAL** · **P2_PARTIAL** · **P3_PARTIAL** · **MANUAL_UI_QA_PENDING** |
 
 ---
 
