@@ -1,25 +1,10 @@
-Case_ID,Area,Initial_State,Fault,Expected_Result,Actual_Result,Environment_Authority_After_Fault,Start_Allowed,Runtime_Output,Severity,Evidence,Required_Remediation,Acceptance_Test
-FI-001,CMAltimeter,idle,absolute altitude unavailable,unavailable state; no auto authority,preserved manual/import,unchanged,NO,N/A,P4,WatchCMAltimeterLifecycleTests,N/A,testUnavailable
-FI-002,CMAltimeter,sampling,Core Motion error,failed; subscription stopped,prior authority preserved,unchanged,NO,N/A,P3,FullComputerEnvironmentSensorService,Ensure stopAbsoluteAltitudeUpdates,N/A
-FI-003,CMAltimeter,sampling,timeout 8s,timedOut; no proposal,unchanged,unchanged,NO,N/A,P3,FullComputerAltitudeSamplingPolicy,N/A,testTimeout
-FI-004,CMAltimeter,sampling,nil data+nil error,nilDataStream fail-closed,unchanged,unchanged,NO,N/A,P3,WatchCMAltimeterLifecycleTests,N/A,testNilDataNilError
-FI-005,CMAltimeter,sampling,late callback old request,ignored by generation token,unchanged,unchanged,NO,N/A,P3,WatchCMAltimeterRemediationTests,N/A,testLateCallback
-FI-006,CMAltimeter,sampling,two rapid requestProposal,superseded request cancelled,unchanged,unchanged,NO,N/A,P3,WatchCMAltimeterLifecycleTests,N/A,testConcurrentRequests
-FI-007,Environment,confirmed manual,active dive alt change attempt,rejected immutable,unchanged,frozen,NO,unchanged,P4,FullComputerPrediveConfigurationStore,N/A,static review
-FI-008,Depth,sampling,NaN depth,markUnavailable,degraded/unavailable,N/A,N/A,degraded,P3,FullComputerRuntimeEngine,N/A,ingestSample test
-FI-009,Depth,sampling,Inf depth,markUnavailable,degraded,N/A,N/A,unavailable,P3,FullComputerRuntimeEngine,N/A,ingestSample test
-FI-010,Timing,active dive,negative dt,tick no-op,tick guard,N/A,N/A,unchanged,P4,FullComputerRuntimeEngine,N/A,tick test
-FI-011,Timing,active dive,out-of-order timestamp,reject sample,non_monotonic_timestamp,N/A,N/A,degraded,P3,FullComputerRuntimeEngine,N/A,ingestSample test
-FI-012,Timing,active dive,120s suspension,integrate full dt + degraded,missed_tick degraded,N/A,N/A,degraded not optimistic,P3,FullComputerTimingFaultTests,N/A,testLongSuspension
-FI-013,Checkpoint,active dive,corrupt payload,restore throws,no fresh tissues,N/A,N/A,fail-closed,P3,FullComputerRecoveryCheckpointTests,N/A,testCorruptCheckpoint
-FI-014,Checkpoint,active dive,future schema,restore throws,fail-closed,N/A,N/A,fail-closed,P3,FullComputerRecoveryCheckpointTests,N/A,testFutureSchema
-FI-015,Sync,idle,malformed plan HMAC,reject import,fail-closed,N/A,NO,N/A,P3,DivePlanPackageCodecTests,N/A,testInvalidHMAC
-FI-016,Sync,idle,duplicate ACK,idempotent handling,no duplicate apply,N/A,N/A,N/A,P4,WatchSyncServiceIntegrationTests,N/A,N/A
-FI-017,Planner,idle,stale briefing card,reference only no mutation,no runtime change,N/A,N/A,N/A,P4,PlannerBriefingReceiverTests,N/A,N/A
-FI-018,Solver,active dive,calculation slow,budget fallback conservative stale cache,conservative fallback,N/A,N/A,stale conservative,P4,FullComputerDecoSolver,N/A,FullComputerDecoSolverCacheIsolationTests
-FI-019,Gas,active dive,invalid gas switch,markDegraded invalid_gas_switch,degraded,N/A,N/A,degraded,P3,FullComputerRuntimeEngine,N/A,changeGas test
-FI-020,Restore,post-crash,tissue reset detection,recovery_tissue_reset_detected diagnostic,flagged,N/A,N/A,degraded,P3,recoverySelfCheckDiagnostics,N/A,FullComputerRecoveryCheckpointTests
-FI-021,Environment,missing env,start FC,canStart fails,no sea-level fallback,N/A,NO,start blocked,P4,FullComputerPrediveReadiness,N/A,OrchestratedAltitudeEnvironmentTests
-FI-022,Memory pressure,active dive,low memory,N/A NOT_EXECUTED,N/A,N/A,N/A,N/A,P2,N/A,Instruments profiling,PENDING
-FI-023,Physical,all,real Watch underwater,N/A,PENDING_PHYSICAL,N/A,N/A,N/A,P2,PHYSICAL_QA matrix,Execute wet QA,PENDING_PHYSICAL
-FI-024,Water auto-open,idle,Apnea preferred destination with shallow policy,route to valid step not crash,divingModeSelection in test harness,N/A,N/A,routing only,P2,WatchWaterAutoOpenPolicyTests @2c30412,Align test DepthCapabilityPolicy,WFC-P2-005
+Case_ID,Area,Initial_State,Fault,Expected_Result,Actual_Result,Environment_Authority_After_Fault,Start_Allowed,Runtime_Output,UI_Diagnostic,Subscription_Cleanup,Persistence_Effect,Severity,Evidence,Required_Remediation,Acceptance_Test
+FI-001,CMAltimeter,predive,absolute altitude unavailable,fail closed proposal,Observed fail-closed,unchanged,false,N/A,pending sensor state,yes,none,P1,WatchCMAltimeterRemediationTests,None,N/A
+FI-002,CMAltimeter,predive,nil data + nil error,timeout/error state,Observed fail-closed,unchanged,false,N/A,error banner,yes,none,P1,WatchCMAltimeterRemediationTests,None,N/A
+FI-003,CMAltimeter,predive,late callback from old request,ignore stale callback,Observed ignored,unchanged,false,N/A,no state flip,yes,none,P1,WatchCMAltimeterRemediationTests,None,N/A
+FI-004,Timing,active dive,duplicate timestamp,no double-count,Observed guarded,N/A,true,stable tissues,none,N/A,none,P1,FullComputerTimingFaultTests,None,N/A
+FI-005,Timing,active dive,negative dt,fail-safe skip,Observed guarded,N/A,true,stable tissues,none,N/A,none,P1,FullComputerTimingFaultTests,None,N/A
+FI-006,Restore,relaunch,checkpoint corruption,fail-safe restoration,Observed fail-safe,checkpoint source,false,degraded/safe,restore error,N/A,no optimistic reset,P1,FullComputerRecoveryCheckpointTests,None,N/A
+FI-007,External validation,audit,no independent external run,mark pending external,Marked pending,N/A,N/A,N/A,docs gate,N/A,N/A,P1,External validation plan,Run third-party parity,Signed external report
+FI-008,Physical QA,audit,no wet/physical execution,mark pending physical,Marked pending,N/A,N/A,N/A,docs gate,N/A,N/A,P2,Physical QA matrix,Execute matrix,Attach physical evidence
+FI-009,Test baseline,test run,snorkeling localization parity missing keys,record failing tests,Recorded 2 fails in watch + 2 in iOS,N/A,N/A,N/A,test output,N/A,N/A,P2,xcodebuild outputs,Add missing keys,Rerun both test suites green

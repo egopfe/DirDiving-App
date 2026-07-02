@@ -1,11 +1,5 @@
-Case_ID,Authority_Layer,Source_Symbol,Authoritative_For_Safety,Compile_Flag,InfoPlist_Tier,Runtime_Resolution,FC_Start_Allowed,Gauge_Start_Allowed,Test_Evidence,CONS-007_Verdict,Notes
-DCAP-01,Compile-time full,DepthCapabilityEntitlementProbe.runtimeAuthorityTier,YES,DEPTH_ENTITLEMENT_FULL,ignored,appleFull,YES,YES,DepthCapabilityTests,PASS,Primary authority
-DCAP-02,Compile-time shallow,DepthCapabilityEntitlementProbe.runtimeAuthorityTier,YES,DEPTH_ENTITLEMENT_SHALLOW,ignored,appleShallow,NO (default),NO (default),DepthCapabilityTests,PASS,~6m scope
-DCAP-03,Shallow + dev FC toggle,DeveloperSettings.allowsShallowDepthDivingTesting,YES (internal QA),DEPTH_ENTITLEMENT_SHALLOW,ignored,appleShallow+toggle,YES (internal),gauge toggle separate,DepthCapabilityTests,PASS,CONS-006 coupled
-DCAP-04,Info.plist metadata only,DepthCapabilityEntitlementProbe.infoPlistMetadataTier,NO,,full/shallow/none,fallback if compile none,depends,depends,DepthCapabilityEntitlementProbe.swift L41,PASS,Non-authoritative label in code
-DCAP-05,Simulation sensor,DepthCapabilityResolver + DeveloperSettings,YES (DEBUG/TF),,none,simulation,NO,NO,DeveloperSensorSourceTests,PASS,Not production FC path
-DCAP-06,None entitlement,DepthCapabilityPolicy.supportsFullComputerRuntime,NO,,none,none,NO,NO,DepthCapabilityTests,PASS,Fail-closed
-DCAP-07,SecTask runtime read,N/A,NOT_SUPPORTED,watchOS limitation,,,N/A,N/A,DepthCapabilityEntitlementProbe comment,PASS,Documented constraint
-DCAP-08,WAO auto-launch gate,DIRStartupSelectionPolicy.resolveAutomaticStep,YES,,resolved policy,blocks FC on shallow,conditional,WatchWaterAutoOpenPolicyTests,PARTIAL,WFC-P2-005,12 routing tests FAIL @2c30412; production L110-112 correct when FC supported
-DCAP-09,Production App Store FC,DepthCapabilityPolicy,YES,,appleFull required,appleFull,YES,YES,DepthCapabilityPolicy.swift,PASS,Shallow-signed builds block FC without dev toggle
-DCAP-10,Physical wet validation,MASTER_SHALLOW_DEPTH_RELEASE_GATE,NOT_EXECUTED,,,,PENDING_PHYSICAL,PENDING_PHYSICAL,CONS-042,PASS (software),Physical QA separate gate
+Case_ID,Authority_Source,Requirement,Observed,Result,Evidence,Notes
+DEP-AUTH-001,Runtime depth capability policy,Do not trust Info.plist alone,Observed policy-based authority,PASS,DepthCapabilityPolicy + tests,
+DEP-AUTH-002,Water auto-open routing,Route must respect mode/depth authority,Observed guarded routing,PASS,routing policy tests/docs,
+DEP-AUTH-003,Developer shallow toggles,Remain unlock-gated/testing-only,Observed documented gating,PASS,developer UX matrix,
+DEP-AUTH-004,Physical depth sensor entitlement,Require physical validation for release,Not executed,PENDING_PHYSICAL,physical QA matrix,

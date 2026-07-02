@@ -1,14 +1,5 @@
-Budget_ID,Component,Platform,Operation,Metric,Threshold,Test_Evidence,Simulator_Status,Physical_Status,Notes
-APNEA-PERF-01,ApneaWatchRuntimeStore,Watch,Session tick loop,Hz,1,Apnea lifecycle tests,PASS,PENDING,Cancelled on session end
-APNEA-PERF-02,ApneaWatchRuntimeStore,Watch,Checkpoint debounce,ms,250,ApneaCheckpointFoundationTests,PASS,PENDING,Atomic write
-APNEA-PERF-03,ApneaWatchRuntimeStore,Watch,Sample processing,signpost,apnea_sample_process,DIRPerformanceSignpost,PASS,PENDING,No profile data in signpost name
-APNEA-PERF-04,ApneaWatchRuntimeStore,Watch,Auto-detection loop,CPU,bounded,Apnea auto-detection tests,PASS,PENDING,Physical wet NOT_EXECUTED
-APNEA-PERF-05,IOSApneaLogbookStore,iOS,Session list load,wall_ms,soft 500,ApneaLogbookStoreTests,PASS,PENDING,Cap 80 sessions
-APNEA-PERF-06,IOSApneaDashboard,iOS,Dashboard recompute,debounce,generation token,Apnea dashboard tests,PASS,PENDING,SwiftUI invalidation bounded
-APNEA-PERF-07,WatchSyncService,Both,Apnea session encode/decode,crypto,HMAC v3,ApneaSyncCodecTests,PASS,PENDING,wc_encode_decode signpost
-APNEA-PERF-08,ApneaWatchRuntimeStore,Watch,Task cancellation on end,race,none,Apnea lifecycle tests,PASS,N/A,[weak self] + cancel — CONC-005
-APNEA-PERF-09,Apnea session merge,iOS,Duplicate ID merge,integrity,no sample drop,ApneaSessionMergeIntegrityTests,PASS,N/A,Sync path
-APNEA-PERF-10,Apnea battery,Watch,Long training session,field,PENDING,Manual QA,NOT_RUN,PENDING,MAIN-APNEA-001 physical gate
-CONC-APNEA-01,ApneaWatchRuntimeStore,Watch,Cancellable tick Task,P4,MITIGATED,Session end leak,task cancel,Apnea lifecycle tests,
-CONC-APNEA-02,IOSApneaLogbookStore,iOS,Async ingest MainActor,P4,MITIGATED,WC callback hop,@MainActor store,ApneaSyncWatchReceiverTests,
-CONC-APNEA-03,Apnea recovery UI,Watch,Timer publish MainActor,P4,ACCEPTED,1 Hz countdown,MainActor only,Apnea recovery tests,
+Risk_ID,Area,Pattern,Status,Evidence,Notes
+APN-PERF-001,Runtime loop,1Hz cancellable session tick,PASS,Apnea runtime tests,Software-only evidence
+APN-PERF-002,Checkpointing,debounced persistence cadence,PASS,Apnea checkpoint tests,Bounded write policy
+APN-CONC-001,Async cancellation,task cancellation on session end,PASS,Apnea lifecycle tests,No stale post-end update expected
+APN-PHY-001,Battery/thermal field profile,physical Instruments evidence,PENDING_INSTRUMENTS,Not executed in this pass,Keep gate pending

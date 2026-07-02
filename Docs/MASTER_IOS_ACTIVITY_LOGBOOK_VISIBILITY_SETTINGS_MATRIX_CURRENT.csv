@@ -1,0 +1,6 @@
+Setting_ID,Activity,Default,Store_Key,Visible_In_Settings,Affects_Canonical_Store,Affects_Watch_Runtime,Status,Evidence,Notes
+LOGBOOK_VIS_DIVING,diving,OFF,dirdiving_ios_logbook_visibility_diving,YES,NO,NO,PASS,iOSApp/Services/IOSActivityLogbookVisibilitySettingsStore.swift,Presentation-only toggle
+LOGBOOK_VIS_APNEA,apnea,OFF,dirdiving_ios_logbook_visibility_apnea,YES,NO,NO,PASS,iOSApp/Services/IOSActivityLogbookVisibilitySettingsStore.swift,Presentation-only toggle
+LOGBOOK_VIS_SNORKELING,snorkeling,OFF,dirdiving_ios_logbook_visibility_snorkeling,YES,NO,NO,PASS,iOSApp/Services/IOSActivityLogbookVisibilitySettingsStore.swift,Presentation-only toggle
+LOGBOOK_VIS_UI_SECTION,all,N/A,N/A,YES,NO,NO,PASS,iOSApp/Views/Shared/IOSActivityLogbookVisibilitySettingsSection.swift,Section embedded in each activity settings content
+LOGBOOK_VIS_TESTS,all,N/A,N/A,N/A,N/A,N/A,PASS,Tests/iOSAlgorithmTests/IOSActivityLogbookVisibilitySettingsTests.swift,Automated software coverage present

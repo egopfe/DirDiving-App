@@ -1,0 +1,6 @@
+Policy_Area,Expected_State,Observed_State,Status,Risk,Required_Action
+Location permission mode,When-In-Use only unless explicitly changed and audited,Documented,PASS,High,None
+Always location claim,No Always Location requirement claim,Documented,PASS,High,None
+Underwater GPS privacy claim,No continuous underwater tracking guarantee,Documented,PASS,High,None
+Cross-activity location leakage,No unintended cross-activity contamination,Documented,PASS,High,None
+Release privacy disclosure,Privacy matrices aligned with release docs,Mostly aligned,PARTIAL,Medium,Improve index cross-links

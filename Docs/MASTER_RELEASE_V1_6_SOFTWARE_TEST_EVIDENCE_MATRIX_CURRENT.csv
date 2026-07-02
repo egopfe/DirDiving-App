@@ -1,0 +1,6 @@
+Evidence_ID,Source,Baseline,Result,Status,Severity,Notes
+V16-EV-001,Audit 01 Watch baseline,7ae527b,1191 executed / 2 failed,PARTIAL,P2,Localization parity failures still open
+V16-EV-002,Audit 02 iOS baseline,7ae527b,1832 executed / 2 failed,PARTIAL,P2,Localization parity failures still open
+V16-EV-003,Audit 03 UI/UX baseline,7ae527b,PARTIAL,PARTIAL,P2,Manual evidence lanes pending
+V16-EV-004,Audit 04 Main code baseline,7ae527b,PARTIAL with guarded posture,PARTIAL,P2,Pending physical/external lanes preserved
+V16-EV-005,Preflight command checks,7ae527b,PASS,PASS,P3,Branch/commit/xcode baseline captured

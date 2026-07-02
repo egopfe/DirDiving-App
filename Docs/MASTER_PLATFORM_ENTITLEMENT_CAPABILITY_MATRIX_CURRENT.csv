@@ -1,27 +1,11 @@
-Capability_ID,Platform,Feature,Required,Implemented,Entitlement_Or_Plist,Simulator_Only,Physical_Required,Apple_Approval_Required,Release_Blocker,Status,Software_Status,Physical_Status,Evidence_Path,Notes
-CAP-W-DEPTH-SHALLOW,Watch,Shallow submerged depth and pressure,yes,yes,Config/DIRDiving.WithShallowDepth.entitlements + submerged-shallow-depth-and-pressure,no,yes,yes,yes,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/HARDWARE_ENTITLEMENT/,Default signing @2c30412; ~6m scope
-CAP-W-DEPTH-FULL,Watch,Full submerged depth and pressure,yes,yes,Config/DIRDiving.WithWaterSubmersion.entitlements,alternate archive,no,yes,yes,yes,PENDING,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/HARDWARE_ENTITLEMENT/,Requires full provisioning profile
-CAP-W-DEPTH-TIER,Watch,DIRDepthEntitlementTier plist alignment,yes,yes,App/Info.plist DIRDepthEntitlementTier=shallow,no,yes,no,yes,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,DepthCapabilityEntitlementProbe,MASTER-DEPTH-002 metadata trust
-CAP-W-AUTO-LAUNCH,Watch,WKSupportsAutomaticDepthLaunch,yes,yes,App/Info.plist true,no,yes,yes,yes,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_SYSTEM_LISTING/,Physical listing NOT_EXECUTED
-CAP-W-BG-UNDERWATER,Watch,WKBackgroundModes underwater-depth,yes,yes,App/Info.plist,no,yes,no,no,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,Session lifecycle docs,
-CAP-W-CM,Watch,CoreMotion CMAltimeter absolute altitude,yes,yes,NSMotionUsageDescription in App/Info.plist,yes,yes,no,yes,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL/,WCMA software remediation PASS
-CAP-W-WC,Watch,WatchConnectivity sync,yes,yes,Linked framework,no,yes,no,no,PASS,SOFTWARE_READY,PENDING_PHYSICAL,Tests/WatchAlgorithmTests/WatchSync*,Codec tests PASS; field PENDING
-CAP-W-LOC,Watch,Location for GPS track,yes,yes,Info.plist location usage,no,yes,no,no,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/SNORKELING_GPS/,Surface-only disclosure
-CAP-W-KIT,Watch,WatchKit runtime,yes,yes,Watch App target,no,no,no,no,PASS,SOFTWARE_READY,N/A,project.yml,
-CAP-W-GRP,Watch,App Groups,optional,no,N/A,N/A,N/A,N/A,no,PASS,SOFTWARE_READY,N/A,Not used in MAIN,
-CAP-W-HK,Watch,HealthKit,optional,no,N/A,N/A,N/A,N/A,no,PASS,SOFTWARE_READY,N/A,Not used in MAIN,
-CAP-W-BG,Watch,Background modes (general),optional,limited,Info.plist as configured,yes,yes,no,no,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md,
-CAP-I-LOC,iOS,Location permission,yes,yes,iOSApp Info.plist location keys,no,yes,no,no,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/SNORKELING_IOS_MAPS/,
-CAP-I-PHOTO,iOS,Photos/files permission,yes,yes,Info.plist photo usage,no,yes,no,no,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/SNORKELING_PHOTO_PRIVACY/,
-CAP-I-ICLOUD,iOS,iCloud KVS + CloudKit (diving opt-in),yes,yes,iOSApp/Config/DIRDivingiOS.entitlements,no,yes,no,yes,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/ICLOUD_TWO_DEVICE/,
-CAP-I-WC,iOS,WatchConnectivity companion,yes,yes,Linked framework,no,yes,no,no,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/WATCH_IOS_SYNC/,
-CAP-I-GRP,iOS,App Groups,optional,no,N/A,N/A,N/A,N/A,no,PASS,SOFTWARE_READY,N/A,Not used,
-CAP-I-HK,iOS,HealthKit,optional,no,N/A,N/A,N/A,N/A,no,PASS,SOFTWARE_READY,N/A,Not used,
-CAP-I-CHARTS,iOS,Charts framework,yes,yes,Linked SDK,yes,no,no,no,PASS,SOFTWARE_READY,N/A,Planner charts,
-CAP-BOTH-PRIV,Both,PrivacyInfo.xcprivacy,yes,yes,Config/PrivacyInfo-Watch.xcprivacy + iOSApp/Config/PrivacyInfo-iOS.xcprivacy,no,no,no,no,PASS,SOFTWARE_READY,N/A,SecurityPrivacyTrustRemediationTests,
-CAP-BOTH-EXPORT,Both,Export/share file handling,yes,yes,Share sheet + tmp staging,no,yes,no,no,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,QA_EVIDENCE/PDF_RENDER/,
-CAP-W-DSS,Watch,Developer Sensor Source release gating,yes,yes,DeveloperSettings + SensorSourceMode,no,yes,no,no,PASS,SOFTWARE_READY,N/A,DeveloperSensorSourceTests,
-CAP-W-SIM,Watch,Simulation mode release gating,yes,yes,SensorSourceMode + UI badges,yes,yes,no,yes,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,TESTFLIGHT_REVIEW_NOTES.md,Must remain labeled simulation
-CAP-W-DEV-SHALLOW,Watch,Developer shallow Gauge/FC toggles,yes,yes,DeveloperSettingsView + DepthCapabilityPolicy,no,yes,no,yes,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,DeveloperSettingsTests,App Store hidden; TF default OFF
-CAP-ASC-CAT,App Store,Category and age rating,yes,partial,App Store Connect metadata,N/A,N/A,yes,yes,PENDING,SOFTWARE_PASS,PENDING,QA_EVIDENCE/APP_STORE_MARKETING/,Final ASC config pending
-CAP-W-BUNDLE,Watch,iOS embeds Watch companion,yes,yes,DIRDiving iOS embeds Watch App,no,yes,no,no,PASS,SOFTWARE_READY,PENDING_PHYSICAL,xcodebuild iOS build PASS @451f8fb,
+Capability_ID,Capability,Required,Implemented,Evidence,Classification,Release_Blocker,Notes
+ENT-001,Shallow depth entitlement tier,YES,YES,Config/*.entitlements + Info.plist,Required;Apple approval required,NO,Shallow posture documented
+ENT-002,Full depth entitlement tier,CONDITIONAL,UNKNOWN,No physical provisioning evidence,Apple approval required;Physical-device required,YES,Do not claim full-depth availability without evidence
+ENT-003,WKSupportsAutomaticDepthLaunch,YES,YES,Info.plist/project settings,Required;Physical-device required,YES,Needs physical listing/launch evidence
+ENT-004,WKBackgroundModes underwater-depth,YES,YES,Info.plist,Required;Physical-device required,YES,No physical QA evidence attached
+ENT-005,CoreMotion CMAltimeter,YES,YES,Code paths + docs,Required;Physical-device required,YES,Physical acceptance/rejection evidence pending
+ENT-006,When-In-Use location policy,YES,YES,Info.plist/disclosure docs,Required,NO,No Always Location promotion found
+ENT-007,WatchConnectivity,YES,YES,Sync code/tests,Required;Physical-device required,YES,Paired field QA pending
+ENT-008,iCloud/KVS capability,CONDITIONAL,YES,Project and docs,Required,NO,Physical restore drills pending
+ENT-009,PrivacyInfo.xcprivacy present,YES,YES,Privacy manifest file,Required,NO,Must remain aligned with disclosures
+ENT-010,Developer sensor source release gating,YES,PARTIAL,Docs and tests,Simulator-only risk,YES,Needs explicit release exclusion checks

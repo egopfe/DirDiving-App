@@ -1,11 +1,10 @@
-Check_ID,Surface,Requirement,Production_Source,Expected,Actual@2c30412,Pass,CONS-006/007,Evidence
-GF-UX-01,Full Computer settings,GF presets only under Diving FC,FullComputerDivingSettingsView,3 presets visible,3 presets,PASS,N/A,FullComputerGradientFactorPresetTests
-GF-UX-02,Gauge settings,No GF exposure,Gauge settings views,No GF controls,None,PASS,N/A,WatchActivitySettingsOwnershipTests
-GF-UX-03,Apnea settings,No GF exposure,Apnea settings,No GF,None,PASS,N/A,ApneaArchitectureIsolationTests
-GF-UX-04,Predive confirmation,GF displayed before runtime,FullComputerPrediveConfirmationView,GF+source shown,Shown,PASS,N/A,Static review
-GF-UX-05,iOS plan lock,Override state visible,FullComputerPrediveSettingsView,Lock visible when iosPlan,Visible,PASS,CONS-002,FullComputerImportedPlanStoreTests
-GF-UX-06,Active dive lock,GF immutable during dive,FullComputerGradientFactorRuntimeResolutionTests,Locked,Locked,PASS,N/A,Runtime resolution tests
-GF-UX-07,Logbook,GF shown FC dives only,DiveDetailView,FC metadata only,FC only,PASS,N/A,WatchActivityLogbookRoutingTests
-GF-UX-08,Localization EN/IT,Safe GF terminology,Localizable.strings,Complete EN/IT,Complete,PASS,N/A,WatchLocalizationStaticSweepTests
-GF-UX-09,Action Button,No underwater GF change,WatchUnderwaterActionRouterTests,No GF shortcut,Blocked,PASS,N/A,ActionButtonIntentsSafetyTests
-GF-UX-10,Water auto-open,No GF change on submerged launch,WatchWaterAutoOpenPolicy,Routing only,Routing only,PASS,N/A,Static review
+Case_ID,Requirement,Status,Evidence,Notes
+GF-UX-001,GF settings only in Diving -> Full Computer,PASS,views + existing tests,
+GF-UX-002,Gauge/Apnea/Snorkeling do not expose GF settings,PASS,mode-specific views,
+GF-UX-003,Three fixed presets understandable,PASS,GF settings docs/UI,
+GF-UX-004,iOS plan override/lock truthful,PASS,predive confirmation flow,
+GF-UX-005,Active dive lock state truthful,PASS,runtime lock behavior,
+GF-UX-006,Predive confirmation shows final GF/source,PASS,predive confirmation view,
+GF-UX-007,Logbook shows GF/source only for FC dives,PASS,dive detail/logbook policy,
+GF-UX-008,No underwater shortcut mutates GF,PASS,action button/routing policy,
+GF-UX-009,EN/IT copy complete and safe,PARTIAL,current localization parity failures are Snorkeling-specific,

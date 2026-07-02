@@ -1,11 +1,6 @@
-Boundary_ID,Apnea_Feature,FC_Exposure_Risk,Production_Isolation,Test_Coverage,Test_Result@2c30412,Physical_QA,Verdict,Notes
-APNEA-FC-001,ApneaSessionEngine lifecycle,No FC tissue mutation,Separate engine,ApneaArchitectureIsolationTests,PASS,PENDING_PHYSICAL,PASS,No Buhlmann symbols
-APNEA-FC-002,Apnea logbook store,No DiveLogStore write,ApneaLogbookStore only,ApneaArchitectureIsolationTests,PASS,PENDING_PHYSICAL,PASS,
-APNEA-FC-003,Apnea sync codec,No dive session keys,Separate namespace,testSyncNamespaceKeysRemainIsolated,PASS,PENDING_PHYSICAL,PASS,
-APNEA-FC-004,Apnea recovery math,No GF/deco settings,ApneaRecoveryPolicy,ApneaRecoveryPolicyLifecycleTests,PASS,PENDING_PHYSICAL,PASS,No medical guarantee
-APNEA-FC-005,Apnea settings ownership,No FC GF in Apnea,WatchActivitySettingsOwnershipTests,PASS,PENDING_PHYSICAL,PASS,
-APNEA-FC-006,Apnea training P1/P2/P3,No FC runtime coupling,ApneaTrainingStepRuntimeEvaluator,ApneaTrainingStepRuntimeEvaluatorTests,PASS,PENDING_PHYSICAL,PASS,@76f3703
-APNEA-FC-007,Apnea checkpoint restore,No FC checkpoint cross-read,ApneaSessionCheckpoint,ApneaCheckpointFailureInjectionTests,PASS,PENDING_PHYSICAL,PASS,
-APNEA-FC-008,Apnea depth feed,Shared DepthMeasurementFeed read-only,DepthMeasurementFeed,ApneaWatchSensorQualityTests,PASS,PENDING_PHYSICAL,PASS,Feed shared; FC tissues separate
-APNEA-FC-009,Apnea iOS mode switch,No remote FC session switch,iOS Settings,Activity sync isolation,PASS,PENDING_PHYSICAL,PASS,Static policy
-APNEA-FC-010,Apnea localization,No decompression wording,Apnea strings,ApneaReleaseHardValidationTests,PASS,N/A,PASS,
+Case_ID,Boundary_Rule,Expected,Observed,Status,Evidence,Notes
+APN-BND-001,No FC tissue mutation from Apnea,No FC runtime authority call path,Observed isolated,PASS,Apnea architecture isolation tests,
+APN-BND-002,No GF/deco controls in Apnea UI,Apnea remains non-decompression mode,Observed,PASS,UI docs/tests,
+APN-BND-003,No cross-activity logbook contamination,Activity stores remain separate,Observed,PASS,sync/logbook tests,
+APN-BND-004,Water auto-open should not bypass safety/mode gating,Routing remains gated,Observed,PASS,routing policy tests,
+APN-BND-005,Physical underwater behavior evidence,Need wet/manual validation,Not executed,PENDING_PHYSICAL,QA pending gates,

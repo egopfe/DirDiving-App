@@ -1,0 +1,9 @@
+Pending_ID,Category,Status,Severity,Reason,Required_Evidence
+V16-PEN-001,Physical Watch QA,PENDING_PHYSICAL,P1,No executed artifacts attached,Real-device run logs/screenshots/traces
+V16-PEN-002,Physical iPhone QA,PENDING_PHYSICAL,P1,No executed artifacts attached,Device-specific QA logs
+V16-PEN-003,Paired Watch/iPhone QA,PENDING_PHYSICAL,P1,Template-only evidence,Paired transfer/session logs
+V16-PEN-004,Underwater/depth sensor QA,PENDING_PHYSICAL,P1,No wet/chamber evidence,Wet/chamber reports
+V16-PEN-005,Manual unified logbook QA,PENDING_MANUAL_QA,P2,Walkthrough not attached,Manual checklist completion
+V16-PEN-006,Manual snorkeling remediation UX QA,PENDING_MANUAL_QA,P2,Checklist pending,Manual UX execution logs
+V16-PEN-007,Accessibility manual QA,PENDING_MANUAL_QA,P2,No signed run package,VoiceOver/Dynamic Type walkthrough evidence
+V16-PEN-008,Legal/certification review,PENDING_LEGAL_REVIEW,P1,Counsel sign-off missing,Legal memo and approved copy

@@ -1,0 +1,8 @@
+Activity,Expected_GPS_Policy,Observed_Documentation,Status,Risk,Required_Action
+Diving,Surface entry/exit metadata only and no decompression authority,Documented,PASS,High,None
+Apnea,Surface start/end metadata only and no runtime navigation authority,Documented,PASS,High,None
+Snorkeling,Track/route features remain snorkeling-owned and non-decompression authority,Documented,PASS,High,None
+Unified view,Read-only presentation not canonical GPS authority,Documented,PASS,High,None
+Underwater guarantee claims,No underwater GPS guarantee,Documented,PASS,Critical,None
+No fake coordinate policy,No fabricated coordinate claims,Documented,PASS,High,None
+Top-level discoverability,GPS policy consistently linked in index/readme,Incomplete,PARTIAL,Medium,Add direct links

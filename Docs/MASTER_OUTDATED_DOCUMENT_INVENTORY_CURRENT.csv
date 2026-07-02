@@ -1,28 +1,15 @@
 File,Type,Last_Known_Update,Outdated_Topic,Severity,Reason,Superseded_By,Keep_Archive,Required_Action,Notes
-README.md,readme,2026-06-20,baseline SHA bf03fb0,needs update,P1,INDEX @ 2c30412,Update baseline to 2c30412,yes,Add V1.5 launch sequence link,yes,
-Docs/README.md,readme,2026-06-20,baseline + master audit table,needs update,P1,This audit,Refresh stato corrente to 2c30412,yes,Add orchestrator V1.5 + audit 07 row,yes,
-Docs/INDEX.md,index,2026-07-01,header SHA ad1c836 vs 2c30412,needs update,P1,Audits 01–06 @ 2c30412,Update Aggiornato date + SHA,yes,Refresh command version column to V1.5,yes,
-Docs/INDEX.md,index,2026-06-28,Command 06 cites V1.1; orchestrator V1.3,needs update,P1,Disk V1.5,Update master command table versions,yes,Link Command 06 V1.5 outputs,yes,
-Docs/INDEX.md,index,2026-06-28,Command 10 file reference vs Command 11 on disk,conflicting,P1,11-MASTER_2026_06_30...,Update INDEX to Command 11 path,yes,Remediation body present as Command 11,yes,
-Docs/INDEX.md,index,2026-07-01,Apnea audit outputs missing from top blocks,missing link,P1,MASTER_IOS_APNEA / UI_UX_APNEA / APNEA_RELEASE,Add Apnea first-class audit INDEX block,yes,V1.5 Apnea scope,yes,
-Docs/INDEX.md,index,2026-07-01,SOFTWARE_READY 100% vs audits 01–05 PARTIAL,conflicting,P1,Upstream audit verdicts,Reconcile INDEX verdict language,yes,Software lanes ready; release PARTIAL,yes,
-Docs/ROADMAP.md,roadmap,2026-06-14,header SHA 99ea74a,needs update,P2,HEAD 2c30412,Update date/SHA,yes,Confirm Apnea/Snorkeling MAIN rows,yes,
-Docs/DIR_DIVING_Feature_Comparison.csv,matrix,2026-06-20,experimental vs MAIN duplicate rows; missing 2026 wave,needs update,P1,MASTER_* feature inventories,Reconcile rows 12–26 vs 430–433; add GF/shallow/water-auto-open,yes,Add mode switcher row,yes,
-Docs/WATCH_LOW_POWER_MISSION_MODE_IMPLEMENTATION_REPORT.md,report,2026-05-29,App Store ready conditional yes,unsafe claim,P0,MASTER_RELEASE_QA audit,Demote App Store claim,yes,Add PENDING physical gates,yes,
-Docs/DOCUMENTATION_UPDATE_REPORT_20260609.md,report,2026-06-09,CCR external validation complete listed as not claimed,conflicting,P0,CCR_REBREATHER_VALIDATION_EVIDENCE,Remove false bullet,yes,Contradicts PENDING status,yes,
-Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md,report,2026-05-23,Excludes Apnea/Snorkeling from MAIN,conflicting,P1,APNEA/SNORKELING architecture,Archive superseded banner,yes,Pre-V3.0 snapshot,yes,
-Docs/MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md,plan,2026-06-30,baseline @ 451f8fb V1.3 orchestrator,needs update,P1,Audits @ 2c30412,Refresh baseline SHA and V1.5 refs,yes,Content largely valid,yes,
-Docs/ORCHESTRATED_AUDIT_CONSOLIDATED_REPORT_CURRENT.md,audit output,2026-06,orchestrator NO-GO vs master audits,superseded,P2,MASTER_CONSOLIDATED_AUDIT plan,Superseded notice,yes,Historical orchestrator path,yes,
-commands_for_cursor/OOLD/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-30.md,command,2026-06-30,pre-V1.5 sequence,superseded,P3,00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_V1.5.md,Archive note,yes,Keep in OOLD,yes,
-commands_for_cursor/OLD/*,command archive,2026-06,V2.0 CCR commands,superseded,P3,01–07 V1.5 commands,ARCHIVE_README,yes,7 files,yes,
-commands_for_cursor/OOLD/*,command archive,2026-06,V1.0–V2.x prior masters,superseded,P3,01–07 V1.5,ARCHIVE_README,yes,32 files,yes,
-Docs/TESTFLIGHT_REVIEW_NOTES.md,release,2026-06-17,baseline 7b620f3 in header,needs update,P2,2c30412,Refresh baseline SHA,yes,Add shallow-depth + water auto-open bullets,yes,
-Docs/PRODUCT_FEATURES_IT.md,overview,2026-06,branch comparison table ambiguity,needs update,P2,Docs/README opening,Clarify MAIN vs codex,yes,Not experimental exclusion anymore,yes,
-Docs/APNEA_EXPERIMENTAL_SPEC.md,spec,legacy,filename implies all Apnea experimental,needs update,P2,APNEA_ARCHITECTURE.md,Rename or legacy banner,yes,Buddy-only experimental,yes,
-Docs/SNORKELING_EXPERIMENTAL_SPEC.md,spec,legacy,filename implies Snorkeling experimental,needs update,P2,SNORKELING_ARCHITECTURE.md,Legacy banner,yes,MAIN Snorkeling shipped,yes,
-Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md,audit,historical,App Store NO-GO snapshot,historical,P3,MASTER_IOS_FULL_DEEP audit,Archive banner,yes,Legacy CCR audit track,yes,
-Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md,alignment,historical,MAIN excludes Apnea,historical,P2,DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT V3,Superseded banner,yes,Pre-V3.0,yes,
-Docs/INDEX.md,index,,Command 6 V3.0 git alignment still listed,superseded,P1,06-MASTER V1.5,Superseded banner,yes,Wrong active command,yes,
-commands_for_cursor/01-07,command,2026-07-01,V1.5 filename/body parity,current,P4,none,None — launch order verified,yes,Bodies aligned; script PASS,yes,
-commands_for_cursor/11-MASTER_2026_06_30...,command,2026-06-30,Remediation as Command 11 not Command 10,needs update,P1,INDEX Command 10 refs,Update INDEX or add alias,yes,COMMAND_10_DOCUMENTED: PARTIAL,yes,
-Scripts/validate_commands_for_cursor_integrity.sh,script,2026-07-01,V1.5 filename expectations,current,P4,V1.5 commands,None — PASS @ 2c30412,yes,CONS-046 FIXED,yes,
+README.md,needs update,2026-06-17,Release baseline,P1,Baseline hash stale vs 7ae527b,Docs/INDEX.md,YES,Refresh baseline and readiness text,Root readme drift
+Docs/README.md,conflicting,2026-06-20,Activity ownership,P1,States stable multi-activity and legacy experimental bullets together,MASTER_IOS/MAIN/UIUX current audits,YES,Remove contradictory feature bullets,Architecture wording conflict
+Docs/INDEX.md,needs update,2026-07-02,Command references,P1,Still contains older V1.1/V1.2 command references,commands_for_cursor V1.7 files,YES,Normalize command section to V1.7 chain,Sequence drift
+Docs/INDEX.md,needs update,2026-07-02,Baseline pointer,P2,Branch advised hash not at current audit baseline,Current preflight baseline,YES,Update baseline metadata,Discoverability issue
+Docs/DOCUMENTATION_UPDATE_REPORT_20260614.md,unsafe claim,2026-06-14,External validation,P0,Contains CCR external validation complete statement without closure evidence,MASTER_CCR validation matrices,YES,Demote claim to pending or evidence-backed only,Critical claim risk
+Docs/MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md,needs update,2026-07-01,Audit baseline,P2,Anchored to prior 2c30412 wave,This audit output,YES,Replace with 7ae527b audit output,Expected refresh
+Docs/MASTER_DOCUMENTATION_REMEDIATION_PLAN_CURRENT.md,needs update,2026-07-01,Open findings list,P2,Does not include latest missing V1.7/V1.6 docs alignment files,This audit output,YES,Refresh prioritized actions,Scope expansion
+Docs/MASTER_COMMAND_VERSION_ALIGNMENT_MATRIX_CURRENT.csv,needs update,2026-07-01,Command inventory,High,Missing explicit MISSING flags for canonical 07/10 files,This audit output,YES,Refresh matrix rows,Integrity risk
+commands_for_cursor/07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.6.md,superseded,2026-06-30,Version drift,P1,V1.6 exists but V1.7 expected by command 06,Expected V1.7 file,YES,Create V1.7 and mark V1.6 historical,Active-chain mismatch
+Docs/MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md,needs update,2026-07-01,Latest-wave references,P2,Still references older orchestrator framing in sections,Latest V1.7 wave docs,YES,Add V1.7 wave cross-links,Consistency improvement
+Docs/MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md,needs update,2026-07-01,V1.7 CCR/equipment/demo links,P2,Release audit does not centrally link all latest V1.7 sub-audits,Latest V1.7 docs,YES,Add cross-links in next remediation pass,Traceability gap
+Docs/MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md,needs update,2026-07-01,Unified logbook policy references,P2,Needs stronger linkage to new unified-logbook matrices,Unified logbook matrices,YES,Add explicit references,Cross-domain traceability
+Docs/MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md,needs update,2026-07-01,Planner send order/GPS truthfulness links,P2,Needs direct links to latest UX matrices,Latest UX V1.7 matrices,YES,Add direct matrix references,QA navigation gap
+Docs/MASTER_TESTFLIGHT_SOFTWARE_READINESS_CURRENT.md,needs update,2026-07-01,Physical/external qualifier prominence,P2,Can be misread without nearby pending-gate context,Release pending gate docs,YES,Strengthen qualifier placement,Messaging clarity

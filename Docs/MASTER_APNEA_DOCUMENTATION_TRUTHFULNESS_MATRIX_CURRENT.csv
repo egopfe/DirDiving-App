@@ -1,18 +1,8 @@
-Document,Section,Claim,Current_Code_Evidence,Current_Audit_Evidence,Truth_Status,Risk,Required_Update,Priority,Notes
-APNEA_ARCHITECTURE.md,Status,Apnea production on MAIN not experimental,Apnea MAIN targets,Feature matrix 430,TRUE,Low,Cross-link Apnea audit outputs,P2,
-APNEA_ARCHITECTURE.md,Decompression isolation,No Bühlmann/GF in Apnea,Apnea code paths,MASTER_IOS_APNEA audit,TRUE,Low,None,P3,
-APNEA_EXPERIMENTAL_SPEC.md,Filename,Implies all Apnea experimental,Apnea on MAIN,APNEA_ARCHITECTURE,OUTDATED,Medium,Legacy banner or rename,P2,Filename misleading
-Docs/INDEX.md,Apnea block,Apnea P1/P2/P3 @ ad1c836 INTERNAL_READY,HEAD 2c30412,Apnea audits,OUTDATED,Medium,Update SHA; link audit outputs,P1,
-Docs/INDEX.md,Apnea audit outputs,Missing MASTER_IOS_APNEA / UI_UX_APNEA / APNEA_RELEASE,Files exist,Audits 02/03/05,MISSING,Medium,Add INDEX block,P1,
-MASTER_IOS_APNEA_FULL_DEEP_AUDIT_CURRENT.md,Truthfulness,No decompression/GF in Apnea iOS,Isolation tests,Audit 02,TRUE,Low,INDEX link,P2,
-MASTER_UI_UX_APNEA_FULL_DEEP_AUDIT_CURRENT.md,Recovery copy,No medical guarantee,Localization audit,Audit 03,TRUE,Low,INDEX link,P2,
-MASTER_UI_UX_APNEA_FULL_DEEP_AUDIT_CURRENT.md,WAO,Does not auto-start Apnea session,Routing policy,Audit 03,TRUE,Low,None,P3,
-MASTER_APNEA_RELEASE_QA_EVIDENCE_AUDIT_CURRENT.md,Auto-detection,Not physically validated,PENDING label,Audit 05,TRUE,PENDING,None,P3,
-MASTER_APNEA_RELEASE_QA_EVIDENCE_AUDIT_CURRENT.md,Physical wet QA,PENDING_PHYSICAL,No signed packs,Audit 05,TRUE,PENDING,None,P3,
-MASTER_APNEA_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv,Claims registry,Apnea claims mapped to evidence,APN-CLM rows,Audit 05,TRUE,Low,INDEX link,P2,
-MASTER_WATCH_APNEA_WATER_AUTO_OPEN_BOUNDARY_MATRIX_CURRENT.csv,WAO boundary,Apnea route does not start session,WatchLaunchRoutingPolicy,Audit 01,TRUE,Low,Cross-link APNEA_ARCHITECTURE,P2,
-MASTER_WATCH_FULL_COMPUTER_APNEA_BOUNDARY_AUDIT_CURRENT.md,FC/Apnea isolation,No decompression leakage into Apnea,ApneaArchitectureIsolationTests,Audit 01,TRUE,Low,INDEX link,P2,
-TESTFLIGHT_REVIEW_NOTES.md,Apnea scope,Apnea on main; not certified coaching,Review notes,Release audit,TRUE,Low,Refresh baseline SHA,P2,
-Resources/*.lproj Apnea strings,Recovery disclaimer,Training aid not medical advice,ApneaReleaseHardValidationTests,Audit 05,TRUE,Low,None,P3,
-DIR_DIVING_Feature_Comparison.csv,Row 430,Apnea lifecycle MAIN; wet QA PENDING,Apnea runtime,Feature inventory,TRUE,PENDING,Reconcile vs experimental rows 12–26,P1,
-DIR_DIVING_Feature_Comparison.csv,Experimental Apnea rows,Mark codex-only experimental,MAIN row 430 conflicts,Same CSV,CONTRADICTED,Medium,Mark legacy rows superseded,P1,
+Document,Section,Claim,Evidence,Truth_Status,Risk,Required_Update,Priority,Notes
+Docs/APNEA_ARCHITECTURE.md,Scope,Apnea is first-class activity architecture,Architecture docs + latest audits,TRUE,High,None,P1,Aligned
+Docs/MASTER_IOS_APNEA_FULL_DEEP_AUDIT_CURRENT.md,Verdict,No Apnea-specific P0/P1 software defect,Audit row indicates none,TRUE,High,None,P1,Software-only context
+Docs/MASTER_APNEA_RELEASE_QA_EVIDENCE_AUDIT_CURRENT.md,Readiness,Apnea software readiness conditional with physical pending,Report wording conditional,TRUE,High,None,P1,Correct pending gate
+Docs/INDEX.md,Apnea update blocks,Apnea P1/P2/P3 test verification present,Index includes update rows,TRUE,Medium,Ensure baseline freshness,P2,Present but mixed epochs
+Docs/README.md,Feature scope,No stale experimental-only wording for Apnea,Some legacy bullets conflict,PARTIAL,High,Remove legacy experimental wording,P1,Contradiction risk
+Docs/APNEA_RELEASE_CHECKLIST.md,Claims policy,No EN13319/ISO6425 claim,Checklist denies certification,TRUE,High,None,P1,Aligned
+Docs/MASTER_APNEA_PRIVACY_DISCLOSURE_MATRIX_CURRENT.csv,Privacy,No overreach in privacy claims,Matrix present,TRUE,Medium,None,P2,Aligned

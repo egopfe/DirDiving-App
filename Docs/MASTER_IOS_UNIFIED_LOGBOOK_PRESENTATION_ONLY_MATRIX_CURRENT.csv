@@ -1,0 +1,6 @@
+Check_ID,Requirement,Observed,Status,Evidence,Notes
+UL-PRES-001,Unified view is optional read-only aggregation,Observed in unified list/detail host,PASS,iOSApp/Views/Shared/IOSUnifiedLogbookListView.swift,No canonical write path in presentation builder
+UL-PRES-002,No merged persistent store for unified timeline,Observed separate activity stores,PASS,iOSApp/Services/IOSCompanionStoreCoordinator.swift,Aggregation occurs at presentation layer
+UL-PRES-003,Default behavior does not force unified view globally,Observed activity visibility gating,PASS,iOSApp/Services/IOSActivityLogbookVisibilitySettingsStore.swift,Per-activity toggle ownership preserved
+UL-PRES-004,Unified entry routes to activity-specific detail host,Observed activity-tagged selection routing,PASS,iOSApp/Views/Shared/IOSUnifiedLogbookDetailHost.swift,No universal canonical detail model
+UL-PRES-005,No Watch sync mutation from unified presentation,No mutation path observed,PASS,Docs/IOS_UNIFIED_LOGBOOK_NO_CONTAMINATION_POLICY.md,Requires manual/paired QA evidence for full release
