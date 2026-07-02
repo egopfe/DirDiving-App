@@ -1610,6 +1610,7 @@
 "snorkeling.watch.ready.route_missing" = "Missing";
 "snorkeling.watch.ready.route_name" = "Route name";
 "snorkeling.watch.ready.route_pending_activation" = "Route pending — activates after session";
+"snorkeling.watch.ready.route_pending_activation.a11y" = "Route will activate on Apple Watch when the current session ends";
 "snorkeling.watch.route_summary" = "Route summary";
 "snorkeling.watch.route_no_route" = "No route selected";
 "snorkeling.watch.route_summary.waypoints" = "%d waypoints";

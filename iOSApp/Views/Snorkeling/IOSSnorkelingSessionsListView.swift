@@ -2,6 +2,7 @@ import SwiftUI
 
 struct IOSSnorkelingSessionsListView: View {
     @EnvironmentObject private var logbook: IOSSnorkelingLogbookStore
+    @EnvironmentObject private var sessionSyncService: IOSSnorkelingSessionSyncService
     @EnvironmentObject private var demoLogbookSettings: IOSActivityDemoLogbookSettingsStore
     @EnvironmentObject private var coordinator: IOSCompanionStoreCoordinator
     @EnvironmentObject private var logbookVisibility: IOSActivityLogbookVisibilitySettingsStore
@@ -122,6 +123,7 @@ struct IOSSnorkelingSessionsListView: View {
 
     private func sessionRow(for entry: IOSSnorkelingLogbookDisplayEntry) -> some View {
         let row = IOSSnorkelingLogbookPresentationMapper.sessionRow(entry.session, units: unitPreference)
+        let syncPresentation = sessionSyncService.logbookSyncPresentation(for: entry.session)
         return HStack(spacing: 12) {
             if entry.isDemo {
                 DemoLogbookBadge()
@@ -130,6 +132,11 @@ struct IOSSnorkelingSessionsListView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(DIRTheme.orange)
                     .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.ios.session.warning.data_quality"))
+            }
+            if let badgeKey = syncPresentation.badgeKey {
+                Image(systemName: syncPresentation.badgeIsWarning ? "exclamationmark.circle.fill" : "clock.fill")
+                    .foregroundStyle(syncPresentation.badgeIsWarning ? DIRTheme.orange : DIRTheme.cyan)
+                    .accessibilityLabel(DIRIOSLocalizer.string(badgeKey))
             }
             VStack(alignment: .leading, spacing: 4) {
                 Text(row.dateText)
