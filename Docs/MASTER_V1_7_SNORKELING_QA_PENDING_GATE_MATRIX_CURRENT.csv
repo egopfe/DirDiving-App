@@ -1,0 +1,7 @@
+Gate,Status,Evidence_Type,Can_Auto_Close,Notes
+Manual_UI_QA,PENDING,Manual execution artifacts,NO,Required for final UX validation
+Paired_Device_WC_QA,PENDING,Real paired iPhone-Watch sessions,NO,Procedure exists but execution pending
+Open_Water_Snorkeling_QA,PENDING,Field/open-water runs,NO,Cannot infer from simulator/tests
+Physical_Watch_iPhone_QA,PENDING,Real hardware captures,NO,No substitution from docs/tests
+GPS_Field_Quality_QA,PENDING,Outdoor route evidence,NO,No fabricated coordinates allowed
+Unified_Logbook_Manual_QA,PENDING,Manual UI traversal evidence,NO,Presentation-only policy must be observed

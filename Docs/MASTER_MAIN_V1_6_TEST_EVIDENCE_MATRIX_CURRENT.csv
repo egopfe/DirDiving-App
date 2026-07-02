@@ -1,0 +1,6 @@
+Evidence_ID,Source,Baseline,Result,Scope,Status,Notes
+EV-001,Audit 01 Watch baseline,7ae527b,1191 executed / 2 failed,Watch algorithm tests,PARTIAL,Localization parity failures remain
+EV-002,Audit 02 iOS baseline,7ae527b,1832 executed / 2 failed,iOS algorithm tests,PARTIAL,Localization parity failures remain
+EV-003,Audit 03 UI/UX baseline,7ae527b,PARTIAL verdict,UX truthfulness and accessibility gates,PARTIAL,Manual/physical gates pending
+EV-004,Current audit preflight command checks,7ae527b,PASS,branch/commit/xcode baseline,PASS,
+EV-005,Physical/paired/instruments evidence,7ae527b,NOT_EXECUTED,field validation gates,PENDING_PHYSICAL,No fabricated evidence

@@ -1,0 +1,8 @@
+Evidence_Claim,Expected_State,Observed_State,Status,Risk,Required_Action
+Apnea tests,21 iOS + 25 Watch PASS reflected as software evidence,Documented,PASS,Medium,None
+Audit 07 totals,1655 iOS + 1152 Watch PASS reflected with scope qualifiers,Documented,PASS,High,None
+Snorkeling P1/P2/P3 tests,Software remediation tests documented while manual/physical pending,Documented,PASS,High,None
+Physical/open-water QA,Pending until real evidence,Documented,PASS,Critical,None
+Paired-device QA,Pending until real evidence,Documented,PASS,High,None
+Unified logbook manual UI QA,Pending until executed,Documented,PASS,High,None
+Test evidence discoverability,All latest evidence linked from top-level docs,Incomplete,PARTIAL,Medium,Add links in index/readme

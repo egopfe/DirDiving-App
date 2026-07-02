@@ -1,62 +1,15 @@
-# Watch Full Computer — Apnea Boundary Audit — CURRENT
+# Watch Full Computer Apnea Boundary Audit (V1.7)
 
-**Baseline:** `main` @ `2c30412`  
-**Audit date:** 2026-07-01  
-**Context:** Apnea P1/P2/P3 @ `76f3703`
+## Boundary verdict
+`PASS` in software scope.
 
----
+## Verified constraints
+- Apnea path does not expose Full Computer decompression authority.
+- No GF/gas/MOD/PPO2/deco controls are introduced into Apnea runtime.
+- Apnea logbook/sync remain activity-owned and isolated.
+- Water auto-open boundary remains policy/routing-gated; no auto-start of FC without explicit mode path.
 
-## Scope
+## Pending items
+Physical in-water behavior and UX traversal evidence remain `PENDING_PHYSICAL`.
 
-Verify Apnea remains isolated from Full Computer Bühlmann/decompression runtime per V1.5 APNEA FIRST-CLASS SCOPE.
-
----
-
-## Architecture Isolation — PASS
-
-| Check | Result | Evidence |
-|---|---|---|
-| Apnea sources exclude FC/Bühlmann symbols | PASS | ApneaArchitectureIsolationTests @2c30412 |
-| Apnea runtime does not write DiveLogStore | PASS | ApneaWatchRuntimeStore static review + test |
-| Separate sync namespace keys | PASS | testSyncNamespaceKeysRemainIsolated |
-| Apnea UI independent of DiveManager | PASS | testApneaProductionUIAndRuntimeDoNotReferenceDiveManager |
-| No decompression wording in Apnea production | PASS | Static localization sweep (prior UI audit) |
-| No GF/gas/MOD in Apnea settings | PASS | WatchActivitySettingsOwnershipTests |
-
----
-
-## Apnea Truthfulness Checks
-
-| Rule | Status |
-|---|---|
-| No medical guarantee for recovery | PASS — reference-only copy |
-| No claim Apnea auto-detection physically validated | PASS — PENDING_PHYSICAL documented |
-| No claim water auto-open starts Apnea session | PASS — conditional routing copy |
-| No cross-activity logbook/settings leakage | PASS — separate stores |
-
----
-
-## Water Auto-Open Boundary — PARTIAL
-
-Apnea P1/P2/P3 changed startup routing behavior. **12 water-auto-open tests FAIL** @2c30412:
-
-- Tests expect Apnea water auto-open → `.ready(activity: .apnea)`
-- Production returns `.divingModeSelection` in test harness configuration
-
-**Finding:** WFC-P2-005 (P2) — test/product alignment needed; **not** an FC tissue safety defect.
-
-Detail matrix: `Docs/MASTER_WATCH_APNEA_WATER_AUTO_OPEN_BOUNDARY_MATRIX_CURRENT.csv`
-
----
-
-## Full Computer Impact from Apnea Wave
-
-- **FC math/runtime:** No changes to `FullComputerRuntimeEngine` or `BuhlmannCore` in Apnea commits.
-- **FC tests:** All Audit-15 and FC-specific tests PASS.
-- **Routing UX:** May require test fixture update for DepthCapabilityPolicy in water-auto-open tests.
-
----
-
-## Verdict
-
-**APNEA_FC_BOUNDARY:** **PASS** (architecture) / **PARTIAL** (water-auto-open test alignment)
+Baseline refresh: 7ae527b (target baseline 7ae527b254dcd536fe20fb05c1863ad50b4e4dde).

@@ -1,125 +1,46 @@
-# DIR DIVING — Master Security Threat Model (Current)
+# Master Security Threat Model (CURRENT)
 
-**Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.2  
-**Date:** 2026-06-30  
-**Branch:** `main` @ `451f8fb`  
-**Pass type:** Post-remediation audit rerun  
-**Scope:** Watch + iOS MAIN targets (Diving, Apnea, Snorkeling)
+**Baseline:** `main` @ `7ae527b`  
+**Scope:** Watch + iOS, Diving/Apnea/Snorkeling sync, storage, transfer, imports/exports, intents
 
-**Not claimed:** Penetration testing, App Store privacy approval, GDPR/HIPAA certification, physical device compromise QA.
+## Assets
 
----
+- Activity logbooks and checkpoints
+- Full Computer runtime checkpoints and plan packages
+- Sync envelopes, ACK metadata, tombstones, trust/bootstrap secrets
+- Snorkeling route packages and presentation payloads
+- Companion image/briefing-card files and metadata
 
-## 1. System context
+## Threat Surface Summary
 
-DIR DIVING is a **local-first** multi-activity dive companion:
+1. Cross-activity payload misrouting
+2. Forged/altered sync payloads and ACK replay
+3. Path traversal or unsafe file write/delete on transfer/import
+4. Privacy overreach in GPS/location flows
+5. Misuse of developer/testing/simulation paths in release contexts
+6. Command/process integrity drift reducing audit reliability
 
-- **Watch:** In-water runtime (Gauge, Full Computer), Apnea, Snorkeling; depth/GPS sensors; WatchConnectivity to iPhone.
-- **iOS:** Planner, logbooks, settings, import/export, iCloud KVS (Diving opt-in only).
-- **Trust boundary:** Paired Watch ↔ iPhone via WatchConnectivity (Apple-encrypted transport); no arbitrary network client.
+## Existing Controls (software evidence)
 
-```text
-[User] → [Watch App] ←WC HMAC→ [iOS Companion] → [Local JSON / KVS / Exports]
-                ↓                              ↓
-         Depth/GPS sensors              File picker / Share sheet
-```
+- Signed transport envelope + activity discriminator (`ActivitySyncSignedTransport`, `ActivitySyncEnvelope`)
+- Replay/nonce cache (`SyncNonceReplayCache`)
+- Signed ACK pattern with per-feature ack signers
+- Namespaced payload keys per activity/store
+- Presentation-only unified logbook architecture with no merged canonical store
+- Path sanitization and bounded import policies for files/assets
+- App-intent safety/legal guard layering
 
----
+## Open Threat Findings
 
-## 2. Assets
+- `MAIN-CMD-001`: command integrity chain incomplete (missing launch-order 07 file)
+- `MAIN-PRIV-001`: location policy is scoped in manifests/plist, but full physical permission-path evidence is pending
+- `MAIN-SYNC-001`: large payload stress not validated in paired field conditions
 
-| Asset | Sensitivity | Storage |
-|-------|-------------|---------|
-| Dive profiles / tissue checkpoints | Safety-critical | Protected Application Support |
-| Apnea session / recovery data | Health-like | Activity-scoped logbooks |
-| Snorkeling GPS tracks / photos | Location + PII | Activity-scoped; export policies |
-| Peer sync secret | Cryptographic | Keychain + WC applicationContext (TOFU) |
-| Planner briefing cards | Reference metadata | Sandboxed briefing store |
-| User photos (companion) | PII | UserImageStore; validated import |
-| Pending sync queues | Session payloads | ProtectedSensitiveFileStore |
+## Residual Risk Statements
 
----
+- WC trust bootstrap remains an accepted risk boundary until stronger pre-shared trust provisioning is introduced.
+- No penetration-test, certification, or external compliance claim is made in this audit.
 
-## 3. Threat actors
+## Verdict
 
-| Actor | Capability | Relevance |
-|-------|------------|-----------|
-| Malicious paired app (wrong bundle) | WC messages | Mitigated: bundle ID + HMAC + TOFU pinning |
-| Replay attacker on WC | Resend signed payloads | Mitigated: nonce replay cache + skew window |
-| Local file attacker | Read/write app container | Mitigated: `.completeFileProtection`; path sanitization |
-| User (CSV/import) | Pick malicious files | Mitigated: size caps, magic bytes, row limits |
-| Backup extractor | iCloud/device backup | Residual: TOFU secret in WC context (documented) |
-| App Intent caller | Start dive without consent | Mitigated: legal acceptance gate |
-
----
-
-## 4. Attack surfaces
-
-### 4.1 WatchConnectivity
-
-- **Controls:** HMAC-SHA256 v3 envelope (`activityType`, `messageType` in signed body); constant-time compare; signed import ACK; reply handler policy (transport hints do not dequeue).
-- **Residual:** TOFU bootstrap via `applicationContext` — `WatchSyncTrustBootstrapPolicy` TTL/epoch; documented in `MASTER-SEC-002`.
-- **Tests:** SEC-NEG-01..20; `ActivitySyncCrossDecodeRejectionTests`; `ActivitySyncTombstoneTests`.
-
-### 4.2 File import/export
-
-- **Controls:** `DiveCSVImportBounds` (10 MB, row cap); `DivingExportPrivacyPolicy` (GPS omit default); temp files with file protection; Subsurface fidelity tests.
-- **Tests:** SEC-NEG-13, SEC-NEG-16; `SecurityPrivacyTrustRemediationTests`.
-
-### 4.3 Briefing cards / photos
-
-- **Controls:** `PlannerBriefingFilenameSanitizer`; atomic card swap; `WatchCompanionPhotoValidator` (magic bytes, 16 MP cap, JPEG re-encode).
-- **Tests:** `PlannerBriefingCardStoreTests`; `CompanionPhotoImportSupportTests`.
-
-### 4.4 Cloud backup
-
-- **Controls:** Diving-only opt-in (`CloudBackupCapability`); Apnea/Snorkeling explicitly unavailable; KVS budget policy; legacy migration.
-- **Tests:** `CloudBackupCapabilityTests`; `CloudSyncBudgetPolicy` tests.
-
-### 4.5 App Intents / simulation
-
-- **Controls:** `requireLegalAcceptanceForSafetyIntent()`; `TestFlightSimulationSafetyPolicy`; App Store blocks simulation depth source.
-- **Tests:** `SecurityPrivacyTrustRemediationTests`.
-
----
-
-## 5. Activity isolation threats
-
-| Threat | Impact | Control | Status |
-|--------|--------|---------|--------|
-| Dive payload → Apnea store | P0 data corruption | Distinct payload keys + envelope activity guard | **PASS** |
-| Apnea settings → Diving runtime | P0 wrong thresholds | ActivitySettingsVisibility | **PASS** |
-| Briefing card mutates live FC | P0 wrong deco state | Reference-only store; no DiveManager write | **PASS** |
-| Cross-activity logbook merge | P1 wrong history | Separate filenames + isolation tests | **PASS** |
-
----
-
-## 6. STRIDE summary
-
-| Category | Primary risks | Mitigation status |
-|----------|---------------|-------------------|
-| Spoofing | Forged WC peer | HMAC + bundle ID + TOFU | **PASS** (static) |
-| Tampering | Payload modification | HMAC verify; signed tombstones | **PASS** |
-| Repudiation | N/A local app | Signed ACK symmetry | **PASS** (software verified @ 5d757cc) |
-| Information disclosure | GPS in export; backup | Export policies; file protection | **PASS** |
-| Denial of service | Huge CSV/sync payload | Size caps; fail-closed; large-payload file transfer | **PASS** (software) |
-| Elevation | App Intent bypass | Legal gate | **PASS** |
-
----
-
-## 7. Pending field validation
-
-| ID | Threat path | Status |
-|----|-------------|--------|
-| MASTER-SEC-001 | End-to-end paired tombstone + large-payload + replay | **PENDING_PHYSICAL** |
-| MASTER-SYNC-001 | 5 MB file-transfer round-trip on hardware | **PENDING_PHYSICAL** |
-
----
-
-## 8. Privacy manifest
-
-Both MAIN targets include `PrivacyInfo.xcprivacy` (no tracking; required-reason APIs declared). See `PRIVACY_MANIFEST_DECLARATION_CURRENT.md`.
-
----
-
-**Threat model audit completed:** 2026-06-22 on `main` @ `1f62235`.
+`PARTIAL` - software controls remain strong, but process integrity and field evidence gates remain open.

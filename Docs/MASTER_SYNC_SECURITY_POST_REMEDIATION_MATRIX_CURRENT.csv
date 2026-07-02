@@ -1,8 +1,6 @@
-Consolidated_ID,Finding_ID,Remediation_Area,Verification_Method,Expected_At_2c30412,Actual_At_2c30412,Status,Evidence,Notes
-CONS-003,MAIN-PERF-006,iOS in-flight ACK cleanup,Code review + PerformanceConcurrencyBatteryRemediationTests,releaseInFlightOutboundSession on error paths,Present + tests PASS,PASS,iOS 1655 @ 2c30412,Sync queue can retry
-CONS-004,MAIN-SYNC-002,Symmetric diveImportAck,ActivitySyncSignedAckSymmetryTests,sendDiveImportAckToWatch after import,Tests PASS,PASS,ActivitySyncSignedAckSymmetryTests,Watch pending dequeues
-CONS-005,MAIN-SYNC-003,Signed tombstones,ActivitySyncTombstoneTests,Signed verifiedSessionIDs primary,Tests PASS,PASS,ActivitySyncTombstoneTests @ 2c30412,P3 legacy mirror remains
-CONS-001,MAIN-P1-001,Command integrity,validate_commands_for_cursor_integrity.sh V1.5,PASS,PASS exit 0,PASS,Script @ 2c30412,CONS-046 V1.5
-CONS-046,MAIN-P1-001,Script filename alignment,bash validate_commands_for_cursor_integrity.sh,V1.5 paths,PASS,PASS,6a0005b fix,Closed
-CONS-049,MAIN-P2-001,iOS test lane,xcodebuild iOS Algorithm Tests,1655 PASS,1655 PASS,PASS,68.3s @ 2c30412,Snorkeling tests green
-CONS-011,MAIN-SEC-001,Paired sync security QA,Physical QA matrix,NOT_EXECUTED,PENDING_PHYSICAL,PENDING_PHYSICAL,Template only,Software HMAC PASS
+Control_ID,Domain,Control,Status,Evidence,Pending_Gate,Notes
+SYNC-SEC-001,Signed transport,HMAC + activity discriminator,PASS,ActivitySync envelope/auth tests,,
+SYNC-SEC-002,Replay defense,nonce/replay cache,PASS,SyncNonceReplayCache references,,
+SYNC-SEC-003,Signed ACK cleanup,in-flight release on errors,PASS,Main remediation docs/tests,,
+SYNC-SEC-004,Large payload fallback,bounded package transfer,PARTIAL,Large payload tests,PENDING_PHYSICAL,Needs paired stress evidence
+SYNC-SEC-005,Two-device tombstone integrity,signed tombstone route,PARTIAL,ActivitySync tombstone tests,PENDING_PHYSICAL,Field pair verification pending

@@ -1,0 +1,8 @@
+Requirement,Expected_State,Observed_State,Status,Risk,Required_Action
+Unified view mode,Presentation-only optional aggregate default OFF,Documented,PASS,High,None
+Persistence model,No merged persistent storage,Documented,PASS,High,None
+Cross-write policy,No cross-activity write/mutation from unified view,Documented,PASS,Critical,None
+Sync behavior,No Watch sync mutation by unified presentation mode,Documented,PASS,High,None
+Demo isolation,No demo/fake entries in real unified view,Documented,PASS,Critical,None
+Manual UI QA status,Manual QA remains pending unless executed,Documented,PASS,High,None
+Top-level index linkage,Unified policy surfaced from index/readme,Incomplete,PARTIAL,Medium,Add direct links in index/readme

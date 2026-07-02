@@ -1,30 +1,21 @@
 Duplicate_Group_ID,Consolidated_Finding_ID,Source_Audit,Source_Finding_ID,Source_Title,Same_Root_Cause,Same_Symptom,Same_Affected_Files,Same_Affected_Runtime,Merge_Decision,Severity_Adjustment,Reason,Notes
-DG-WAO-003,CONS-050,01-Watch,WFC-P2-005,Water auto-open routing tests fail after Apnea P1/P2/P3,Yes,Yes,Yes,Yes,MERGE,None,Apnea @76f3703 changed resolveAutomaticStep; tests expect direct ready/predive,13 failures @2c30412; 0 FC failures
-DG-WAO-003,CONS-050,03-UI/UX,MUIUX-P2-005,WAO routing test drift post-Apnea,Yes,Yes,Yes,Yes,MERGE,None,UI audit cross-read of Watch test harness,12/14 WAO matrix rows FAIL
-DG-WAO-003,CONS-050,04-Main,MAIN-P2-003,Watch routing test drift,Yes,Yes,Yes,Yes,MERGE,None,Main code audit explicit alias MAIN-P2-003=WFC-P2-005,Blocks 1152/1152 green
-DG-WAO-003,CONS-050,05-Release,REL-P2-001,Watch suite partial 1139/1152,Yes,Yes,Partial,Yes,MERGE,None,Release audit attributes partial Watch suite to WFC-P2-005,INTERNAL_TF software still READY
-DG-WAO-003,CONS-050,04-Main,MAIN-APNEA-002,Apnea preferred destination WAO tests fail,Yes,Yes,Yes,Yes,MERGE,None,Apnea-specific subset of same routing test drift,Included in 13 failures
-DG-EXT-001,CONS-009,01-Watch,WFC-P1-001,External Bühlmann validation not executed,Yes,Yes,Yes,Yes,MERGE,None,Same external validation gap,Blocks App Store algorithm claims
-DG-EXT-001,CONS-009,02-iOS,IOS-P2-001,No third-party Bühlmann comparison,Yes,Yes,Yes,Yes,MERGE,None,iOS planner parity depends on same external gate,IOS-P2-001 PENDING_EXTERNAL
-DG-EXT-001,CONS-009,05-Release,MASB-E-01,External validation gaps,Yes,Yes,Yes,Yes,MERGE,None,Release audit meta-finding,0% external executed
-DG-TEST-001,CONS-049,02-iOS,IOS-P1-001,Snorkeling test compile failure,Yes,Yes,Yes,No,MERGE,None,Test infrastructure only,FIXED @2c30412 1655/1655 PASS
-DG-TEST-001,CONS-049,04-Main,MAIN-P2-001,Snorkeling test fixture drift,Yes,Yes,Yes,No,MERGE,None,Same remediation wave,FIXED_SOFTWARE
-DG-DOC-003,CONS-046,06-Docs,DOC-P1-005,Integrity script drift,Yes,Yes,Yes,No,MERGE,None,Script expected superseded V2.1/V1.1 paths,FIXED @6a0005b V1.5 PASS
-DG-DOC-003,CONS-046,04-Main,MAIN-P1-001,Command integrity verified,Yes,Yes,Yes,No,MERGE,None,Main audit confirms script PASS,CONS-046 CLOSED
-DG-DOC-004,CONS-053,06-Docs,DOC-P0-001,Mission Mode doc claims conditional App Store ready,Yes,Yes,Yes,No,MERGE,Escalated P0,Legacy doc contradicts audit PARTIAL verdict,2 P0 legacy claim docs @ audit 06
-DG-DOC-004,CONS-053,06-Docs,DOC-P0-002,Documentation report false CCR external validation,Yes,Yes,Yes,No,MERGE,Escalated P0,False claim in Not claimed section,Blocks truthful release docs
-DG-DOC-005,CONS-054,06-Docs,DOC-P1-001,INDEX README baseline stale,Yes,Yes,Yes,No,MERGE,None,HEAD 2c30412 vs INDEX ad1c836,Documentation readiness 72%
-DG-DOC-005,CONS-054,06-Docs,DOC-P1-002,INDEX SOFTWARE_READY 100% contradicts audits,Yes,Yes,Partial,No,MERGE,None,Software lanes ready; release PARTIAL,Reconcile INDEX verdict
-DG-PHY-001,CONS-010,01-Watch,WFC-P2-002,Physical Watch FC QA not executed,Yes,Yes,Yes,Yes,MERGE,None,Wet depth/CMAltimeter 0%,PENDING_PHYSICAL
-DG-PHY-001,CONS-010,05-Release,MASB-P-01,Physical Watch QA pending,Yes,Yes,Yes,Yes,MERGE,None,Release physical matrix,Do not claim physical PASS
-DG-WAO-001,CONS-021,03-UI/UX,WAO-G-008,Water auto-open physical QA pending,Yes,Yes,Yes,Yes,MERGE,None,Software PASS; wet not executed,SOFTWARE_READY preserved
-DG-WAO-001,CONS-021,05-Release,WAO-PHY-001,WAO end-to-end physical,Yes,Yes,Yes,Yes,MERGE,None,Same physical gate,Blocks WAO claims
-DG-HW-001,CONS-022,03-UI/UX,MASB-HW-01,Underwater Crown physical QA,Yes,Yes,Yes,Yes,MERGE,None,Crown clamp software PASS,Water Lock physical pending
-DG-HW-001,CONS-022,05-Release,HWC-PHY-004,Water Lock physical QA,Yes,Yes,Yes,Yes,MERGE,None,Hardware interaction matrix,Blocks hardware claims
-DG-GF-001,CONS-002,02-iOS,IOS-P0-VERIFIED-001,GF preset parity remediated,Yes,Yes,Yes,Yes,MERGE,None,CONS-002 FIXED @ remediation,Verified @2c30412
-DG-GF-001,CONS-043,01-Watch,MASB-SW-04,GF external spot-check pending,Yes,Partial,Yes,Yes,KEEP_SEPARATE,None,Software PASS vs external validation distinct,CONS-043 PENDING_EXTERNAL
-DG-SNORK-001,CONS-048,02-iOS,IOS-P2-006,12 Snorkeling QA templates pending,Yes,Yes,Yes,Yes,MERGE,None,Snorkeling field QA 0/12,Software P1/P2/P3 PASS
-DG-SNORK-001,CONS-048,04-Main,MAIN-P2-002,Snorkeling physical QA templates,Yes,Yes,Yes,Yes,MERGE,None,Same 12-folder gate,CONS-048 P1 PENDING_PHYSICAL
-DG-SNORK-002,CONS-051,01-Watch,WFC-P2-006,Snorkeling progress test failure,Yes,Yes,Yes,Yes,MERGE,None,Single test isolated from FC,testProgressAtStartIsNearZero FAIL
-DG-SNORK-002,CONS-051,05-Release,REL-P2-002,Snorkeling progress test fail,Yes,Yes,Yes,Yes,MERGE,None,Release audit cross-reference,P2 software gap
-DG-AUDIT-001,CONS-047,00-Orchestrator,CONS-047,Stale upstream audits,Yes,Yes,Yes,No,MERGE,None,01-06 refreshed @2c30412,VERIFIED CLOSED
+DG-EXT-001,CF-001,01-Watch,WFC-P1-001,External Buhlmann validation pending,YES,YES,PARTIAL,YES,MERGED,NO_CHANGE,Same missing third-party validation path across FC and release lanes,Required key group
+DG-EXT-001,CF-001,02-iOS,IOS-P2-001,iOS planner external parity not evidenced,YES,YES,PARTIAL,YES,MERGED,NO_CHANGE,Planner parity and FC parity share root cause,Required key group
+DG-EXT-001,CF-001,05-Release,REL-E-001,Release evidence package missing external validation,YES,YES,NO,YES,MERGED,NO_CHANGE,Release symptom stems from same validation gap,Required key group
+DG-LOC-001,CF-002,01-Watch,WFC-P2-001,Snorkeling localization parity failure,YES,YES,YES,YES,MERGED,ESCALATED_TO_P1,Cross-audit regression currently failing tests and blocking confidence,Required key group
+DG-LOC-001,CF-002,04-Main,MAIN-TEST-001,Localization namespace mismatch in Watch tests,YES,YES,YES,YES,MERGED,ESCALATED_TO_P1,Main audit confirms same localization contract drift,Required key group
+DG-LOC-001,CF-002,04-Main,MAIN-TEST-002,Localization fallback mismatch in iOS tests,YES,YES,YES,YES,MERGED,ESCALATED_TO_P1,Same key-set drift appears in iOS lane,Required key group
+DG-LOC-001,CF-002,03-UIUX,MUIUX-P2-002,Snorkeling key truthfulness mismatch in UI copy,YES,YES,PARTIAL,YES,MERGED,ESCALATED_TO_P1,User-visible symptom is same key drift,Required key group
+DG-PHY-001,CF-003,01-Watch,WFC-PHY-SET,Watch physical QA not executed,YES,YES,PARTIAL,YES,MERGED,NO_CHANGE,Missing physical execution is shared across audits,Required key group
+DG-PHY-001,CF-003,02-iOS,IOS-PHY-SET,iOS physical QA pending,YES,YES,PARTIAL,YES,MERGED,NO_CHANGE,Same physical evidence debt in iOS lane,Required key group
+DG-PHY-001,CF-003,05-Release,REL-PHY-SET,Release gates blocked by missing physical evidence,YES,YES,NO,YES,MERGED,NO_CHANGE,Release posture reflects same unresolved physical QA,Required key group
+DG-SNORK-001,CF-004,04-Main,SNORK-REM-001,Snorkeling remediation applied but QA pending,YES,YES,PARTIAL,YES,MERGED,NO_CHANGE,Software and evidence mismatch share single closure root cause,Required key group
+DG-SNORK-001,CF-004,03-UIUX,SNORK-MANUAL-001,Snorkeling manual/open-water validation pending,YES,YES,PARTIAL,YES,MERGED,NO_CHANGE,Manual QA backlog is same unresolved cause,Required key group
+DG-SNORK-001,CF-013,05-Release,SNORK-REL-001,Snorkeling release readiness still partial,YES,YES,NO,YES,MERGED,NO_CHANGE,Release symptom linked to same pending QA closure,Required key group
+DG-DEMO-001,CF-005,04-Main,DEMO-LOG-001,Demo logbook contamination fixed,YES,YES,YES,YES,MERGED,NO_CHANGE,Cross-audit confirmation of same resolved defect,Required key group verified at f90b671
+DG-DEMO-001,CF-005,06-Docs,DOC-DEMO-001,Docs confirm no demo contamination in real logbook,YES,YES,PARTIAL,YES,MERGED,NO_CHANGE,Documentation and code evidence align on same fix,Required key group verified at f90b671
+DG-CMD-001,CF-006,04-Main,MAIN-CMD-001,Missing command 07 lifecycle artifact,YES,YES,NO,YES,MERGED,NO_CHANGE,Same command-chain governance issue across audit lanes,Required key group
+DG-CMD-001,CF-012,06-Docs,DOC-CMD-002,Legacy references to command 10 and missing 07 continuation clarity,YES,YES,NO,YES,MERGED,NO_CHANGE,Docs/main mismatch shares command lifecycle root cause,Required key group
+DG-DOC-001,CF-008,06-Docs,DOC-P0-INDEX-001,INDEX and README stale baseline references,YES,YES,YES,YES,MERGED,ESCALATED_TO_P0,Readiness overstatement risk warrants P0 communication severity,Escalation recorded
+DG-DOC-002,CF-009,06-Docs,DOC-P0-CCR-001,Unsupported CCR claim document persists,YES,YES,PARTIAL,YES,MERGED,ESCALATED_TO_P0,Unsupported claims are legal and safety exposure,Escalation recorded
+DG-REL-003,CF-011,05-Release,REL-READINESS-001,External and App Store readiness still NOT_READY,YES,YES,NO,YES,MERGED,NO_CHANGE,Umbrella blocker combines open validation and evidence dependencies,Consolidated release blocker

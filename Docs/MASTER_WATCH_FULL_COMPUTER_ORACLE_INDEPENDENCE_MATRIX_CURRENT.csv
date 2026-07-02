@@ -1,16 +1,6 @@
-Oracle_Component,Production_Dependency,Independent_Implementation,Uses_Production_TissueUpdate,Uses_Production_runtimeProjection,Test_Suite,Evidence_Status,CONS-008_Verdict,Tolerance,Notes
-Tissue loading Schreiner/Haldane,None,IndependentBuhlmannOracle.schreiner/haldane,NO,NO,Audit15MultilevelOracleProfilesTests,PASS,0.0001 bar,Separate constants verified vs BuhlmannConstants
-Ceiling GF interpolation,None,IndependentBuhlmannOracle.project,NO,NO,SchreinerAnalyticParityTests,PASS,0.5 m,Independent a/b mixing
-NDL projection,None,IndependentBuhlmannOracle.project.ndlMinutes,NO,NO,Audit15Air39MultilevelProfileTests,PASS,1 min,Oracle NDL sweep
-TTS minutes (remediated),None,independentTTSMinutesOnOracleTissues,NO,NO,Audit15TTSScheduleOracleSweepTests,PASS,3 min,CONS-008 fix — no production projection
-Schedule stops (remediated),None,independentRuntimeProjectionOnOracleTissues,NO,NO,Audit15MultilevelOracleProfilesTests,PASS,3 min TTS,Independent forward sim on oracle tissues
-Deprecated alias,productionProjectionOnOracleTissues,BuhlmannEngine.runtimeProjection,NO,YES (deprecated),Audit15OracleIndependenceGuard,PASS (guard),N/A,Retained for mutation detection only
-Production self-compare,FullComputerDecoSolver,BuhlmannEngine.runtimeProjection,N/A,N/A,FullComputerDecoSolverTests,PARTIAL,4 min,Planner vs runtime — not independent oracle
-External Subsurface/RatioDeco,None,N/A,N/A,N/A,N/A,NOT_EXECUTED,N/A,CONS-009 pending
-Hand-check Schreiner R=0,Haldane parity,BuhlmannTissueModel.schreiner when rate≈0,YES (production path),N/A,BuhlmannCoreCrossTargetEquivalenceTests,PASS,1e-10,Algebraic equivalence at zero rate
-ML-01 Air 39→10m,FullComputerRuntimeEngine,IndependentBuhlmannOracle replay,YES (prod engine),NO (oracle schedule),Audit15Air39MultilevelProfileTests,PASS,per ReleaseHardTolerances,Central forensic scenario
-ML-02 EAN50 switch,FullComputerRuntimeEngine,Oracle replay,YES,NO,Audit15MultilevelOracleProfilesTests,PASS,tissue 0.0001 bar,Gas switch boundary
-ML-03 Trimix,FullComputerRuntimeEngine,Oracle replay,YES,NO,Audit15MultilevelOracleProfilesTests,PASS,tissue 0.0001 bar,He+N2 dual gas
-ML-04 Sawtooth,FullComputerRuntimeEngine,Oracle replay,YES,NO,Audit15MultilevelOracleProfilesTests,PASS,tissue 0.0001 bar,No schedule cache assumption
-ML-05 Re-descent,FullComputerRuntimeEngine,Oracle replay,YES,NO,Audit15RedescentOracleTests,PASS,tissue 0.0001 bar,Deco reappearance
-External validation campaign,Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/,None,N/A,N/A,N/A,PENDING_EXTERNAL_VALIDATION,N/A,MWFC-P1-002 @2c30412
+Case_ID,Oracle_Type,Scope,Independent_From_Production,Status,Evidence,Notes
+ORC-001,Independent in-test oracle,Tissue/deco parity,YES,PASS,Audit15 + oracle tests,Software only
+ORC-002,Analytic hand-check vectors,Selected compartments,YES,PASS,Schreiner parity tests,
+ORC-003,iOS shared-core self-comparison,Supplementary only,NO,PARTIAL,Shared core architecture,Not counted as external proof
+ORC-004,Third-party decompression tool replay,External parity package,YES,PENDING_EXTERNAL_VALIDATION,External validation plan,Required for release gate
+ORC-005,Controlled chamber/open-water external run,Physical external validation,YES,PENDING_EXTERNAL_VALIDATION,External validation + physical matrix,

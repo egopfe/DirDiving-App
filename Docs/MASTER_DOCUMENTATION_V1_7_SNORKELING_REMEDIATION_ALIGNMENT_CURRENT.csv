@@ -1,0 +1,14 @@
+Requirement,Expected_Documentation,Observed_Documentation,Status,Risk,Required_Action
+R1-001 sync visibility,Session detail/planner visibility documented,Present,PASS,Medium,Keep linked from release docs
+R1-003 battery policy,Watch battery fraction policy documented,Present,PASS,Medium,Keep test evidence references
+R1-004 pending route UX,Pending route activation UX documented,Present,PASS,Low,Maintain a11y wording
+R1-005 sync failure/pending,List/detail pending states documented,Present,PASS,Medium,Maintain no overclaim
+R1-006 source row,Watch/Manual/Imported source row documented,Present,PASS,Low,None
+R1-007 pending send queue,Persisted pending queue documented,Present,PASS,Medium,None
+R1-009 WC E2E procedure,Procedure documented and paired QA pending,Present,PASS,High,Do not mark paired QA pass
+R2-001 return primary action,returnIsPrimaryAction contract documented,Present,PASS,Medium,None
+R2-002 settings re-send banner,Re-send required banner documented,Present,PASS,Medium,None
+R2-005 route summary panel,Ready panel route summary documented,Present,PASS,Low,None
+R3-001 heatmap blocked,No production heatmap claim,Present,PASS,High,None
+R3-002 adherence wording,Non-safety wording for planned-vs-actual,Present,PASS,High,None
+R3-003 QA templates pending,Manual/physical pending preserved,Present,PASS,Critical,None

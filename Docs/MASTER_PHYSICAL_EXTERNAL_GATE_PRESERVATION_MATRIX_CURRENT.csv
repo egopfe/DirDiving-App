@@ -1,23 +1,9 @@
-Gate_ID,Gate_Category,Pre_Remediation_Status,Post_Remediation_Status,Evidence_Type,Fake_Closure_Risk,Preserved_Correctly,Severity,Finding_ID,Notes
-PEG-001,PHYSICAL,Watch wet QA PENDING,PENDING_PHYSICAL,physical Watch,no,yes,P1,CONS-042,0% executed @2c30412
-PEG-002,PHYSICAL,iPhone field QA PENDING,PENDING_PHYSICAL,physical iPhone,no,yes,P1,,Scroll/PDF/VoiceOver templates only
-PEG-003,PHYSICAL,Paired-device sync PENDING,PENDING_PHYSICAL,paired-device,no,yes,P1,,WC + iCloud tombstones
-PEG-004,PHYSICAL,CMAltimeter physical PENDING,PENDING_PHYSICAL,physical Watch,no,yes,P1,WFC-P2-001,OrchestratedAltitude tests PASS software only
-PEG-005,PHYSICAL,Shallow wet Gauge/FC PENDING,PENDING_PHYSICAL,underwater,no,yes,P1,CONS-042,
-PEG-006,PHYSICAL,Water Lock physical PENDING,PENDING_PHYSICAL,physical Watch,no,yes,P1,HWC-PHY-004,
-PEG-007,PHYSICAL,Action Button physical PENDING,PENDING_PHYSICAL,physical Watch,no,yes,P2,HWC-PHY-003,
-PEG-008,PHYSICAL,Digital Crown physical PENDING,PENDING_PHYSICAL,physical Watch,no,yes,P2,HWC-PHY-001,
-PEG-009,PHYSICAL,WAO system listing PENDING,PENDING_PHYSICAL,physical Watch,no,yes,P2,WAO-PHY-002,
-PEG-010,PHYSICAL,Apnea wet interaction PENDING,PENDING_PHYSICAL,physical Watch,no,yes,P2,,APNEA_WET_INTERACTION folder empty
-PEG-011,PHYSICAL,Snorkeling 12 field QA PENDING,PENDING_PHYSICAL,physical Watch+iOS,no,yes,P1,CONS-048,12/12 NOT_EXECUTED
-PEG-012,EXTERNAL,Bühlmann external PENDING,PENDING_EXTERNAL_VALIDATION,external reference,no,yes,P1,WFC-P1-001,
-PEG-013,EXTERNAL,Schreiner external PENDING,PENDING_EXTERNAL_VALIDATION,external reference,no,yes,P1,,Bundled with Bühlmann campaign
-PEG-014,EXTERNAL,Subsurface round-trip PENDING,PENDING_EXTERNAL_VALIDATION,external reference,no,yes,P2,,SUBSURFACE_EXTERNAL folder empty
-PEG-015,EXTERNAL,CCR external PENDING,PENDING_EXTERNAL_VALIDATION,external reference,no,yes,P2,,Reference-only acknowledged
-PEG-016,LEGAL,App Store marketing review PENDING,PENDING_LEGAL_REVIEW,legal review,no,yes,P1,CONS-044,
-PEG-017,LEGAL,EN13319 strategy doc PENDING,PENDING_CERTIFICATION_REVIEW,documentation,no,yes,P3,,Strategy documented not claim
-PEG-018,SOFTWARE,iOS test lane FAIL @451f8fb,PASS @2c30412,automated unit,no,yes,P1,IOS-P1-001,Correctly closed not faked
-PEG-019,SOFTWARE,Command integrity FAIL @451f8fb,PASS @2c30412,script,no,yes,P1,CONS-046,Correctly closed
-PEG-020,SOFTWARE,Watch TTS test crash FAIL,PASS @2c30412,automated unit,no,yes,P2,,testPlannerRuntimeTTSWithinTolerance
-PEG-021,SOFTWARE,Watch routing tests PASS @451f8fb,PARTIAL @2c30412,automated unit,no,yes,P2,WFC-P2-005,New drift after Apnea wave — not fake closure
-PEG-022,EXTERNAL,GF external oracle PENDING,PENDING_EXTERNAL_VALIDATION,external reference,no,yes,P2,MWFC-P1-001,Internal oracle PASS only
+Gate_ID,Category,Prior_Status,Current_Status,Fake_Closure_Detected,Severity,Notes
+PEG-001,Physical Watch QA,PENDING_PHYSICAL,PENDING_PHYSICAL,NO,P0,Preserved truthful pending state
+PEG-002,Physical iPhone QA,PENDING_PHYSICAL,PENDING_PHYSICAL,NO,P0,Preserved truthful pending state
+PEG-003,Paired-device QA,PENDING_PHYSICAL,PENDING_PHYSICAL,NO,P0,No unsupported pass claim
+PEG-004,Underwater/depth QA,PENDING_PHYSICAL,PENDING_PHYSICAL,NO,P0,No unsupported pass claim
+PEG-005,External Bühlmann validation,PENDING_EXTERNAL_VALIDATION,PENDING_EXTERNAL_VALIDATION,NO,P0,No unsupported pass claim
+PEG-006,External Schreiner validation,PENDING_EXTERNAL_VALIDATION,PENDING_EXTERNAL_VALIDATION,NO,P0,No unsupported pass claim
+PEG-007,External Subsurface validation,PENDING_EXTERNAL_VALIDATION,PENDING_EXTERNAL_VALIDATION,NO,P0,No unsupported pass claim
+PEG-008,Legal review,PENDING_LEGAL_REVIEW,PENDING_LEGAL_REVIEW,NO,P0,No unsupported legal closure

@@ -1,22 +1,12 @@
 namespace_id,direction,mechanism,payload_key_or_transfer_type,ack_type,store_target,hmac,replay_cache,activity_envelope,test_reference,status,severity,notes
-NS-DIVE-SESSION,Watch→iOS,WC message/userInfo,dirdiving_dive_session,diveImportAck + ackSignature,DiveLogStore / IOS DiveLogStore,yes,SyncNonceReplayCache,yes activity=diving,WatchSyncConflictTests,PASS,,Primary diving session transport v3 envelope
-NS-DIVE-SESSION,iOS→Watch,WC message/userInfo,dirdiving_dive_session,diveImportAck + ackSignature,DiveLogStore,yes,same,yes,WatchSyncServiceIntegrationTests,PASS,,Signed ACK required to dequeue iOS outbound
-NS-DIVE-LARGE,Both,WC file transfer,activitySyncLargePayload,signed ACK via session path,DiveLogStore,yes,same,yes,ActivitySyncLargePayloadTransferTests,PASS,P2,>512KB direct; up to 5MB package
-NS-APNEA-SESSION,Watch→iOS,WC message/userInfo,dirdiving_apnea_session,dirdiving_apnea_session_import_ack,IOSApneaLogbookStore,yes,ApneaSessionSyncCodec replay cache,yes activity=apnea,ApneaSessionSyncTransportNegativeTests,PASS,,Distinct from diving key
-NS-APNEA-SESSION,iOS→Watch,WC message/userInfo,dirdiving_apnea_session,dirdiving_apnea_session_import_ack,ApneaLogbookStore,yes,same,yes,ApneaSyncWatchReceiverTests,PASS,,Watch-origin session sync
-NS-SNORKEL-SESSION,Watch→iOS,WC message/userInfo,dirdiving_snorkeling_session_sync,dirdiving_snorkeling_session_import_ack,IOSSnorkelingLogbookStore,yes,SnorkelingSessionSyncCodec replay cache,yes activity=snorkeling,SnorkelingSessionSyncTransportNegativeTests,PASS,,Distinct sync key suffix
-NS-SNORKEL-SESSION,iOS→Watch,WC message/userInfo,dirdiving_snorkeling_session_sync,dirdiving_snorkeling_session_import_ack,SnorkelingLogbookStore,yes,same,yes,SnorkelingSessionSyncCodecTests,PASS,,Bidirectional session sync
-NS-FC-PLAN,iOS→Watch,transferUserInfo,fullComputerPlanPackage,fullComputerPlanPackageAck,FullComputerImportedPlanStore,yes,N/A,N/A,DivePlanPackageCodecTests,PASS,,Context dirdiving_fc_plan_snapshot
-NS-APNEA-PLAN,iOS→Watch,transferUserInfo,apneaSyncPlanPackage,apneaSyncPlanPackageAck,ApneaImportedPlanStore,yes,N/A,N/A,FullComputerNamespaceIsolationTests,PASS,,Isolated from FC namespace
-NS-SNORKEL-ROUTE,iOS→Watch,transferUserInfo,snorkelingRoutePackage,snorkelingRoutePackageAck,SnorkelingImportedRouteStore,yes,N/A,N/A,SnorkelingRouteSyncCodecTests,PASS,,Context dirdiving_snorkeling_route_snapshot
-NS-PLANNER-BRIEF,iOS→Watch,WCSession file,plannerBriefingManifest / plannerBriefingCard,plannerBriefingAck,PlannerBriefingCardStore,hash+size,N/A,N/A,PlannerBriefingCardStoreTests,PASS,,Reference-only cards; path sanitized
-NS-COMPANION-PHOTO,iOS→Watch,WCSession file,photoFileName + photoID metadata,companionPhotoAck,UserImageStore,signed mgmt requests,N/A,N/A,CompanionPhotoTransferPipelineTests,PASS,,File transfer not userInfo envelope
-NS-TOMBSTONE-DIVE,Both,applicationContext,dirdiving_deleted_diving_session_tombstones,N/A,DiveLogStore,yes signed,N/A,yes activity=diving,ActivitySyncTombstoneTests,PASS,,Signed path primary
-NS-TOMBSTONE-DIVE-LEGACY,Both,applicationContext,dirdiving_deleted_session_ids,N/A,DiveLogStore,no,N/A,N/A,ActivitySyncTombstoneTests,PASS,P3,Bootstrap/pairing mirror only; signed path primary @ 2c30412 CONS-005
-NS-TOMBSTONE-APNEA,Both,applicationContext,dirdiving_deleted_apnea_session_tombstones,N/A,ApneaLogbookStore,yes signed,N/A,yes activity=apnea,ActivitySyncTombstoneTests,PASS,,SYNC-P1-001 remediated
-NS-TOMBSTONE-SNORKEL,Both,applicationContext,dirdiving_deleted_snorkeling_session_tombstones,N/A,SnorkelingLogbookStore,yes signed,N/A,yes activity=snorkeling,ActivitySyncTombstoneTests,PASS,,SYNC-P2-003 remediated
-NS-TRUST,Both,applicationContext,dirdiving_watch_sync_secret,N/A,N/A,N/A,N/A,N/A,WatchSyncPeerSecretPinningIOSTests,PASS,P3,TOFU via WatchSyncAuth; bootstrap TTL
-NS-SETTINGS-UNITS,Both,applicationContext,units,N/A,UserDefaults,N/A,N/A,N/A,IOSActivitySettingsCoherenceTests,PASS,,Shared preference sync
-NS-SETTINGS-TTV,Both,applicationContext,dirdiving_watch_gauge_show_ttv,N/A,UserDefaults,N/A,N/A,N/A,Manual,PASS,,Diving Gauge only
-NS-DELETED-KVS-DIVE,Both,iCloud KVS,dirdiving_shared_deleted_session_ids,N/A,DiveLogStore,N/A,N/A,N/A,CloudSessionMergeTests,PASS,,iOS + Watch diving tombstones
-NS-DELETED-KVS-APNEA,Watch,iCloud KVS,dirdiving_watch_deleted_apnea_session_ids,N/A,ApneaLogbookStore,N/A,N/A,N/A,ActivitySyncTombstoneWatchTests,PASS,,Watch KVS tombstones
+NS-DIVE-SESSION,Bidirectional,WC message/userInfo,dirdiving_dive_session,diveImportAck + ackSignature,Dive logbook stores,yes,yes,yes (diving),ActivitySyncCrossDecodeRejectionTests,PASS,,Diving-only session namespace
+NS-APNEA-SESSION,Bidirectional,WC message/userInfo,dirdiving_apnea_session,dirdiving_apnea_session_import_ack,Apnea logbook stores,yes,yes,yes (apnea),ApneaSessionSyncTransportNegativeTests,PASS,,Apnea isolated from diving/deco namespace
+NS-SNORKEL-SESSION,Bidirectional,WC message/userInfo,dirdiving_snorkeling_session_sync,dirdiving_snorkeling_session_import_ack,Snorkeling logbook stores,yes,yes,yes (snorkeling),SnorkelingSessionSyncTransportNegativeTests,PASS,,Snorkeling isolated session route
+NS-SNORKEL-ROUTE,iOS->Watch,transferUserInfo,snorkelingRoutePackage,snorkelingRoutePackageAck,Snorkeling route import store,yes,n/a,n/a,SnorkelingRouteSyncCodecTests,PASS,,Dedicated route package schema
+NS-FC-PLAN,iOS->Watch,transferUserInfo,fullComputerPlanPackage,fullComputerPlanPackageAck,FC imported plan store,yes,n/a,n/a,DivePlanPackageCodecTests,PASS,,FC plan transfer isolated from Apnea/Snorkeling
+NS-APNEA-PLAN,iOS->Watch,transferUserInfo,apneaSyncPlanPackage,apneaSyncPlanPackageAck,Apnea plan import store,yes,n/a,n/a,ApneaSyncCodecNegativePathTests,PASS,,Apnea plan namespace isolated
+NS-TOMBSTONE-DIVING,Both,applicationContext,dirdiving_deleted_diving_session_tombstones,n/a,Diving stores,yes,n/a,yes (diving),ActivitySyncTombstoneTests,PASS,,Signed tombstones preferred path
+NS-TOMBSTONE-APNEA,Both,applicationContext,dirdiving_deleted_apnea_session_tombstones,n/a,Apnea stores,yes,n/a,yes (apnea),ActivitySyncTombstoneTests,PASS,,Activity-specific delete propagation
+NS-TOMBSTONE-SNORKEL,Both,applicationContext,dirdiving_deleted_snorkeling_session_tombstones,n/a,Snorkeling stores,yes,n/a,yes (snorkeling),ActivitySyncTombstoneTests,PASS,,No cross-activity delete path
+NS-LARGE-PAYLOAD,Both,WC file transfer,activitySyncLargePayload,signed ACK via session flow,activity-scoped importers,yes,yes,yes,ActivitySyncLargePayloadTransferTests,PASS,P2,Physical stress evidence pending
+NS-TRUST-BOOTSTRAP,Both,applicationContext,dirdiving_watch_sync_secret,n/a,Trust cache,bootstrap assumption,n/a,n/a,WatchSyncPeerSecretPinningIOSTests,DOCUMENTED_ACCEPTED_RISK,P3,TOFU model documented in threat model
