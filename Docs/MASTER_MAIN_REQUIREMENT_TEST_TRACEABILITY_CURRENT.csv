@@ -1,32 +1,11 @@
-Requirement_ID,Domain,Requirement,Automated_Test,Evidence_Type,Platform,Status,Gap_Notes
-REQ-ARCH-001,Architecture,Multi-activity isolation,IntegratedModesSequentialFlowTests,automated unit,Watch+iOS,PASS,
-REQ-ARCH-002,Architecture,Cross-decode rejection,ActivitySyncCrossDecodeRejectionTests,automated unit,iOS,PASS,1655 iOS tests @ 2c30412
-REQ-ARCH-003,Architecture,Apnea isolation from FC,ApneaArchitectureIsolationTests,automated unit,Watch,PASS,Apnea P1/P2/P3 @ 76f3703
-REQ-SYNC-001,Sync,Diving session HMAC v3,WatchDiveSyncCodecTests; ActivitySyncEnvelopeTests,automated unit,Both,PASS,
-REQ-SYNC-002,Sync,Apnea session HMAC v3,ApneaSessionSyncTransportNegativeTests,automated unit,Both,PASS,
-REQ-SYNC-003,Sync,Snorkeling session HMAC v3,SnorkelingSessionSyncTransportNegativeTests,automated unit,Both,PASS,
-REQ-SYNC-004,Sync,Snorkeling route package codec,SnorkelingRouteSyncCodecTests,automated unit,Both,PASS,iOS 1655 PASS @ 2c30412
-REQ-SYNC-005,Sync,Symmetric diveImportAck,ActivitySyncSignedAckSymmetryTests,automated unit,Both,PASS,
-REQ-SYNC-006,Sync,inFlight outbound release,PerformanceConcurrencyBatteryRemediationTests,automated unit,iOS,PASS,
-REQ-SYNC-007,Sync,Signed tombstones,ActivitySyncTombstoneTests,automated unit,Both,PASS,
-REQ-SYNC-008,Sync,Large payload transfer,ActivitySyncLargePayloadTransferTests,automated unit,Both,PASS,
-REQ-SEC-001,Security,Privacy manifests,SecurityPrivacyTrustRemediationTests,automated unit,Both,PASS,
-REQ-SEC-002,Security,App Intent legal gate,MainDeepCodeReadinessCurrentWatchTests,automated unit,Watch,PASS,
-REQ-SEC-003,Security,Simulation release block,SecurityPrivacyTrustRemediationTests,automated unit,Both,PASS,
-REQ-PERF-001,Performance,FC timing fault policy,FullComputerTimingFaultTests,automated unit,Watch,PASS,
-REQ-PERF-002,Performance,Planner background calc,PerformanceConcurrencyBatteryRemediationTests,automated unit,iOS,PASS,
-REQ-PERF-003,Performance,Snorkeling map downsampling,SnorkelingRoutePresentationSampling,automated unit,Both,PARTIAL,SnorkelingRouteProgressCalculatorTests 1 fail
-REQ-DEPTH-001,Depth,Shallow compile authority,DepthCapabilityTests,automated unit,Watch,PASS,
-REQ-DEPTH-002,Depth,Developer shallow toggles default OFF,validate_developer_shallow_testing_release_gate.sh,script,Watch,PASS,
-REQ-WAO-001,Water auto-open,Predive not live runtime,DIRModesAndStartupFlowTests,automated unit,Watch,PASS,
-REQ-WAO-002,Water auto-open,DepthCapabilityPolicy gate,WatchWaterAutoOpenPolicyTests,automated unit,Watch,FAIL,13 routing failures WFC-P2-005; production OK
-REQ-GF-001,Full Computer,GF preset-only Watch,FullComputerGradientFactorPresetTests,automated unit,Watch,PASS,
-REQ-GF-002,Full Computer,iOS GF import parity,DivePlanPackageBuilderTests,automated unit,iOS,PASS,CONS-002
-REQ-CLOUD-001,Cloud,Diving-only opt-in,CloudBackupCapabilityTests,automated unit,iOS,PASS,
-REQ-APNEA-001,Apnea,Sync namespace isolation,ApneaSyncCodecTests; ActivitySyncCrossDecodeRejectionTests,automated unit,Both,PASS,
-REQ-APNEA-002,Apnea,No deco in Apnea settings,ApneaTruthfulnessCopyTests,automated unit,Watch,PASS,
-REQ-SNORKEL-001,Snorkeling,Route planner validation,SnorkelingRouteValidator tests,automated unit,iOS,PASS,
-REQ-SNORKEL-002,Snorkeling,Physical open-water QA,SNORKELING_* QA templates,physical,Watch+iOS,PENDING_PHYSICAL,12 folders CONS-048
-REQ-PHYS-001,Physical,Watch Ultra depth QA,WATCH_ULTRA templates,physical,Watch,PENDING_PHYSICAL,CONS-010
-REQ-EXT-001,External,Bühlmann third-party compare,BUHLMANN_EXTERNAL templates,external,Both,PENDING_EXTERNAL_VALIDATION,WFC-P1-001
-REQ-CMD-001,Process,Command integrity script,validate_commands_for_cursor_integrity.sh,script,All,PASS,CONS-046 V1.5 @ 2c30412
+Requirement_ID,Area,Requirement,Automated_Evidence,Manual_Physical_Evidence,Status,Notes
+REQ-001,Architecture,Multi-activity separation by store/settings/logbook,IOSActivityLogbookDataIsolationTests;ActivitySyncCrossDecodeRejectionTests,Not required for software gate,PASS,
+REQ-002,Sync,Activity discriminator and cross-decode rejection,ActivitySyncCrossDecodeRejectionTests,Paired stress pending,PARTIAL,Field paired-device gate pending
+REQ-003,Schema,Fail-closed unsupported/future schemas,Apnea/Snorkeling transport negative tests,Not required for software gate,PASS,
+REQ-004,Security,HMAC/replay/ACK control paths,Sync/auth test suite references,Paired physical security path pending,PARTIAL,
+REQ-005,Privacy,When-In-Use location policy in app manifests,Info.plist checks,Physical permission-flow evidence pending,PARTIAL,
+REQ-006,Unified logbook,Presentation-only and no contamination,IOSUnifiedLogbookNoContaminationTests,Manual UI QA pending,PARTIAL,
+REQ-007,Snorkeling remediation,Route queue persistence and ACK clear policy,Snorkeling pending queue tests,Open-water/paired QA pending,PARTIAL,
+REQ-008,Demo contamination,No fake/demo data in real views,Demo contamination tests/manual audits,Manual E2E pending,PARTIAL,
+REQ-009,Performance,Documented budgets and bounded operations,Performance matrices + remediation tests,Instruments profiling pending,PARTIAL,
+REQ-010,Algorithmic safety gate,Main code must not weaken FC authority,Audit 01 + algorithmic safety protection gate,External validation pending,PARTIAL,

@@ -1,0 +1,6 @@
+Claim_ID,Claim,Expected_Position,Status,Evidence,Severity,Pending_Gate,Notes
+UL-CLM-001,Unified logbook is presentation-only,Must remain read-only,PASS,IOS unified logbook audits,P1,PENDING_MANUAL_QA,No write-path promotion found
+UL-CLM-002,No merged canonical cross-activity store,Must remain absent,PASS,Presentation builder/store coordinator,P1,PENDING_MANUAL_QA,Activity stores remain owners
+UL-CLM-003,No watch sync mutation from unified UI,Must remain absent,PASS,Policy docs/tests,P1,PENDING_PHYSICAL,Paired field QA pending
+UL-CLM-004,Demo/fake logs excluded from real unified view,Must remain enforced,PASS,Demo contamination audit,P1,PENDING_MANUAL_QA,Manual walkthrough pending
+UL-CLM-005,Unified mode default-off/activity-scoped visibility,Must remain configurable,PASS,Visibility settings docs/tests,P2,PENDING_MANUAL_QA,Manual UX evidence pending

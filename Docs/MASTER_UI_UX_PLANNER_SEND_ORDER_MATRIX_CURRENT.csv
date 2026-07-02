@@ -1,0 +1,6 @@
+Requirement_ID,Area,Feature,Expected_Order,Observed_Order,Status,Evidence,Pending_Gate,Notes
+PSO-001,Snorkeling planner,Incomplete-state warning placement,Incomplete/route safety messaging appears before Watch send action,Policy remains documented and consumed,PASS,Docs/MASTER_V1_7_SNORKELING_NO_REGRESSION_MATRIX_CURRENT.csv,PENDING_MANUAL_QA,Manual interaction capture pending
+PSO-002,Snorkeling planner,Re-send required banner,Banner appears when operational config/settings require resend,Banner policy remains documented,PASS,Docs/MASTER_IOS_V1_7_SNORKELING_REMEDIATION_AUDIT_CURRENT.md,PENDING_MANUAL_QA,Simulator/manual screenshots pending
+PSO-003,Planner safety,Reference-only transfer copy,Send flow must not imply live decompression authority,No conflicting claim found in V1.7 scope,PASS,Docs/MASTER_UI_UX_POST_REMEDIATION_COPY_CLAIMS_MATRIX_CURRENT.csv,PENDING_MANUAL_QA,Copy walkthrough pending
+PSO-004,Routing,No hidden transfer bypass,Send action remains explicit and user-initiated,No hidden auto-send path evidenced,PASS,Docs/SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_IMPLEMENTATION_REPORT_CURRENT.md,PENDING_PAIRED_DEVICE_QA,Paired transfer evidence pending
+

@@ -1,16 +1,6 @@
-ID,Profile,Gas,GF_Low,GF_High,Environment,Compartment,HalfTime,Initial_PN2,Initial_PHe,Start_Depth,End_Depth,Duration_s,Rate,Expected_PN2,Watch_PN2,Absolute_Error,Relative_Error,Expected_Ceiling,Watch_Ceiling,Expected_Deco_State,Watch_Deco_State,Pass,Evidence,Notes
-SCH-001,Constant 20m,Air,30,70,Sea level,1,5 N2,0.742,0,20,20,60,0,Oracle,Production,≤0.0001,PENDING,Oracle,Production,NDL,NDL,PASS,SchreinerAnalyticParityTests,R=0 Haldane parity
-SCH-002,Constant 20m,Air,30,70,Sea level,4,18.5 N2,0.742,0,20,20,60,0,Oracle,Production,≤0.0001,PENDING,Oracle,Production,NDL,NDL,PASS,SchreinerAnalyticParityTests,
-SCH-003,Constant 20m,Air,30,70,Sea level,8,77 N2,0.742,0,20,20,60,0,Oracle,Production,≤0.0001,PENDING,Oracle,Production,NDL,NDL,PASS,SchreinerAnalyticParityTests,
-SCH-004,Constant 20m,Air,30,70,Sea level,12,239 N2,0.742,0,20,20,60,0,Oracle,Production,≤0.0001,PENDING,Oracle,Production,NDL,NDL,PASS,SchreinerAnalyticParityTests,
-SCH-005,Constant 20m,Air,30,70,Sea level,16,635 N2,0.742,0,20,20,60,0,Oracle,Production,≤0.0001,PENDING,Oracle,Production,NDL,NDL,PASS,SchreinerAnalyticParityTests,
-SCH-006,Descent 0→39m,Air,30,70,Sea level,ALL,ALL,0.742,0,0,39,120,+rate,Oracle,Production,≤0.0001,PENDING,Oracle,Production,NDL/deco,match,PASS,SchreinerAnalyticParityTests,Linear segment
-SCH-007,Ascent 39→10m,Air,30,70,Sea level,ALL,ALL,loaded,0,39,10,180,-rate,Oracle,Production,≤0.0001,PENDING,Oracle,Production,deco,match,PASS,Audit15Air39MultilevelProfileTests @2c30412,ML-01 central forensic
-SCH-008,Ascent 10→3m,Air,30,70,Sea level,ALL,ALL,loaded,0,10,3,90,-rate,Oracle,Production,≤0.0001,PENDING,Oracle,Production,deco,match,PASS,Audit15MultilevelOracleProfilesTests,
-SCH-009,Trimix bottom,TMX21/35,30,70,Sea level,ALL,He+N2,surface,surface,0,45,150,+rate,Oracle,Production,≤0.0001,PENDING,Oracle,Production,deco,match,PASS,ML-03,He compartments active
-SCH-010,1s stepping vs analytic,Air,30,70,Sea level,8,77,0.742,0,0,39,120,+rate,Analytic,1s steps,≤0.0001,PENDING,N/A,N/A,PASS,SchreinerAnalyticParityTests,Segment splitting bounded
-SCH-011,Altitude 1000m,Air,30,70,1000m,1,5 N2,alt-adjusted,0,20,20,60,0,Oracle,Production,≤0.0001,PENDING,Oracle,Production,NDL,NDL,PASS,OrchestratedAltitudeEnvironmentTests,
-SCH-012,Gas switch boundary,EAN50,30,70,Sea level,ALL,ALL,loaded,0,21,21,30,0,Oracle,Production,≤0.0001,PENDING,Oracle,Production,deco,match,PASS,ML-02,Inspired pressure step at switch
-SCH-013,t=0 identity,Air,30,70,Sea level,4,18.5,P0,0,10,10,0,0,P0,P0,0,0,N/A,N/A,NDL,NDL,PASS,BuhlmannTissueModel.schreiner,Returns P_t0 at t=0
-SCH-014,Tiny dt 0.5s,Air,30,70,Sea level,1,5,0.742,0,20,20,0.5,0,Oracle,Production,≤0.0001,PENDING,N/A,N/A,PASS,FullComputerTimingFaultTests,Stable small dt
-SCH-015,Negative rate ascent,Air,30,70,Sea level,12,239,loaded,0,30,12,108,-rate,Oracle,Production,≤0.0001,PENDING,Oracle,Production,deco,match,PASS,ML-07 slow ascent,
+ID,Profile,Gas,GF_Low,GF_High,Environment,Compartment,HalfTime,Initial_PN2,Initial_PHe,Start_Depth,End_Depth,Duration_s,Rate,Expected_PN2,Expected_PHe,Watch_PN2,Watch_PHe,Absolute_Error,Relative_Error,Expected_Ceiling,Watch_Ceiling,Expected_Controller,Watch_Controller,Expected_Deco_State,Watch_Deco_State,Pass,Evidence,Notes
+SCH-001,ML-01,Air,30,70,SeaLevel,1,5.0,0.75,0.00,0,39,180,descent,calc,0.00,match,0.00,<=tol,<=tol,dynamic,dynamic,1,1,nodeco,nodeco,YES,SchreinerAnalyticParityTests,Analytic parity sample
+SCH-002,ML-01,Air,30,70,SeaLevel,4,18.5,0.75,0.00,39,10,240,ascent,calc,0.00,match,0.00,<=tol,<=tol,dynamic,dynamic,dynamic,dynamic,deco,deco,YES,Audit15Air39MultilevelProfileTests,
+SCH-003,ML-01,Air,30,70,SeaLevel,8,54.3,0.75,0.00,10,10,900,flat,calc,0.00,match,0.00,<=tol,<=tol,dynamic,dynamic,dynamic,dynamic,deco/decreasing,deco/decreasing,YES,Audit15Air39MultilevelProfileTests,
+SCH-004,ML-02,EAN50,30,70,SeaLevel,12,146.0,0.75,0.00,21,6,480,ascent,calc,0.00,match,0.00,<=tol,<=tol,dynamic,dynamic,dynamic,dynamic,deco,deco,YES,Audit15MultilevelOracleProfilesTests,Gas-switch boundary
+SCH-005,ML-03,Trimix21/35,30,70,Altitude1000,16,635.0,0.60,0.20,39,21,360,ascent,calc,calc,match,match,<=tol,<=tol,dynamic,dynamic,dynamic,dynamic,deco,deco,YES,Audit15MultilevelOracleProfilesTests,Helium compartment

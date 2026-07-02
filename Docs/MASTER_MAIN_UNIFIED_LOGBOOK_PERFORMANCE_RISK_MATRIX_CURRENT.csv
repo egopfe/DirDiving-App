@@ -1,0 +1,4 @@
+Risk_ID,Risk,Severity,Status,Mitigation,Evidence,Pending_Gate
+ULOG-PERF-001,Large aggregate list recomposition latency,P2,PARTIAL,Read-model builder + bounded UI windows,Unified presentation tests,PENDING_INSTRUMENTS
+ULOG-PERF-002,Cross-activity merge overhead under high volume,P3,MONITOR,Keep store isolation and lazy loading,Architecture + logbook tests,
+ULOG-PERF-003,Manual UI stutter in real device runs,P2,NOT_EXECUTED,Execute physical scroll/navigation profiling,No device artifacts,PENDING_PHYSICAL

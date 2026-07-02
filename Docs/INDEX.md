@@ -1,7 +1,21 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` @ `f90b671`
+**Aggiornato:** 2026-07-02  
+**Branch consigliato:** `main` @ `34b6925`
+
+---
+
+## Aggiornamento indice 2026-07-02 — Master audit orchestrator V1.7 (audits 01–06 + consolidation)
+
+Sequential read-only orchestrator @ `7ae527b`: Watch FC math PASS (0 P0); consolidated readiness **64%** PARTIAL; physical/external/manual QA gates preserved.
+
+| Campo | Valore |
+|-------|--------|
+| **Orchestrator** | `commands_for_cursor/00-MASTER_SUPER_ORCHESTRATOR_…_V1.7.md` |
+| **Plan** | [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md) |
+| **Findings** | [`MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`](MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv) |
+| **Execution log** | [`MASTER_ORCHESTRATOR_SEQUENTIAL_EXECUTION_LOG_CURRENT.csv`](MASTER_ORCHESTRATOR_SEQUENTIAL_EXECUTION_LOG_CURRENT.csv) |
+| **Verdict** | **PARTIAL** · FC software PASS · External TF / App Store **NOT_READY** |
 
 ---
 
@@ -2779,4 +2793,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `origin/main` @ `cc38a47`. Baseline orchestrator audit 2026-06-21 @ `6cbba649`; next remediation Command 17. Baseline documentale storica: piano UI/UX readiness 100% 2026-06-05, audit full UI/UX @ `bdd3a43`.*
+*Indice per ripresa lavoro su `main` @ `origin/main` @ `34b6925`. Baseline orchestrator audit V1.7 2026-07-02 @ `34b6925` (scope `7ae527b`); consolidated readiness 64% PARTIAL. Baseline documentale storica: piano UI/UX readiness 100% 2026-06-05, audit full UI/UX @ `bdd3a43`.*

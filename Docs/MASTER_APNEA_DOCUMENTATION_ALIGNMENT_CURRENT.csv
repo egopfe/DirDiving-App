@@ -1,25 +1,8 @@
-Topic,Expected_Documentation_Claim,Primary_Doc_Path,Doc_Status,Code_Evidence_Audit,Truth_Status,Physical_QA_Label,Required_Update,Priority,Notes
-Apnea first-class on MAIN,Production activity not experimental,APNEA_ARCHITECTURE.md; Feature matrix row 430,TRUE,Apnea MAIN targets,TRUE,PENDING,None,P3,
-Apnea root/dashboard,Documented iOS + Watch entry,APNEA_ARCHITECTURE.md; MASTER_IOS_APNEA audit,TRUE,IOSApneaRootView; ApneaView,TRUE,PENDING,INDEX link to Apnea audit block,P1,Audit outputs exist; under-indexed
-Apnea live session,Watch-authoritative; iOS import only,MASTER_IOS_APNEA_FULL_DEEP_AUDIT_CURRENT.md,TRUE,ApneaWatchRuntimeStore,TRUE,PENDING,None,P3,
-Apnea automatic detection,Not physically validated unless evidenced,MASTER_APNEA_RELEASE_QA_EVIDENCE_AUDIT_CURRENT.md,TRUE,PENDING_PHYSICAL labeled,TRUE,PENDING,None,P3,Truthful pending
-Apnea depth/time profile,Watch records; iOS displays import,MASTER_IOS_APNEA audit § scope,TRUE,Imported profile display,TRUE,PENDING,None,P3,
-Apnea recovery countdown,No medical guarantee,MASTER_UI_UX_APNEA audit,TRUE,Localization + release hard tests,TRUE,PENDING,None,P3,
-Apnea targets/alarms/markers,P1/P2/P3 training; editor UI P2 gap,MASTER_UI_UX_APNEA audit,TRUE,Training compound steps,TRUE,PENDING,Document P2 editor gap in APNEA_ARCHITECTURE,P2,
-Apnea statistics/records,iOS statistics; Watch no browse logbook,APNEA_ARCHITECTURE.md,TRUE,IOSApneaStatisticsView,TRUE,n/a,None,P3,
-Apnea logbook ownership,Strict Apnea namespace; no cross-activity,MASTER_IOS_APNEA_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv,TRUE,IOSActivityLogbookRoutingTests,TRUE,PENDING,INDEX link,P2,
-Apnea settings ownership,Strict Apnea settings; iOS mode switch,MASTER_IOS_APNEA_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv,TRUE,IOSActivitySettingsRoutingTests,TRUE,PENDING,INDEX link,P2,
-Apnea iOS Settings mode switch,Activity switcher routes to Apnea settings,IOS_COMPANION_SETTINGS_MODE_SWITCH_CURRENT.md,TRUE,MASTER_UI_UX settings PASS,TRUE,n/a,Feature matrix row missing,P2,
-Apnea Watch in-mode Settings,Read-only companion section on Watch,MASTER_UI_UX_APNEA audit,TRUE,WatchInModeSettingsAccessButton,TRUE,PENDING,None,P3,
-Apnea water auto-open routing,Does NOT auto-start Apnea session,MASTER_WATCH_APNEA_WATER_AUTO_OPEN_BOUNDARY_MATRIX_CURRENT.csv,TRUE,WatchLaunchRoutingPolicy,TRUE,PENDING,Cross-link in APNEA_ARCHITECTURE,P2,
-Apnea Action Button,D unavailable during live Apnea session,MASTER_UI_UX_APNEA audit,TRUE,Router policy,TRUE,PENDING,None,P3,
-Apnea Digital Crown policy,Live-only clamp; no planner scroll underwater,MASTER_UI_UX_APNEA audit,TRUE,WatchUnderwaterPagePolicy,TRUE,PENDING,None,P3,
-Apnea localization/accessibility,No decompression wording in Apnea strings,MASTER_UI_UX_APNEA_ACCESSIBILITY_LOCALIZATION_MATRIX_CURRENT.csv,TRUE,Grep + a11y tests,TRUE,PENDING,None,P3,
-Apnea sync/persistence isolation,dirdiving_apnea_* schema isolated,MASTER_IOS_APNEA_SYNC_SCHEMA_MATRIX_CURRENT.csv,TRUE,ApneaSyncCodec tests,TRUE,PENDING,INDEX link,P2,
-Apnea privacy positioning,No medical guarantee; training aid only,MASTER_APNEA_PRIVACY_DISCLOSURE_MATRIX_CURRENT.csv,TRUE,ApneaReleaseHardValidationTests,TRUE,PENDING,None,P3,
-Apnea physical/wet QA,All wet gates PENDING,MASTER_APNEA_PHYSICAL_WET_QA_MATRIX_CURRENT.csv,TRUE,No signed QA packs,TRUE,PENDING,None,P3,Correctly pending
-No decompression wording in Apnea,Mandatory negative check,All Apnea docs grep,TRUE,Audits 02/03/05 PASS,TRUE,n/a,None,P3,
-No GF/gas/MOD/PPO2 in Apnea,Mandatory negative check,Apnea settings/views,TRUE,IOSActivitySettingsRoutingTests,TRUE,n/a,None,P3,
-No cross-activity logbook leakage,Mandatory negative check,Logbook routing tests,TRUE,6/6 forbidden routes blocked,TRUE,n/a,None,P3,
-Apnea P1/P2/P3 wave,INTERNAL_READY · PHYSICAL_QA_PENDING,INDEX Apnea block @ ad1c836,TRUE,46 Apnea tests PASS,TRUE,PENDING,Reconcile INDEX SHA to 2c30412,P2,
-Apnea audit outputs indexed,MASTER_IOS_APNEA / UI_UX_APNEA / APNEA_RELEASE in INDEX,INDEX top blocks,MISSING,Files exist @ 2c30412,MISSING,n/a,Add Apnea first-class audit INDEX section,P1,V1.5 gap
+Area,Expected_State,Observed_State,Status,Risk,Required_Update
+Apnea first-class scope,Apnea documented as production activity on MAIN,Present in multiple docs,PASS,High if downgraded,Keep top-level links current
+Apnea settings ownership,Activity-owned settings no cross-leakage,Documented,PASS,High,Maintain isolation wording
+Apnea logbook ownership,Activity-owned logbook with no contamination,Documented,PASS,High,Add stronger index linkage
+No decompression wording in Apnea,No GF/gas/deco settings in Apnea docs,Mostly respected,PASS,High,Keep claim checks
+Apnea auto-detection wet claims,No physical validation overclaim,Pending labels generally present,PASS,High,Preserve pending stance
+Apnea GPS policy,Surface metadata only, no runtime underwater navigation,Documented in latest wave docs,PARTIAL,Medium,Add direct index references
+Apnea tests evidence,21 iOS + 25 Watch tests PASS referenced,Documented,PASS,Medium,Keep tied to software-only scope

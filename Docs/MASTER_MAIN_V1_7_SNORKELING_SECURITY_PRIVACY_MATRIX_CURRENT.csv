@@ -1,0 +1,7 @@
+Check_ID,Check,Status,Evidence,Notes
+SN-SEC-001,Snorkeling sync namespace isolated,PASS,Snorkeling session/route codec and tests,
+SN-SEC-002,No cross-activity write into Diving/Apnea stores,PASS,Cross-decode rejection + isolation tests,
+SN-SEC-003,When-In-Use location policy retained,PASS,Info.plist inspection + docs,
+SN-SEC-004,No Always-location policy introduced,PASS,No Always-location key found in inspected plist,
+SN-SEC-005,No underwater GPS authority claim promoted,PASS,V1.7 docs and verdict language,
+SN-SEC-006,Paired/open-water privacy behavior physically verified,NOT_EXECUTED,No artifacts in this pass,PENDING_PHYSICAL

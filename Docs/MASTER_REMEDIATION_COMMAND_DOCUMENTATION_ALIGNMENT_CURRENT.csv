@@ -1,8 +1,5 @@
-Command_Reference,Expected_Type,Documented_In,Doc_Claim_Matches_Reality,File_On_Disk,INDEX_Linked,Remediation_Outputs_Exist,Status,Required_Action,Priority,Notes
-11-MASTER_2026_06_30_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_COMMAND_V1.0.md,remediation not audit,Disk present; INDEX § Command 10,Remediation is implementation not read-only audit,PRESENT,PARTIAL (as Command 10),YES,PARTIAL,Update INDEX to Command 11 path,P1,COMMAND_10_DOCUMENTED_AS_REMEDIATION: PARTIAL
-10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md,remediation alias,INDEX Command 10 block,Expected filename for remediation,MISSING,YES,YES,FAIL,Add symlink/alias or update INDEX,P1,Body lives as Command 11
-MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md,plan doc,INDEX orchestrator block,Consolidates post-remediation state,PRESENT,YES,YES,PARTIAL,Refresh baseline @ 2c30412 and V1.5 refs,P1,Header stale @ 451f8fb
-MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv,findings register,INDEX; orchestrator,CONS-001..049 tracked,PRESENT,YES,YES,PASS,Refresh CONS-046/049 closed notes,P2,
-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md,remediation report,INDEX Command 10 block,Reports software fixes not physical closure,PRESENT,YES,YES,PASS,Clarify remediation ≠ App Store ready in header,P2,
-validate_consolidated_software_readiness.sh,gate script,Remediation plan,Software readiness gate,PRESENT,PARTIAL,YES,PASS,Document in RELEASE_CHECKLIST,P2,
-validate_commands_for_cursor_integrity.sh,integrity gate,INDEX CONS-046 block,Script aligned @ V1.5,PRESENT,YES,n/a,PASS,None,P4,CONS-046 FIXED @ 2c30412
+Command,Expected_Label,Observed_Label,Status,Required_Action
+07 post-remediation audit,V1.7 audit command exists and documented,Only V1.6 file visible,FAIL,Create V1.7 canonical command file and update index
+10 remediation command,V1.0 remediation command exists and documented,Canonical V1.0 filename missing,FAIL,Create or rename canonical file and update docs
+00 orchestrator,V1.7 orchestrator documented,Present,PASS,None
+01-06 master chain,V1.7 chain documented,Present but mixed with older refs,PARTIAL,Normalize index to prefer V1.7

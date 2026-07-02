@@ -1,0 +1,8 @@
+Area,Expected_State,Observed_State,Status,Risk,Required_Action
+CCR acknowledgement persistence,Independent from generic planner gates,Documented,PASS,High,Keep in index links
+CCR mode-aware UI,Mode-aware copy and policy documented,Documented,PASS,Medium,Maintain localization checks
+CCR authority scope,Reference-only no live loop PPO2 controller claim,Documented,PASS,Critical,Retain legal guardrails
+Equipment gas toggle,Generic GAS toggle removed from checklist items,Documented,PASS,High,Retain compatibility notes
+Gas/cylinder section,Dedicated section and creation path documented,Documented,PASS,Medium,Keep UX screenshots current
+usesGas persistence,Persistence/planner compatibility preserved in docs,Documented,PASS,Medium,Include in release summary
+Demo contamination isolation,Demo/fake logs excluded from real logbooks,Documented,PASS,Critical,Cross-link in release docs

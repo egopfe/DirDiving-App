@@ -1,37 +1,23 @@
-# DIR DIVING — Master Security Remediation Plan (Current)
+# Master Security Remediation Plan (CURRENT)
 
-**Audit:** 04 @ `2c30412` | **Date:** 2026-07-01
+## Objective
 
-## Software posture
+Close remaining cross-cutting process/security/privacy gates without introducing production code changes in this audit pass.
 
-Static security controls **PASS** at `451f8fb`: HMAC v3 envelopes, activity routing guards, signed tombstones, peer secret pinning, path-sanitized file transfers, Privacy Manifests, App Intent legal gates, simulation release blocks.
+## Open items
 
-## Open remediation (by priority)
+1. **MAIN-CMD-001 (P1)** - restore command integrity for launch-order 07 file and rerun integrity scanner.
+2. **MAIN-PRIV-001 (P2)** - execute physical permission-path validation for location privacy policy.
+3. **MAIN-SYNC-001 (P2)** - paired-device large payload sync stress evidence.
+4. **MAIN-QA-001 (P4)** - external validation artifacts remain pending by policy.
 
-### P1
+## Acceptance criteria
 
-| ID | Gap | Remediation | Tests |
-|----|-----|-------------|-------|
-| MAIN-P1-001 | Command integrity script stale | Update script paths (process gate) | `validate_commands_for_cursor_integrity.sh` PASS |
+- Integrity scanner reports full PASS on 00-07 command chain.
+- No unresolved P1 items remain open for security/process trust.
+- Physical privacy + paired sync evidence attached and traceable.
+- No new claim exceeds available evidence.
 
-### P2 — field validation (no fake evidence)
+## Execution policy
 
-| ID | Gap | Remediation | Tests |
-|----|-----|-------------|-------|
-| MAIN-SEC-001 | Paired sync security not field-verified | Execute paired QA matrix | SEC-NEG field cases |
-| MAIN-SYNC-001 | Large payload file transfer not field-verified | 5MB round-trip on hardware | ActivitySyncLargePayloadTransfer + field |
-
-### P3 — accepted architectural boundaries
-
-| ID | Gap | Posture |
-|----|-----|---------|
-| MAIN-SEC-002 | WC TOFU peer secret bootstrap | DOCUMENTED_ACCEPTED_RISK — pinning + reset epoch |
-| MAIN-SYNC-004 | Legacy diving tombstone UUID mirror at bootstrap | DOCUMENTED_ACCEPTED_RISK — signed path primary |
-
-## Do not weaken
-
-- HMAC verification or constant-time compare
-- Activity envelope `activityType` discriminator
-- Cross-decode rejection in `ActivitySyncRoutingGuard`
-- Briefing card reference-only policy on Watch
-- Cloud backup opt-in truthfulness per activity
+This file defines remediation planning only. Implementation/fix changes must be performed in dedicated remediation commands.

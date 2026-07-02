@@ -1,0 +1,5 @@
+Risk_ID,Risk,Severity,Status,Evidence,Pending_Gate,Notes
+SN-PERF-001,Long route rendering jank,P2,PARTIAL,Downsampling utilities + software tests,PENDING_INSTRUMENTS,Needs device FPS traces
+SN-PERF-002,Queue flush latency under low battery,P2,PENDING_PHYSICAL,No paired stress artifacts,PENDING_PHYSICAL,Software guards present
+SN-PERF-003,Route analytics compute overhead,P3,MONITOR,Current remediation docs indicate bounded paths,,Keep signposts active
+SN-PERF-004,Background/foreground route state recovery,P3,PARTIAL,Runtime store tests + remediation docs,PENDING_PHYSICAL,Field continuity not evidenced

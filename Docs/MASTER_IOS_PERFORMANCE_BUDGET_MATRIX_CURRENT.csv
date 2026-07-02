@@ -1,21 +1,9 @@
-Budget_ID,Area,Metric,Target,Warning_Threshold,Fail_Threshold,Measurement_Method,Automated,Physical_Required,Current_Result,Status,Notes
-BUD-IOS-001,Startup,App launch to first UI frame,1000 ms,1500 ms,2500 ms,Instruments Time Profiler,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,Async coordinator init post-remediation
-BUD-IOS-002,Startup,First dashboard interactive,1500 ms,2000 ms,3500 ms,Instruments,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,performInitialLoadIfNeeded async
-BUD-IOS-003,Settings,Mode switch visible update,100 ms,200 ms,500 ms,SwiftUI manual,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,Mode-scoped env only post-remediation
-BUD-IOS-004,Planner,Debounced OC recalc,200 ms soft,500 ms,5000 ms,testPlannerBackgroundFlushWithinBudget,Yes,No,SYNTHETIC_PASS,PASS,Background pipeline
-BUD-IOS-005,Planner,Calculate button full solve,100 ms UI feedback,300 ms,5000 ms,testPlannerBackgroundFlushWithinBudget,Yes,Yes,SYNTHETIC_PASS,PASS,immediate: true background path
-BUD-IOS-006,Charts,OC/CCR chart snapshot build,50 ms,150 ms,500 ms,Signpost chart_snapshot_prep,PARTIAL,No,NOT_MEASURED,PENDING,Signpost wired; no CI wall clock
-BUD-IOS-007,Charts,Tissue analytics generation,300 ms soft,800 ms,5000 ms,Signpost tissue_analytics_gen,PARTIAL,No,SYNTHETIC_PASS,PASS,Precomputed; 2048 downsample; LRU 32
-BUD-IOS-008,Logbook,Decode 5000 synthetic sessions,500 ms soft,2000 ms,5000 ms,testLogbookLoadBudgetSynthetic5000,Yes,No,PASS,PASS,
-BUD-IOS-009,Logbook,List first paint at cap,300 ms,800 ms,2000 ms,Instruments,PENDING,Yes,NOT_APPLICABLE_CAP,CAP_BOUNDED,40 dive / 80 apnea-snorkeling cap
-BUD-IOS-010,Statistics,Recompute at cap,500 ms,1500 ms,5000 ms,Unit test,PARTIAL,No,PASS,PASS,Uses persisted session.statistics
-BUD-IOS-011,Export,Single session PDF,2000 ms,5000 ms,15000 ms,Instruments,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,IOSExportCancellation added
-BUD-IOS-012,Import,CSV parse 10 MB,3000 ms,8000 ms,30000 ms,DiveCSVImportBounds + validateRowCount,PARTIAL,No,NOT_MEASURED,PENDING,Row count enforced
-BUD-IOS-013,Sync,WC encode/decode 512 KB,100 ms,300 ms,1000 ms,ActivitySyncLargePayloadTransferTests,Yes,No,PASS,PASS,
-BUD-IOS-014,Sync,Outbound flush 40 sessions,500 ms,2000 ms,10000 ms,WatchSyncPendingFlushPolicy,PARTIAL,Yes,NOT_MEASURED,PENDING,Backpressure wired; field pending
-BUD-IOS-015,Map,Dashboard preview 10k points,100 ms,300 ms,1000 ms,Instruments,PENDING,Yes,NOT_MEASURED,PENDING,4096 cap via SnorkelingRoutePresentationSampling
-BUD-IOS-016,Map,Session detail 50k points,300 ms,800 ms,3000 ms,downsampledMeasuredPoints,PARTIAL,Yes,NOT_MEASURED,PENDING,Downsampling wired; Instruments pending
-BUD-IOS-017,Memory,Peak during planner solve,150 MB,250 MB,400 MB,Allocations instrument,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,Background calc reduces main peak
-BUD-IOS-018,Concurrency,Task cancellation latency,50 ms,200 ms,1000 ms,IOSExportCancellation tests,PARTIAL,No,PASS,PASS,Export paths cancellable
-BUD-IOS-019,Main thread,Stall during slider edit,16 ms,33 ms,100 ms,Time Profiler,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,Planner off main post-remediation
-BUD-IOS-020,Battery,Background sync after suspend,0 unexpected work,N/A,policy violation,Energy Log,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,
+Budget_ID,Area,Metric,Target,Evidence,Status,Notes
+IOS-BUD-001,Startup first render,ms,<1500 target (device),No fresh Instruments run,PENDING_INSTRUMENTS,Software readiness only
+IOS-BUD-002,Planner recompute latency,ms,<5000 soft,Planner background tests,PASS,
+IOS-BUD-003,Chart rendering budget,point load,bounded downsample,Planner chart snapshot pipeline,PASS,
+IOS-BUD-004,Logbook scalability,rows/frame pacing,stable under bounded windows,Lazy list + isolation tests,PARTIAL,Needs physical profiling
+IOS-BUD-005,Route map render,point count,<=4096 presentation points,Snorkeling map presentation utility,PASS,Physical FPS pending
+IOS-BUD-006,Sync decode/persist,message burst,bounded queue and ACK policy,Sync remediation evidence,PASS,
+IOS-BUD-007,Export/import bounds,file size/rows,10MB/200k policy,Import bounds policies + tests,PASS,
+IOS-BUD-008,Memory retention,cache size,bounded LRU policies,Tissue analytics service docs/tests,PASS,

@@ -1,14 +1,9 @@
-CONS_ID,Remediation_Topic,Documented_In,Doc_Claim,Remediation_Status,Doc_Status,Physical_External_Gates,Required_Doc_Update,Priority,Notes
-CONS-001,Command body permutation repair,MASTER_CONSOLIDATED_FINDINGS_REGISTER; INDEX orchestrator block,01–07 launch order trustworthy,FIXED_SOFTWARE,TRUE,PENDING,None — bodies V1.5 aligned,P4,Bodies fixed @ V1.5
-CONS-002,iOS ↔ Watch GF preset parity,MASTER_IOS_GF_PRESET_PARITY_POST_REMEDIATION_MATRIX; DIR_DIVING_IOS_DECO_GF_PRESET_CARD_SELECTOR_REPORT,Three presets aligned,FIXED_SOFTWARE,TRUE,PENDING,Cross-link GF matrices in INDEX,P2,
-CONS-003,inFlightOutboundSessionIDs failed-ACK cleanup,MASTER_IOS_SYNC_ACK_POST_REMEDIATION_MATRIX,Pending queue retries after failure,FIXED_SOFTWARE,TRUE,PENDING,None,P3,
-CONS-004,symmetric Watch↔iOS diveImportAck,MASTER_SYNC_SECURITY_POST_REMEDIATION_MATRIX,Symmetric ACK documented,FIXED_SOFTWARE,TRUE,PENDING,None,P3,
-CONS-005,legacy unsigned tombstone hardening,MASTER_IOS_TOMBSTONE_SECURITY_POST_REMEDIATION_MATRIX,Signed-only tombstones,FIXED_SOFTWARE,TRUE,PENDING,None,P3,
-CONS-006,shallow FC developer testing toggle,MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX,Internal/TestFlight only; default OFF,FIXED_SOFTWARE,TRUE,PENDING,Reinforce non-production-deco disclaimer in public docs,P1,
-CONS-007,runtime depth capability authority,MASTER_DEPTH_CAPABILITY_POST_REMEDIATION_MATRIX,Compile authority > plist metadata,FIXED_SOFTWARE,TRUE,PENDING,None,P3,
-CONS-008,independent TTS/schedule oracle,MASTER_WATCH_FULL_COMPUTER_ORACLE_INDEPENDENCE_MATRIX,Independent oracle path,FIXED_SOFTWARE,PARTIAL,PENDING_EXTERNAL,Note partial external validation,P2,
-CONS-019,Water auto-open FC depth gate,MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT,DepthCapabilityPolicy in automatic step,FIXED_SOFTWARE,TRUE,PENDING,Feature matrix row missing,P1,
-CONS-046,validate_commands_for_cursor_integrity.sh drift,INDEX CONS-046 V1.5 block,Script expects V1.5 paths,FIXED_SOFTWARE,TRUE,n/a,None — PASS @ 2c30412,P4,CONS-046 CLOSED
-CONS-047,stale upstream audit outputs,MASTER_CONSOLIDATED_AUDIT plan,01–06 rerun @ 2c30412,PASS,PASS,COMPLETE,Refresh consolidated plan header SHA,P2,Audits 01–05 refreshed V1.5
-CONS-048,Snorkeling physical QA pending,SNORKELING_* docs; INDEX Snorkeling blocks,INTERNAL_READY · PHYSICAL_QA_PENDING,TRUE,TRUE,PENDING,None if labels kept,P3,Snorkeling docs aligned
-CONS-049,iOS test compile regression,MASTER_IOS audit @ 2c30412,iOS tests PASS,FIXED_SOFTWARE,TRUE,PENDING,Update consolidated plan IOS-P1-001 closed note,P2,1655 iOS tests PASS @ 2c30412
+Item,Expected_Post_Remediation_State,Observed_State,Status,Notes
+CONS-001 command integrity,Commands referenced consistently in docs,PARTIAL,FAIL,Missing canonical 07/10 filenames
+CONS-002 GF parity wording,GF parity reflected and non-overclaimed,PASS,PASS,Aligned in remediation docs
+CONS-003/004/005 sync-security wording,Sync/security remediations documented,PASS,PASS,Aligned
+CONS-006/007 depth capability wording,Depth authority vs entitlement documented,PASS,PASS,Aligned
+CONS-008 oracle wording,Oracle status kept honest with pending external context,PASS,PASS,Aligned
+Software 100 scope,Software-actionable only with pending physical/external,PASS,PASS,Correctly scoped
+Audit 07 documentation,Expected V1.7 command pointer,FAIL,FAIL,07 V1.7 file missing
+Command 10 remediation labeling,Expected V1.0 canonical filename,FAIL,FAIL,10 V1.0 file missing

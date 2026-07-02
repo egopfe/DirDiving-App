@@ -1,70 +1,107 @@
-# Master Documentation Remediation Plan — Current
-
-**Audit:** Command 06 V1.5 — Documentation / Repository Alignment  
-**Baseline:** `main` @ `2c30412`  
-**Date:** 2026-07-01  
-**Upstream inputs:** Audits 01–05 @ `2c30412` (all PARTIAL); CONS-046 **CLOSED** (integrity script V1.5 PASS)
-
-Do **not** apply fixes in this audit pass — planned edits only.
-
----
+# MASTER DOCUMENTATION REMEDIATION PLAN (V1.7)
 
 ## P0 — Unsafe / unsupported claims
 
-| File | Section | Exact change required | Why | Audit rerun |
-|------|---------|----------------------|-----|-------------|
-| `Docs/WATCH_LOW_POWER_MISSION_MODE_IMPLEMENTATION_REPORT.md` | § App Store ready / summary tables | Replace **Conditional yes** / **Yes with copy review** with **NO for external App Store** · **Internal TestFlight conditional** · **PHYSICAL_QA_PENDING** | Claims App Store readiness without physical/legal evidence | 05, 06 |
-| `Docs/DOCUMENTATION_UPDATE_REPORT_20260609.md` | Not claimed list | Remove bullet **CCR external validation complete** or move to **PENDING** with evidence link | Contradicts `CCR_REBREATHER_VALIDATION_EVIDENCE` PENDING status | 05, 06 |
+1. File: `Docs/DOCUMENTATION_UPDATE_REPORT_20260614.md`
+   - Section: external validation bullet list
+   - Exact change required: replace "CCR external validation complete" with "CCR external validation pending" and link evidence matrix
+   - Why: unsupported high-risk claim; contradicts audit/release matrices
+   - Priority: P0
+   - Audit to rerun: 05, 06
 
----
+2. File: `Docs/INDEX.md`
+   - Section: software-ready summary blocks lacking physical/external qualifiers
+   - Exact change required: pair any software-ready wording with explicit `PHYSICAL_QA_PENDING` and `EXTERNAL_VALIDATION_PENDING`
+   - Why: reduces unsafe interpretation risk
+   - Priority: P0
+   - Audit to rerun: 05, 06
 
-## P1 — Architecture / command / index drift
+## P1 — Structural documentation alignment
 
-| File | Section | Exact change required | Why | Audit rerun |
-|------|---------|----------------------|-----|-------------|
-| `README.md` | Release baseline | Update `bf03fb0` → `2c30412`; link V1.5 launch sequence | Stale SHA misleads contributors | 06 |
-| `Docs/README.md` | Baseline table | Refresh to `2c30412`; orchestrator **V1.5**; audits 01–07 | Secondary index stale | 06 |
-| `Docs/INDEX.md` | Header | `Aggiornato: 2026-07-01` · `main` @ `2c30412` | Header cites `ad1c836` | 06 |
-| `Docs/INDEX.md` | Master command table | Update all commands to **V1.5** filenames | Still cites V1.1/V1.2/V2.x | 06 |
-| `Docs/INDEX.md` | Command 10 block | Point to `11-MASTER_2026_06_30...` or restore Command 10 alias | Remediation body is Command 11 | 06 |
-| `Docs/INDEX.md` | CONS-046 block | Reconcile **SOFTWARE_READY 100%** with audits 01–05 **PARTIAL** | Overstates release readiness | 06 |
-| `Docs/INDEX.md` | Apnea audit block | Add links to `MASTER_IOS_APNEA_*`, `MASTER_UI_UX_APNEA_*`, `MASTER_APNEA_RELEASE_*` | V1.5 Apnea scope outputs not indexed | 06 |
-| `Docs/MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md` | Header | Refresh to `2c30412`, orchestrator V1.5, CONS-046/049 closed | Plan header @ `451f8fb` stale | 00 |
-| `Docs/DIR_DIVING_Feature_Comparison.csv` | Rows 12–26 vs 430–433 | Mark codex experimental Apnea/Snorkeling rows superseded; add GF/shallow/WAO/mode-switcher rows | Matrix drift | 06 |
-| `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` | Top | Archive banner: superseded pre-V3.0; Apnea/Snorkeling on MAIN | Conflicts current architecture | 06 |
+1. File: `README.md`
+   - Section: release baseline row
+   - Exact change required: update baseline hash/date and link latest 01-06 + 07 outputs
+   - Why: stale baseline drives mismatch in trust chain
+   - Priority: P1
+   - Audit to rerun: 06
 
----
+2. File: `Docs/README.md`
+   - Section: feature list and branch status
+   - Exact change required: remove contradictory experimental statements for Apnea/Snorkeling on MAIN
+   - Why: architecture/logbook/settings ownership truthfulness
+   - Priority: P1
+   - Audit to rerun: 02, 03, 06
 
-## P2 — Missing links / stale baselines
+3. File: `Docs/INDEX.md`
+   - Section: command index blocks
+   - Exact change required: normalize command references to V1.7 00-06 and documented post-remediation/remediation lanes
+   - Why: command sequence integrity
+   - Priority: P1
+   - Audit to rerun: 06
 
-| File | Section | Exact change required | Why | Audit rerun |
-|------|---------|----------------------|-----|-------------|
-| `Docs/ROADMAP.md` | Header | Update SHA/date to `2c30412` | Stale | 06 |
-| `Docs/TESTFLIGHT_REVIEW_NOTES.md` | Header | Refresh baseline SHA; add shallow + WAO bullets | Release notes drift | 05 |
-| `Docs/PRODUCT_FEATURES_IT.md` | Branch table | Clarify codex comparison ≠ MAIN exclusion | Ambiguous experimental wording | 06 |
-| `APNEA_EXPERIMENTAL_SPEC.md` | Header | Legacy banner → `APNEA_ARCHITECTURE.md` | Misleading filename | 06 |
-| `SNORKELING_EXPERIMENTAL_SPEC.md` | Header | Legacy banner → `SNORKELING_ARCHITECTURE.md` | Misleading filename | 06 |
-| `Docs/INDEX.md` | Watch wave | Link `MASTER_ALGORITHMIC_*` gate docs from audit 05 | Under-indexed safety gates | 06 |
+4. File: `commands_for_cursor/*`
+   - Section: canonical command chain
+   - Exact change required: add missing `07 ... V1.7` and `10 ... V1.0` files (or rename canonical artifacts)
+   - Why: command-version matrix contradiction
+   - Priority: P1
+   - Audit to rerun: 00, 06
 
----
+5. File: `Docs/MASTER_COMMAND_SEQUENCE_VERSION_ALIGNMENT_CURRENT.csv`
+   - Section: expected chain rows
+   - Exact change required: keep missing-state rows until files exist
+   - Why: prevents false green command status
+   - Priority: P1
+   - Audit to rerun: 06
 
-## P3 — Copy cleanup / archive notes
+## P2 — Index, matrices, linkage
 
-| File | Section | Exact change required | Why |
-|------|---------|----------------------|-----|
-| `commands_for_cursor/OOLD/` | README | List superseded V1.0–V2.x commands → active V1.5 | Discoverability |
-| Historical CCR audit docs | Header | Archive banner → `MASTER_*_CURRENT` | Prevent mistaken authority |
-| `Docs/PR_STATUS_20260607.md` | Header | Superseded notice | Duplicate narrative |
+1. File: `Docs/INDEX.md`
+   - Section: V1.7 GPS/unified logbook sections
+   - Exact change required: add direct links to unified-logbook, GPS, location privacy, and test-evidence alignment matrices
+   - Why: discoverability and audit traceability
+   - Priority: P2
+   - Audit to rerun: 02, 03, 04, 05, 06
 
----
+2. File: `Docs/DIR_DIVING_Feature_Comparison.csv`
+   - Section: activity ownership and latest wave rows
+   - Exact change required: add rows for unified read-only logbook, snorkeling GPS ownership, CCR ack remediation, equipment gas UI remediation
+   - Why: matrix drift
+   - Priority: P2
+   - Audit to rerun: 03, 06
 
-## Summary counts
+3. File: `Docs/MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md`
+   - Section: latest-wave cross-links
+   - Exact change required: reference V1.7 CCR/equipment/demo contamination docs explicitly
+   - Why: release-claim traceability
+   - Priority: P2
+   - Audit to rerun: 05, 06
 
-| Priority | Count |
-|----------|------:|
-| P0 | 2 |
-| P1 | 10 |
-| P2 | 6 |
-| P3 | 3+ |
+4. File: `Docs/MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md`
+   - Section: unified-logbook/gps policy
+   - Exact change required: add direct links to no-contamination and location privacy matrices
+   - Why: cross-layer integrity transparency
+   - Priority: P2
+   - Audit to rerun: 04, 06
 
-**Total planned remediation items:** 21+ distinct edits across 15+ files.
+## P3 — Copy / formatting / archive hygiene
+
+1. File: `Docs/INDEX.md`
+   - Section: duplicated historical update blocks
+   - Exact change required: compact legacy blocks under one superseded section
+   - Why: reduces confusion
+   - Priority: P3
+   - Audit to rerun: 06
+
+2. File: `Docs/README.md`
+   - Section: long historical table
+   - Exact change required: split legacy timeline into appendix doc
+   - Why: maintainability
+   - Priority: P3
+   - Audit to rerun: 06
+
+3. File: `Docs/MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv`
+   - Section: archive markers
+   - Exact change required: add archive-keep rationale per historical command
+   - Why: consistent superseded governance
+   - Priority: P3
+   - Audit to rerun: 06

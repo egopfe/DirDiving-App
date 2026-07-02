@@ -1,0 +1,6 @@
+Claim_ID,Claim,Expected_Position,Status,Evidence,Severity,Pending_Gate,Notes
+CCR-CLM-001,CCR acknowledgement is independent toggle,Must remain independent,PASS,CCR acknowledgement audit,P1,PENDING_MANUAL_QA,Software confirms independent behavior
+CCR-CLM-002,Mode-aware UI policy preserved,Must remain mode-aware,PASS,CCR acknowledgement audit,P2,PENDING_MANUAL_QA,Manual UX pending
+CCR-CLM-003,No certification/legal approval implied,Must remain absent,PASS,Claims matrix + CCR audit,P0,PENDING_LEGAL_REVIEW,Reference-only retained
+CCR-CLM-004,No live CCR controller authority claim,Must remain absent,PASS,CCR audit,P0,PENDING_EXTERNAL_VALIDATION,No unsupported control claim
+CCR-CLM-005,Localized copy correctness validated,Must be validated,PARTIAL,CCR audit notes,P2,PENDING_MANUAL_QA,Needs manual localization UX evidence

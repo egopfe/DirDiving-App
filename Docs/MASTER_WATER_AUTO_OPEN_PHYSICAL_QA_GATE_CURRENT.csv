@@ -1,16 +1,8 @@
-Gate_ID,Scenario,Expected_Behavior,Automated_Test,Simulator_Evidence,Physical_Evidence,Water_Lock_Evidence,System_Listing_Evidence,Legal_Gate,Safety_Gate,Status,Software_Status,Physical_Status,Severity,Finding_ID,Evidence_Folder,Notes
-WAO-G-001,Default mode disabled,Water auto-open off until user enables,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,Policy default disabled @ 451f8fb
-WAO-G-002,Preferred FC routes predive not live,FC destination → fullComputerPrediveConfiguration,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,yes,PASS,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,P2,WFC-P2-005,,11 test failures post-Apnea; production routing under review
-WAO-G-003,Does not start dive/session,beginWaterAutoLaunch routing only,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,yes,PASS,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,P2,WFC-P2-005,,Same test drift as WAO-G-002
-WAO-G-004,Blocked during active session,No routing when dive active,WatchWaterAutoOpenPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,yes,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
-WAO-G-005,Cold launch submersion probe wired,WatchSubmersionLaunchProbe + WatchLaunchRoutingPolicy,WatchLaunchRoutingPolicyTests,yes,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,CLOSED P1-WAO-001
-WAO-G-006,Cold launch limitation disclosed in Settings,coldLaunchLimitationSection EN/IT,Static + localization,yes,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,CLOSED P1-WAO-002
-WAO-G-007,System Auto-Launch listing not falsely claimed,settings.water_auto_open.system_limitation,Static copy,yes,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P2,WAO-PHY-002,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_SYSTEM_LISTING,Truthful limitation copy; physical listing NOT_EXECUTED
-WAO-G-008,End-to-end water entry physical,Dry/wet auto-open routing on hardware,None,n/a,n/a,NOT_EXECUTED,NOT_EXECUTED,yes,PENDING,NOT_EXECUTED,SOFTWARE_PASS,PENDING_PHYSICAL,P1,WAO-PHY-001,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED,Do not mark passed without artifacts
-WAO-G-009,Active session block physical,Physical block during live dive,None,n/a,n/a,NOT_EXECUTED,NOT_EXECUTED,yes,PENDING,NOT_EXECUTED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,WAO-PHY-003,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_ACTIVE_SESSION_BLOCK,
-WAO-G-010,Water Lock interaction during auto-open,No spurious navigation under Water Lock,None,n/a,n/a,NOT_EXECUTED,NOT_EXECUTED,n/a,PENDING,NOT_EXECUTED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK,Water Lock physical QA gate
-WAO-G-011,Apply Route Now in-app test path,Settings test routing without dive start,WatchWaterAutoOpenSettingsView,yes,yes,NOT_EXECUTED,n/a,n/a,yes,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
-WAO-G-012,Normal icon launch ignores water policy,userColdLaunch false,WatchLaunchRoutingPolicyTests,yes,yes,NOT_EXECUTED,n/a,n/a,n/a,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
-WAO-G-013,Legal gate on OpenWaterAutoLaunchModeIntent,requireLegalAcceptanceForSafetyIntent,ActionButtonIntents tests,yes,yes,NOT_EXECUTED,n/a,n/a,yes,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
-WAO-G-014,Modal sequencing disclaimer first,No double fullScreenCover,ContentView startupFlowPresented,yes,partial,NOT_EXECUTED,n/a,n/a,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P3,,,@2e3f262 fix verified static
-WAO-G-015,Shallow depth plist flag read,isEnabled from WKSupportsAutomaticDepthLaunch,WatchAutomaticDepthLaunchConfiguration,yes,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,PASS,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P2,,,Physical submerged listing pending Apple platform gate
+Gate_ID,Scenario,Status,Severity,Evidence,Notes
+WAO-001,System auto-launch listing evidence,PENDING_PHYSICAL,P1,None,No physical listing artifact attached
+WAO-002,Water auto-open physical QA,PENDING_PHYSICAL,P1,None,Template-only
+WAO-003,Water lock behavior in wet context,PENDING_PHYSICAL,P1,None,No physical underwater run
+WAO-004,Shallow depth wet QA,PENDING_PHYSICAL,P1,None,No chamber/open-water evidence
+WAO-005,Gauge shallow water QA,PENDING_PHYSICAL,P2,None,Pending physical session
+WAO-006,Full computer shallow internal test QA,PENDING_PHYSICAL,P2,None,Pending controlled wet evidence
+WAO-007,Apnea water-auto-open boundary policy,PASS,P2,Boundary docs/tests,Software non-regression preserved

@@ -1,17 +1,8 @@
-Data_Element,Source,Platform,Activity,Storage,Export,Cloud,Third_Party,Redaction,Opt_In_Required,User_Control,Test_Evidence,Status,Notes
-Dive profile samples,Watch depth sensor,Watch,Diving,dirdiving_sessions.json,Subsurface CSV (GPS optional),iCloud KVS Diving only,None,GPS omit default DivingExportPrivacyPolicy,Yes iOS cloud,Export precision choice,SecurityPrivacyTrustRemediationTests,PASS,
-Tissue checkpoints,FC runtime engine,Watch,Diving,dirdiving_fc_runtime_checkpoint.json,Not exported,None,None,N/A,N/A,N/A,FullComputerRecoveryCheckpointTests,PASS,Local recovery only
-Gas mix / plan metadata,iOS Planner,iOS,Diving,PlannerStore in-memory + plan sync,PDF/CSV,WC plan package only,None,N/A,N/A,N/A,DivePlanPackageCodecTests,PASS,Reference to Watch FC
-Apnea session metrics,Watch runtime,Watch,Apnea,dirdiving_apnea_sessions.json,PDF/CSV local,Watch iCloud optional,None,N/A,N/A,Delete session,ApneaSessionMergeIntegrityTests,PASS,
-Apnea recovery intervals,Apnea engine,Watch,Apnea,Session JSON,Export views,None,None,N/A,N/A,N/A,Apnea lifecycle tests,PASS,Health-like — local only iOS
-Snorkeling GPS track,Watch GPS,Watch,Snorkeling,Session JSON + checkpoint,GPX export,None,None,Map presentation downsampled,None,Delete session,SnorkelingRouteSyncCodecTests,PASS,maxPersistedTrackPoints 50000
-Snorkeling photos,User / session,Both,Snorkeling,Session attachments,PDF/GPX context,None,None,EXIF stripped on re-encode,None,Delete,WatchCompanionPhotoValidator,PASS,
-Location (exact),GPS managers,Both,All,Session fields,Export policies vary,Cloud Diving only if enabled,None,Diving default omit; Snorkeling export policy,Yes cloud Diving,Export dialog,SEC-NEG-13,PASS,
-Peer sync secret,WC bootstrap,Both,All,Keychain + applicationContext,Never,WC backup residual,None,Never logged,N/A,Reset peer trust,WatchSyncPeerSecretPinningIOSTests,PASS,DOCUMENTED_ACCEPTED_RISK TOFU
-Pending sync queue,WC transfer,Both,All,ProtectedSensitiveFileStore,Never,None,None,Encrypted at rest file protection,N/A,N/A,SecurityPrivacyTrustRemediationTests,PASS,
-User photos companion,iOS picker,iOS,Diving,UserImageStore,WC file to Watch,None,None,JPEG normalize Watch,None,Delete inventory,CompanionPhotoTransferPipelineTests,PASS,
-Planner briefing PNG,iOS render,iOS,Diving,Briefing card store,WC file transfer,None,None,Reference-only Watch,None,Replace card,PlannerBriefingCardStoreTests,PASS,Does not affect live runtime
-Diagnostics logs,OSLog/Logger,Both,All,Unified logging,None,None,None,No GPS/gas in signposts,None,N/A,DIRPerformanceSignpost policy,PASS,Static names only
-Units preference,Settings,Both,All,UserDefaults + WC context,None,None,None,N/A,N/A,Settings,IOSActivitySettingsCoherenceTests,PASS,Shared non-sensitive
-Cloud backup toggle,iOS Settings,iOS,All,CloudBackupCapability,None,KVS Diving sessions only,None,Truthful per-activity UI,Yes Diving only,Settings toggle,CloudBackupCapabilityTests,PASS,Apnea/Snorkeling blocked
-CCR reference plan,iOS Planner,iOS,Diving,In-memory,PDF,WC optional,None,N/A,N/A,N/A,Mode guard,CCR reference tests,PASS,Not OC runtime
+Flow_ID,Activity,Data_Class,Source,Destination,Storage,Sync,Permission,User_Exposure,Risk,Control,Status,Evidence
+PRIV-001,Diving,Surface GPS entry/exit,Watch runtime,Diving logbook,Diving-only stores,activity-scoped sync,When In Use,Visible in Diving views only,Low,Activity routing + isolation tests,PASS,Audit 01/02/03 docs at 7ae527b
+PRIV-002,Apnea,Surface start/end GPS metadata,Watch runtime,Apnea logbook,Apnea-only stores,activity-scoped sync,When In Use,Visible in Apnea views only,Low,Apnea namespace and store isolation,PASS,Apnea isolation docs/tests consumed
+PRIV-003,Snorkeling,Route track + quality metadata,Watch runtime,Snorkeling logbook,Snorkeling-only stores,activity-scoped sync,When In Use,Visible in Snorkeling and optional unified presentation,Medium,No merged canonical store; route namespace isolation,PASS,V1.7 snorkeling docs + tests
+PRIV-004,All,Unified timeline rows,iOS presentation builder,Unified list UI,Derived read-model only,no outbound mutation,none,new optional aggregate view,Medium,Presentation-only architecture + no contamination tests,PASS,IOSUnifiedLogbookNoContaminationTests
+PRIV-005,All,Sync envelope metadata,Watch/iOS sync services,paired peer,transport-only,namespaced + signed,HMAC/replay controls,not directly user-visible,Low,Signed transport + replay cache,PASS,ActivitySync envelope/auth tests
+PRIV-006,All,Location permission text,Info.plist manifests,OS privacy dialog,system managed,n/a,When In Use only,user consent gate,Medium,No Always-location key in inspected plist,PASS,App/Info.plist + iOSApp/App/Info.plist
+PRIV-007,Snorkeling,Open-water route evidence,physical sessions,QA evidence docs,Docs artifacts only,n/a,n/a,not a runtime flow,High if misclaimed,Keep as pending until artifacts,PENDING_PHYSICAL,No physical evidence attached in this pass

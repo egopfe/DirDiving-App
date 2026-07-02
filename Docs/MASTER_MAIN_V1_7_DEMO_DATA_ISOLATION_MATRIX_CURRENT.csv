@@ -1,0 +1,5 @@
+Check_ID,Check,Status,Evidence,Notes
+DEMO-001,Demo/fake entries excluded from real activity logbooks,PASS,V1.7 demo contamination audit + tests,
+DEMO-002,Unified logbook honors real/demo separation,PASS,Unified no-contamination tests,
+DEMO-003,Demo toggles do not mutate canonical sync paths,PASS,Presentation-only architecture and sync namespace checks,
+DEMO-004,Manual end-to-end proof bundle attached,PENDING_MANUAL_QA,No manual artifacts in this pass,

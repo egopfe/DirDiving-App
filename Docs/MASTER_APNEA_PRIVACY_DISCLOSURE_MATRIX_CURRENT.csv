@@ -1,12 +1,6 @@
-Data_Category,Collected,Stored,Synced,Exported,Shared,Backed_Up,Encrypted,User_Controllable,Privacy_Policy,Privacy_Manifest,Release_Risk,Notes
-Apnea session profiles,yes,yes,yes,yes,no,yes,yes,yes,yes,yes,LOW,Watch-authoritative; iOS imports
-Apnea depth/time samples,yes,yes,yes,yes,no,yes,yes,yes,yes,yes,LOW,Imported from Watch
-Apnea training targets/alarms,yes,yes,yes,no,no,yes,yes,yes,yes,yes,LOW,Config not medical
-Apnea recovery settings,yes,yes,yes,no,no,yes,yes,yes,yes,yes,LOW,Not medical guarantee
-Apnea statistics aggregates,yes,yes,no,yes,no,yes,yes,yes,yes,yes,LOW,iOS computed
-Apnea equipment/buddy notes,yes,yes,no,yes,no,yes,yes,yes,yes,yes,LOW,
-Apnea sync identifiers,yes,yes,yes,no,no,yes,yes,yes,yes,yes,LOW,dirdiving_apnea_* namespace
-Apnea export files,yes,no,no,yes,no,no,N/A,yes,yes,yes,LOW,User-initiated export
-Apnea diagnostics/logs,yes,yes,no,no,no,no,yes,yes,yes,yes,LOW,No tracking
-Apnea iCloud backup,yes,partial,no,no,no,stub,yes,yes,yes,yes,MEDIUM,IOS-P3-002 stub documented
-Apnea App Intents metadata,yes,no,no,no,no,no,N/A,yes,yes,yes,LOW,Router policy on Diving only for AB
+Category,Collected,Stored,Synced,Exported,Policy_Disclosed,Manifest_Declared,Status,Severity,Notes
+Apnea session timeline,YES,YES,YES,YES,YES,YES,PASS,P2,Field export QA still pending
+Apnea depth/time samples,YES,YES,YES,YES,YES,YES,PARTIAL,P1,Physical/wet evidence pending
+Apnea surface GPS metadata,YES,YES,YES,YES,YES,YES,PARTIAL,P1,Surface-only wording preserved
+Apnea recovery counters,YES,YES,YES,YES,YES,YES,PASS,P2,No medical guarantee language
+Apnea sync identifiers,YES,YES,YES,NO,YES,YES,PASS,P2,Namespace isolation covered

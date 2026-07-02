@@ -1,31 +1,25 @@
 Gate_ID,Gate_Name,Applies_To_Batch,Applies_To_Findings,Command,Expected_Result,Blocks_Merge,Physical_Required,External_Required,Evidence_File,Notes
-G-000,Branch main clean,Batch-0,All,git status --short,Empty or docs-only,NO,No,No,git status,Pre-remediation baseline
-G-001,Target isolation,All,All,./Scripts/check_main_target_isolation.sh,PASS,YES,No,No,check_main_target_isolation.sh,Activity target boundaries
-G-002,Secrets scan,All,All,./Scripts/check_secrets.sh,PASS,YES,No,No,check_secrets.sh,No credential leaks
-G-003,Localization audit,All,All,./Scripts/audit_localization.sh,PASS,YES,No,No,audit_localization.sh,EN/IT key parity
-G-004,Command integrity V1.5,Batch-0;Batch-9,CONS-046,./Scripts/validate_commands_for_cursor_integrity.sh,PASS,YES,No,No,validate_commands_for_cursor_integrity.sh,PASS @2c30412
-G-005,xcodegen generate,All,All,xcodegen generate,PASS,YES,No,No,xcodegen output,Project sync
-G-006,iOS build,All,All,xcodebuild -scheme DIRDiving iOS build,BUILD SUCCEEDED,YES,No,No,xcodebuild log,PASS @2c30412
-G-007,Watch build,All,All,xcodebuild -scheme DIRDiving Watch App build,BUILD SUCCEEDED,YES,No,No,xcodebuild log,PASS @2c30412
-G-008,iOS Algorithm Tests,All,CONS-049,xcodebuild -scheme DIRDiving iOS Algorithm Tests test,1655/1655 PASS,YES,No,No,MASTER_IOS audit,PASS @2c30412
-G-009,Watch Algorithm Tests,Batch-6,CONS-050,xcodebuild -scheme DIRDiving Watch Algorithm Tests test,1152/1152 PASS,YES,No,No,MASTER_WATCH audit,PARTIAL 1139/1152 @2c30412
-G-010,Watch FC oracle replay,Batch-1,CONS-009;WFC-P1-001,Audit15MultilevelOracleProfilesTests,PASS,YES,No,Yes,MASTER_WATCH oracle matrices,FC math PASS
-G-011,Schreiner vectors,Batch-1,FC math,Audit15 Schreiner suites,PASS,YES,No,No,SCHREINER_TEST_VECTOR_MATRIX,PASS @2c30412
-G-012,Multilevel ML-01..ML-10,Batch-1,FC math,Audit15MultilevelOracleProfilesTests,PASS,YES,No,No,MULTILEVEL_DECO_TRANSITION_MATRIX,PASS @2c30412
-G-013,Altitude matrix,Batch-1,CONS-015,OrchestratedAltitudeEnvironmentTests,PARTIAL,YES,Yes,Yes,ALTITUDE_MATRIX,Elevation oracle gap
-G-014,Settings ownership tests,Batch-3,Activity isolation,IOSActivitySettingsCoherenceTests,PASS,YES,No,No,SETTINGS_OWNERSHIP_MATRIX,PASS @2c30412
-G-015,Logbook ownership tests,Batch-3,Activity isolation,Logbook routing tests,PASS,YES,No,No,LOGBOOK_OWNERSHIP_MATRIX,PASS @2c30412
-G-016,Sync namespace tests,Batch-2,Sync integrity,ActivitySync*Tests,PASS,YES,No,No,SYNC_MESSAGE_NAMESPACE_MATRIX,Apnea isolated
-G-017,Schema migration tests,Batch-2,Schema,SchemaMigrationTests,PASS,YES,No,No,SCHEMA_MIGRATION_MATRIX,PASS @2c30412
-G-018,Backup restore tests,Batch-2,Persistence,BackupRestoreIsolationTests,PASS,YES,No,No,BACKUP_RESTORE_ISOLATION_MATRIX,PASS @2c30412
-G-019,Security malformed payload tests,Batch-7,Security,SecurityPrivacyTrustRemediationTests,PASS,YES,No,No,SECURITY_THREAT_MODEL,Static PASS
-G-020,Performance budget tests,Batch-5,Performance,PerformanceConcurrencyBatteryRemediationTests,PASS,YES,No,No,PERFORMANCE_BUDGET_MATRIX,Simulator only
-G-021,UI snapshot tests,Batch-6,CONS-032,IOSUIUXRemediationTests,PASS,YES,No,No,VISUAL_REGRESSION_COVERAGE_MATRIX,Structural PASS
-G-022,Mockup visual regression,Batch-6,CONS-032,capture_visual_regression_baselines.sh,PENDING_MANUAL,YES,Yes,No,PHYSICAL_PIXEL_DIFF,0/59 baselines
-G-023,Accessibility contracts,Batch-6,CONS-012,audit_accessibility_contracts.sh,PASS,YES,Yes,No,ACCESSIBILITY_MANUAL_QA_TEMPLATE,Manual pending
-G-024,Release claims check,Batch-9,CONS-044;CONS-053,validate_release_legal_claims_readiness.sh,PASS software,YES,No,Yes,CLAIMS_EVIDENCE_MATRIX,Legal pending
-G-025,Documentation truthfulness,Batch-9,CONS-053;CONS-054,Doc review vs MASTER_* audits,No P0 contradictions,YES,No,No,DOCUMENTATION_TRUTHFULNESS_MATRIX,2 P0 legacy docs open
-G-026,Physical Watch FC QA,Batch-8,CONS-010,MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX,Executed signed,YES,Yes,No,QA_EVIDENCE/BUHLMANN_EXTERNAL,0% @2c30412
-G-027,External Bühlmann validation,Batch-8,CONS-009,External validation plan,Third-party signed,YES,Yes,Yes,EXTERNAL_VALIDATION_GAPS,0% @2c30412
-G-028,WAO routing tests green,Batch-6,CONS-050,WatchWaterAutoOpenPolicyTests;WatchLaunchRoutingPolicyTests,All PASS,YES,No,No,WATCH_WATER_AUTO_OPEN_QA_MATRIX,13 failures @2c30412
-G-029,Apnea isolation gate,Batch-3,APNEA-005..009,ApneaArchitectureIsolationTests,PASS,YES,No,No,MASTER_APNEA_CONSOLIDATED_AUDIT_FINDINGS,PASS @2c30412
+G-001,branch main clean,Batch-0,All,git status --short,Docs-only delta or clean,YES,No,No,git status,Baseline integrity
+G-002,target isolation,Batch-0;Batch-1,All,./Scripts/check_main_target_isolation.sh,PASS,YES,No,No,Scripts output,Mandatory global gate
+G-003,secrets scan,Batch-0;Batch-1,All,./Scripts/check_secrets.sh,PASS,YES,No,No,Scripts output,Mandatory global gate
+G-004,localization audit,Batch-1,CF-002,./Scripts/audit_localization.sh,PASS,YES,No,No,Scripts output,Required for DG-LOC-001
+G-005,iOS build,Batch-1;Batch-2,CF-002|CF-007,xcodebuild -scheme DIRDiving iOS build,BUILD SUCCEEDED,YES,No,No,Build log,Core build gate
+G-006,Watch build,Batch-1;Batch-2,CF-002|CF-007,xcodebuild -scheme DIRDiving Watch App build,BUILD SUCCEEDED,YES,No,No,Build log,Core build gate
+G-007,iOS tests,Batch-1,CF-002,xcodebuild -scheme DIRDiving iOS Algorithm Tests test,All tests PASS,YES,No,No,Test log,Parity failures must be zero
+G-008,Watch tests,Batch-1,CF-002,xcodebuild -scheme DIRDiving Watch Algorithm Tests test,All tests PASS,YES,No,No,Test log,Parity failures must be zero
+G-009,Watch Full Computer oracle replay,Batch-2;Batch-4,CF-001,Audit15MultilevelOracleProfilesTests,PASS,YES,No,No,MASTER_WATCH_FULL_COMPUTER_ORACLE matrix,Required by orchestrator
+G-010,Schreiner vectors,Batch-2;Batch-4,CF-001,Watch Schreiner vector suite,PASS,YES,No,No,MASTER_WATCH_FULL_COMPUTER_SCHREINER_TEST_VECTOR_MATRIX_CURRENT.csv,Required by orchestrator
+G-011,multilevel ML-01 through ML-10,Batch-2;Batch-4,CF-001,Audit multilevel matrix run,PASS,YES,No,No,MASTER_WATCH_FULL_COMPUTER_MULTILEVEL_DECO_TRANSITION_MATRIX_CURRENT.csv,Required by orchestrator
+G-012,altitude matrix,Batch-2;Batch-4,CF-001,Altitude matrix tests,PASS,YES,No,No,MASTER_WATCH_FULL_COMPUTER_ALTITUDE_MATRIX_CURRENT.csv,Required by orchestrator
+G-013,Settings ownership tests,Batch-2;Batch-3,CF-004|CF-010,Settings ownership test suite,PASS,YES,No,No,MASTER_IOS_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv,Required by orchestrator
+G-014,Logbook ownership tests,Batch-2;Batch-3,CF-005|CF-010,Logbook ownership and routing tests,PASS,YES,No,No,MASTER_IOS_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv,Required by orchestrator
+G-015,sync namespace tests,Batch-2,CF-006,Sync namespace tests,PASS,YES,No,No,MASTER_SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv,Required by orchestrator
+G-016,schema migration tests,Batch-2,CF-006,Schema migration compatibility tests,PASS,YES,No,No,MASTER_SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv,Required by orchestrator
+G-017,backup restore tests,Batch-2,CF-006,Backup restore isolation tests,PASS,YES,No,No,MASTER_BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv,Required by orchestrator
+G-018,security malformed payload tests,Batch-2;Batch-4,CF-006|CF-011,Malformed payload rejection tests,PASS,YES,No,No,MASTER_SECURITY_THREAT_MODEL_CURRENT.md,Required by orchestrator
+G-019,performance budget tests,Batch-3;Batch-4,CF-003|CF-004,Performance budget checks,PASS,NO,No,No,MASTER_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv,Non-blocking for docs-only phase
+G-020,UI snapshot tests,Batch-1;Batch-3,CF-002|CF-010,UI snapshot tests,PASS,NO,No,No,MASTER_VISUAL_REGRESSION_COVERAGE_MATRIX_CURRENT.csv,Regression support gate
+G-021,mockup visual regression,Batch-3,CF-010,Visual regression baseline capture,PASS or documented pending,NO,Yes,No,MASTER_MOCKUP_IMPLEMENTATION_MATRIX_CURRENT.csv,Manual-heavy gate
+G-022,accessibility checks,Batch-3,CF-003|CF-004,Accessibility audits + manual checks,PASS or documented pending,NO,Yes,No,MASTER_UI_UX_EXTERNAL_PHYSICAL_QA_PENDING_CURRENT.md,Manual-heavy gate
+G-023,release claims check,Batch-4,CF-008|CF-009|CF-011,Release claims validation script and doc review,PASS,YES,No,Yes,MASTER_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv,Required by orchestrator
+G-024,documentation truthfulness check,Batch-1;Batch-4,CF-008|CF-009|CF-014,Docs truthfulness matrix review,No unsupported claims,YES,No,No,MASTER_DOCUMENTATION_TRUTHFULNESS_MATRIX_CURRENT.csv,Required by orchestrator

@@ -1,0 +1,6 @@
+Check_ID,Requirement,Observed,Status,Evidence,Notes
+UL-NC-001,No cross-activity canonical store merge,Observed separate activity stores,PASS,Tests/iOSAlgorithmTests/IOSUnifiedLogbookNoContaminationTests.swift,Presentation builder read-only
+UL-NC-002,No cross-write from unified list/detail interactions,No write path observed,PASS,iOSApp/Views/Shared/IOSUnifiedLogbookDetailHost.swift,Routes to activity-specific detail only
+UL-NC-003,No demo/fake contamination in real unified view when toggles are off,Observed by regression tests,PASS,Tests/iOSAlgorithmTests/IOSUnifiedLogbookPresentationBuilderTests.swift,Matches demo-logbook fix policy
+UL-NC-004,No watch sync mutation from unified view,No mutation path observed,PASS,Docs/IOS_UNIFIED_LOGBOOK_NO_CONTAMINATION_POLICY.md,Paired-device manual QA still pending
+UL-NC-005,No runtime activity mutation from visibility toggles,Observed scope-only settings behavior,PASS,Tests/iOSAlgorithmTests/IOSActivityLogbookVisibilitySettingsTests.swift,Mode switch remains independent
