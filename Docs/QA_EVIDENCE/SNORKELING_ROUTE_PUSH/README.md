@@ -27,7 +27,7 @@ Route drafted on iOS; Watch reachable
 ## Test steps
 
 1. Install the build at the recorded commit SHA.
-2. Execute the scenario for **SNORKELING_ROUTE_PUSH** per `PROCEDURE.md` when present.
+2. Execute the scenario per [`PROCEDURE.md`](PROCEDURE.md) (WatchConnectivity E2E harness).
 3. Capture screenshot, video, or log artifacts under this folder (do not commit until reviewed).
 4. Record observed results and compare to expected results.
 5. Obtain tester and reviewer signatures before marking PASS.

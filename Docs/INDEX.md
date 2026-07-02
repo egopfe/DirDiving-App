@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-07-02  
-**Branch consigliato:** `main` @ `c982fe3`
+**Aggiornato:** 2026-06-17  
+**Branch consigliato:** `main` @ `7c459cb`
+
+---
+
+## Aggiornamento indice 2026-06-17 — Snorkeling Watch P1/P2/P3 Unified Remediation Implementation
+
+Remediation R1→R2→R3: sync visibility, battery policy, logbook badges, pending queue persistence, return-primary Watch UI, settings re-send banner, adherence disclaimer; WC E2E procedure documented.
+
+| Campo | Valore |
+|-------|--------|
+| **Implementation report** | [`SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_IMPLEMENTATION_REPORT_CURRENT.md`](SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Status CSV** | [`SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_STATUS_CURRENT.csv`](SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_STATUS_CURRENT.csv) |
+| **Remediation plan** | [`SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_PLAN_CURRENT.md`](SNORKELING_WATCH_P1_P2_P3_UNIFIED_REMEDIATION_PLAN_CURRENT.md) |
+| **Verdict** | **PARTIAL** · **MANUAL_UI_QA_PENDING** · **PHYSICAL_QA_PENDING** |
 
 ---
 

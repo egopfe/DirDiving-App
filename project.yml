@@ -143,6 +143,7 @@ targets:
       - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
       - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
       - Utils/SnorkelingWatchMicroMapPresentationPolicy.swift
+      - Utils/SnorkelingWatchBatteryFractionPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - path: Shared
       - path: iOSApp
@@ -282,6 +283,7 @@ targets:
       - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
       - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
       - Utils/SnorkelingWatchMicroMapPresentationPolicy.swift
+      - Utils/SnorkelingWatchBatteryFractionPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
@@ -608,6 +610,8 @@ targets:
       - iOSApp/Utils/SnorkelingPlannedVsActualAnalytics.swift
       - iOSApp/Utils/SnorkelingWaypointReachedReport.swift
       - iOSApp/Utils/SnorkelingTrackQualityAnalytics.swift
+      - iOSApp/Utils/SnorkelingRoutePendingSendQueuePersistence.swift
+      - iOSApp/Utils/SnorkelingSessionLogbookSyncPresentation.swift
       - iOSApp/Services/IOSSnorkelingWatchTransferService.swift
       - iOSApp/Utils/IOSSnorkelingLocationPermission.swift
       - iOSApp/Utils/IOSSnorkelingLocalizationCatalog.swift
@@ -625,6 +629,7 @@ targets:
       - Utils/SnorkelingWatchReturnPrimaryActionPolicy.swift
       - Utils/SnorkelingWatchRouteSummaryPresentationPolicy.swift
       - Utils/SnorkelingWatchMicroMapPresentationPolicy.swift
+      - Utils/SnorkelingWatchBatteryFractionPolicy.swift
       - Utils/DIRWatchLocalizer.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchLayoutContractTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingPersistenceRecoveryTests.swift

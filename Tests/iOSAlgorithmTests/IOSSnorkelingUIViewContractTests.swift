@@ -1,6 +1,19 @@
 import XCTest
 
 final class IOSSnorkelingUIViewContractTests: XCTestCase {
+    func testIOSLogbookAndSettingsRemediationContracts() throws {
+        let root = repositoryRoot()
+        let list = try String(contentsOf: root.appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingSessionsListView.swift"))
+        let detail = try String(contentsOf: root.appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingSessionDetailView.swift"))
+        let settings = try String(contentsOf: root.appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingSettingsContent.swift"))
+        let planner = try String(contentsOf: root.appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingRoutePlannerView.swift"))
+        XCTAssertTrue(list.contains("logbookSyncPresentation"))
+        XCTAssertTrue(detail.contains("logbookSyncPresentation"))
+        XCTAssertTrue(detail.contains("snorkeling.logbook.planned_vs_actual.disclaimer"))
+        XCTAssertTrue(settings.contains("snorkeling.settings.watch_resend_required"))
+        XCTAssertTrue(planner.contains("stale_revision"))
+    }
+
     func testIOSDashboardIncludesAccessibilityAndNoRasterMockups() throws {
         let root = repositoryRoot()
         let dashboard = try String(contentsOf: root.appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingDashboardView.swift"))

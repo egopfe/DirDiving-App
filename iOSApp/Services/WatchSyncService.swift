@@ -771,7 +771,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         do {
             let parsed = try SnorkelingSessionSyncCodec.parsePayload(from: payload)
             let result = snorkelingLogbookStore.mergeImportedSession(parsed.session)
-            snorkelingSessionSyncService?.recordImport(result)
+            snorkelingSessionSyncService?.recordImport(result, sessionID: parsed.session.id)
             switch result {
             case .imported:
                 lastMessage = DIRIOSLocalizer.string("snorkeling.sync.received_from_watch")

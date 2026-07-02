@@ -13,8 +13,9 @@ final class IOSSnorkelingSessionSyncService: ObservableObject {
 
     @Published private(set) var state: PresentationState = .localOnly
     @Published private(set) var lastEventAt: Date?
+    @Published private(set) var sessionBadges: [UUID: SnorkelingSessionImportBadge] = [:]
 
-    func recordImport(_ result: SnorkelingSessionSyncImportResult) {
+    func recordImport(_ result: SnorkelingSessionSyncImportResult, sessionID: UUID? = nil) {
         switch result {
         case .imported:
             state = .imported
@@ -29,6 +30,30 @@ final class IOSSnorkelingSessionSyncService: ObservableObject {
             state = .failed(reason)
             lastEventAt = Date()
         }
+
+        guard let sessionID else { return }
+        switch result {
+        case .imported, .merged, .duplicateIgnored:
+            sessionBadges[sessionID] = .synced
+        case .failed(let reason):
+            sessionBadges[sessionID] = .failed(reason)
+        }
+    }
+
+    func markSessionPending(_ sessionID: UUID) {
+        sessionBadges[sessionID] = .pending
+    }
+
+    func badge(for sessionID: UUID) -> SnorkelingSessionImportBadge {
+        sessionBadges[sessionID] ?? .none
+    }
+
+    func logbookSyncPresentation(for session: SnorkelingSession) -> SnorkelingSessionLogbookSyncPresentation {
+        SnorkelingSessionLogbookSyncPresentationPolicy.make(
+            session: session,
+            aggregateState: state,
+            sessionBadge: badge(for: session.id)
+        )
     }
 
     func statusText(dateFormatter: DateFormatter) -> String {
@@ -62,4 +87,12 @@ final class IOSSnorkelingSessionSyncService: ObservableObject {
             return false
         }
     }
+
+    #if DEBUG
+    func testing_reset() {
+        state = .localOnly
+        lastEventAt = nil
+        sessionBadges = [:]
+    }
+    #endif
 }

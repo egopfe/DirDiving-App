@@ -37,6 +37,44 @@ final class IOSSnorkelingWatchTransferService: ObservableObject {
     private var pendingQueue: [PendingTransfer] = []
     private var activePackageID: UUID?
     private var nextRevision = 1
+    private let pendingQueueDefaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        pendingQueueDefaults = defaults
+        restorePendingQueue()
+    }
+
+    private func restorePendingQueue() {
+        let restored = SnorkelingRoutePendingSendQueuePersistence.load(from: pendingQueueDefaults)
+        pendingQueue = restored.map {
+            PendingTransfer(
+                packageID: $0.packageID,
+                revision: $0.revision,
+                checksum: $0.checksum,
+                packageData: $0.packageData,
+                enqueuedAt: $0.enqueuedAt
+            )
+        }
+        if let maxRevision = pendingQueue.map(\.revision).max() {
+            nextRevision = max(nextRevision, maxRevision + 1)
+        }
+        if !pendingQueue.isEmpty, case .draft = state {
+            state = .queued
+        }
+    }
+
+    private func persistPendingQueue() {
+        let entries = pendingQueue.map {
+            SnorkelingRoutePendingSendEntry(
+                packageID: $0.packageID,
+                revision: $0.revision,
+                checksum: $0.checksum,
+                packageData: $0.packageData,
+                enqueuedAt: $0.enqueuedAt
+            )
+        }
+        SnorkelingRoutePendingSendQueuePersistence.save(entries, to: pendingQueueDefaults)
+    }
 
     func send(
         draft: SnorkelingRoutePlannerDraft,
@@ -89,6 +127,7 @@ final class IOSSnorkelingWatchTransferService: ObservableObject {
             )
             nextRevision = max(nextRevision, package.body.revision + 1)
             state = .sending
+            persistPendingQueue()
             flushPending(session: WCSession.default)
             return true
         } catch {
@@ -117,11 +156,13 @@ final class IOSSnorkelingWatchTransferService: ObservableObject {
 
         if ack.status == SnorkelingRouteSyncTransferSupport.ackStatusImported {
             pendingQueue.remove(at: index)
+            persistPendingQueue()
             let syncedAt = Date()
             lastSuccessfulSyncAt = syncedAt
             state = .acknowledged(packageID: ack.packageID, revision: ack.revision, syncedAt: syncedAt)
         } else {
             pendingQueue.remove(at: index)
+            persistPendingQueue()
             let errorKey = ack.errorCode == "staleRevision"
                 ? "snorkeling.ios.watch.stale_revision"
                 : "snorkeling.ios.watch.rejected"
@@ -158,6 +199,7 @@ final class IOSSnorkelingWatchTransferService: ObservableObject {
     func testing_reset() {
         state = .draft
         pendingQueue = []
+        SnorkelingRoutePendingSendQueuePersistence.clear(from: pendingQueueDefaults)
         currentPackage = nil
         activePackageID = nil
         nextRevision = 1
@@ -166,5 +208,9 @@ final class IOSSnorkelingWatchTransferService: ObservableObject {
     }
 
     func testing_pendingQueueCount() -> Int { pendingQueue.count }
+
+    func testing_restorePendingQueue() {
+        restorePendingQueue()
+    }
     #endif
 }

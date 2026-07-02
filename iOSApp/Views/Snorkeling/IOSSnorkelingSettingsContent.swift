@@ -9,6 +9,12 @@ struct IOSSnorkelingSettingsContent: View {
         VStack(alignment: .leading, spacing: 16) {
             IOSCompanionSharedSettingsEmbeddedContent()
 
+            DIRCard(DIRIOSLocalizer.string("snorkeling.settings.watch_sync_notice"), icon: "applewatch", accent: DIRTheme.cyan) {
+                Text(DIRIOSLocalizer.string("snorkeling.settings.watch_resend_required"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+
             DIRCard(DIRIOSLocalizer.string("snorkeling.ios.settings.detection"), icon: "drop.fill", accent: DIRTheme.cyan) {
                 IOSCompanionSettingsToggleRow(
                     title: DIRIOSLocalizer.string("snorkeling.ios.settings.auto_water"),

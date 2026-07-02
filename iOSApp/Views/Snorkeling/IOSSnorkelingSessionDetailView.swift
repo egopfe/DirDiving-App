@@ -9,6 +9,7 @@ struct IOSSnorkelingSessionDetailView: View {
     @EnvironmentObject private var photoStore: IOSSnorkelingSessionPhotoStore
     @EnvironmentObject private var equipmentStore: IOSSnorkelingEquipmentStore
     @EnvironmentObject private var locationPermission: IOSLocationPermissionService
+    @EnvironmentObject private var sessionSyncService: IOSSnorkelingSessionSyncService
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var secondaryChart: IOSSnorkelingSecondaryChartKind = .distance
 
@@ -40,12 +41,16 @@ struct IOSSnorkelingSessionDetailView: View {
     private var trackQualityAnalytics: SnorkelingTrackQualityAnalytics {
         SnorkelingTrackQualityAnalyticsPolicy.make(session: session)
     }
+    private var logbookSyncPresentation: SnorkelingSessionLogbookSyncPresentation {
+        sessionSyncService.logbookSyncPresentation(for: session)
+    }
 
     var body: some View {
         DIRScreenContainer {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 14) {
                     header
+                    sessionSyncSection
                     heroMetrics
                     depthChartSection
                     IOSSnorkelingSessionMapView(model: mapModel, isDemoSession: isDemoSession)
@@ -110,6 +115,31 @@ struct IOSSnorkelingSessionDetailView: View {
                 Text(warnings)
                     .font(.caption)
                     .foregroundStyle(DIRTheme.orange)
+            }
+            detailRow(
+                DIRIOSLocalizer.string("snorkeling.logbook.session_source"),
+                DIRIOSLocalizer.string(logbookSyncPresentation.sourceKey)
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var sessionSyncSection: some View {
+        if isDemoSession { EmptyView() } else {
+            let sync = logbookSyncPresentation
+            if sync.badgeKey != nil || sync.guidanceKey != nil {
+                DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.sync_status"), icon: "arrow.triangle.2.circlepath", accent: sync.badgeIsWarning ? DIRTheme.orange : DIRTheme.green) {
+                    if let badgeKey = sync.badgeKey {
+                        Text(DIRIOSLocalizer.string(badgeKey))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(sync.badgeIsWarning ? DIRTheme.orange : DIRTheme.green)
+                    }
+                    if let guidanceKey = sync.guidanceKey {
+                        Text(DIRIOSLocalizer.string(guidanceKey))
+                            .font(.caption)
+                            .foregroundStyle(DIRTheme.muted)
+                    }
+                }
             }
         }
     }
@@ -406,6 +436,9 @@ struct IOSSnorkelingSessionDetailView: View {
         DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.planned_vs_actual"), icon: "arrow.left.arrow.right", accent: DIRTheme.cyan) {
             Text(DIRIOSLocalizer.string(presentation.comparisonSummaryKey))
                 .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+            Text(DIRIOSLocalizer.string("snorkeling.logbook.planned_vs_actual.disclaimer"))
+                .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
             if let name = presentation.plannedRouteName {
                 detailRow(DIRIOSLocalizer.string("snorkeling.watch.ready.route_name"), name)
