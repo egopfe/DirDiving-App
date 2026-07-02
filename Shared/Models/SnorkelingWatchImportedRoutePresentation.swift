@@ -12,6 +12,9 @@ struct SnorkelingWatchImportedRoutePresentation: Equatable, Sendable {
     var revision: Int?
     var plannedDistanceMeters: Double?
     var plannedDurationSeconds: TimeInterval?
+    var waypointCount: Int?
+    var returnAlertConfigured: Bool
+    var offRouteThresholdMeters: Double?
     var isPendingWhileSessionActive: Bool
     var staleRevisionRejected: Bool
     var lastImportErrorCode: String?
@@ -22,6 +25,9 @@ struct SnorkelingWatchImportedRoutePresentation: Equatable, Sendable {
         revision: nil,
         plannedDistanceMeters: nil,
         plannedDurationSeconds: nil,
+        waypointCount: nil,
+        returnAlertConfigured: false,
+        offRouteThresholdMeters: nil,
         isPendingWhileSessionActive: false,
         staleRevisionRejected: false,
         lastImportErrorCode: nil

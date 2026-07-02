@@ -295,29 +295,75 @@ struct IOSSnorkelingSessionDetailView: View {
     }
 
     private var markersSection: some View {
-        DIRCard(DIRIOSLocalizer.string("snorkeling.ios.session.markers"), icon: "mappin.and.ellipse", accent: DIRTheme.cyan) {
+        let categoryCounts = SnorkelingMarkerLogbookPresentationPolicy.categoryCounts(markers: session.markers)
+        let markerRows = SnorkelingMarkerLogbookPresentationPolicy.makeRows(markers: session.markers)
+
+        return DIRCard(DIRIOSLocalizer.string("snorkeling.logbook.markers.title"), icon: "mappin.and.ellipse", accent: DIRTheme.cyan) {
             if session.markers.isEmpty {
                 Text(DIRIOSLocalizer.string("snorkeling.ios.session.no_markers"))
                     .foregroundStyle(DIRTheme.muted)
             } else {
-                ForEach(session.markers) { marker in
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(markerLabel(for: marker))
-                                .foregroundStyle(.white)
-                            if let note = marker.note, !note.isEmpty {
-                                Text(note)
+                if !categoryCounts.isEmpty {
+                    Text(DIRIOSLocalizer.string("snorkeling.logbook.markers.by_category"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(DIRTheme.muted)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                        ForEach(categoryCounts) { item in
+                            HStack {
+                                Text(markerCategoryLabel(for: item.category))
                                     .font(.caption)
-                                    .foregroundStyle(DIRTheme.muted)
+                                    .foregroundStyle(.white)
+                                Spacer()
+                                Text("\(item.count)")
+                                    .font(.caption.monospacedDigit())
+                                    .foregroundStyle(DIRTheme.cyan)
                             }
                         }
-                        Spacer()
-                        Text(markerTimeText(for: marker))
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(DIRTheme.muted)
                     }
                 }
+
+                ForEach(markerRows) { row in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(row.categoryLabel)
+                                    .foregroundStyle(.white)
+                                if let gpsQuality = row.gpsQualityText {
+                                    Text(gpsQuality)
+                                        .font(.caption2)
+                                        .foregroundStyle(DIRTheme.muted)
+                                }
+                                if let distance = row.distanceFromEntryText {
+                                    Text(distance)
+                                        .font(.caption2)
+                                        .foregroundStyle(DIRTheme.muted)
+                                }
+                                if let note = row.note, !note.isEmpty {
+                                    Text(note)
+                                        .font(.caption)
+                                        .foregroundStyle(DIRTheme.muted)
+                                }
+                            }
+                            Spacer()
+                            Text(row.timestampText)
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(DIRTheme.muted)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
             }
+        }
+    }
+
+    private func markerCategoryLabel(for category: SnorkelingMarkerCategory) -> String {
+        switch category {
+        case .marineLife: return DIRIOSLocalizer.string("snorkeling.ios.marker.marine_life")
+        case .reef: return DIRIOSLocalizer.string("snorkeling.ios.marker.reef")
+        case .wreck: return DIRIOSLocalizer.string("snorkeling.ios.marker.wreck")
+        case .photoSpot: return DIRIOSLocalizer.string("snorkeling.ios.marker.photo_spot")
+        case .buoy: return DIRIOSLocalizer.string("snorkeling.ios.marker.buoy")
+        case .custom: return DIRIOSLocalizer.string("snorkeling.ios.marker.custom")
         }
     }
 

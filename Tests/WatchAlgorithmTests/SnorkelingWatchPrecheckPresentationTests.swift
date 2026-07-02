@@ -8,6 +8,9 @@ final class SnorkelingWatchPrecheckPresentationTests: XCTestCase {
             revision: 1,
             plannedDistanceMeters: 300,
             plannedDurationSeconds: 900,
+            waypointCount: 3,
+            returnAlertConfigured: true,
+            offRouteThresholdMeters: 50,
             isPendingWhileSessionActive: false,
             staleRevisionRejected: false,
             lastImportErrorCode: nil
@@ -36,6 +39,9 @@ final class SnorkelingWatchPrecheckPresentationTests: XCTestCase {
             revision: nil,
             plannedDistanceMeters: nil,
             plannedDurationSeconds: nil,
+            waypointCount: nil,
+            returnAlertConfigured: false,
+            offRouteThresholdMeters: nil,
             isPendingWhileSessionActive: false,
             staleRevisionRejected: false,
             lastImportErrorCode: nil

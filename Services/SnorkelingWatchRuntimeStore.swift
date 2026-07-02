@@ -300,6 +300,22 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
         guard let plan = store.activeRoutePlan else { return }
         engine.setRoutePlans([plan], activePlanID: plan.id)
         engine.setRoutePlanningMetadata(store.activePlanningMetadata)
+        if let metadata = store.activePlanningMetadata {
+            let thresholds = SnorkelingOperationalThresholds(
+                maxSessionDurationMinutes: Int((metadata.maxSessionDurationSeconds ?? SnorkelingOperationalThresholds.default.maxSessionDurationSeconds) / 60),
+                maxDistanceMeters: metadata.maxDistanceMeters ?? SnorkelingOperationalThresholds.default.maxDistanceMeters,
+                returnAlertDistanceMeters: SnorkelingOperationalThresholds.default.returnAlertDistanceMeters,
+                returnAlertDurationMinutes: SnorkelingOperationalThresholds.default.returnAlertDurationMinutes,
+                defaultReturnAlertPolicy: metadata.returnAlertPolicy,
+                offRouteThresholdMeters: metadata.offRouteThresholdMeters ?? SnorkelingOperationalThresholds.default.offRouteThresholdMeters,
+                gpsQualityWarningAccuracyMeters: metadata.gpsQualityWarningAccuracyMeters ?? SnorkelingOperationalThresholds.default.gpsQualityWarningAccuracyMeters,
+                buddyReminderEnabled: metadata.buddyReminderEnabled ?? SnorkelingOperationalThresholds.default.buddyReminderEnabled
+            )
+            engine.applyOperationalThresholds(thresholds)
+            if let buddyEnabled = metadata.buddyReminderEnabled {
+                buddyReminderEnabled = buddyEnabled
+            }
+        }
     }
 
     private func startSensors() {
