@@ -1,4 +1,6 @@
 import SwiftUI
+import UniformTypeIdentifiers
+import UIKit
 
 private struct LogbookMonthSection: Identifiable {
     let id: String
@@ -124,8 +126,8 @@ struct LogbookView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 18)
+                    .padding(.top, 12)
+                    .padding(.bottom, 20)
                 }
                 .dirCompanionScrollSurface()
             }
@@ -248,11 +250,11 @@ struct DiveLogCard: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             dateBlock
             DiveThumbnail(index: index)
-                .frame(width: 72, height: 72)
-            VStack(alignment: .leading, spacing: 6) {
+                .frame(width: 58, height: 58)
+            VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(session.siteName ?? DIRIOSLocalizer.string("detail.default_site"))
                         .font(.callout.weight(.semibold))
@@ -297,16 +299,21 @@ struct DiveLogCard: View {
                     Text(DIRIOSLocalizer.formatted("logbook.card.duration", Formatters.time(session.durationSeconds)))
                     Spacer()
                     Text(session.gasLabel.rawValue)
+                        .padding(.leading, 8)
+                    Spacer(minLength: 4)
+                    Text(Formatters.optionalTemperature(session.avgWaterTemperatureCelsius, units: unitPreference))
                 }
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.86))
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
             }
-            Spacer(minLength: 6)
+            Spacer(minLength: 4)
             Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.72))
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(DIRTheme.muted.opacity(0.82))
         }
-        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 5)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(DIRTheme.surface.opacity(0.8))
@@ -353,11 +360,18 @@ struct DiveLogCard: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Text(Formatters.clock(session.startDate))
-                .font(.caption2.monospacedDigit())
-                .foregroundStyle(.white.opacity(0.75))
+                .font(.system(size: 9, weight: .regular, design: .rounded).monospacedDigit())
+                .foregroundStyle(DIRTheme.muted)
         }
         .frame(width: 38)
     }
+
+    private static let monthAbbreviationFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "it_IT")
+        formatter.dateFormat = "LLL"
+        return formatter
+    }()
 }
 
 struct DiveThumbnail: View {
@@ -375,21 +389,26 @@ struct DiveThumbnail: View {
     var body: some View {
         ZStack {
             LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [.clear, .black.opacity(0.34)], startPoint: .top, endPoint: .bottom)
             Circle()
                 .fill(.white.opacity(0.16))
-                .frame(width: 52, height: 52)
-                .offset(x: -26, y: -30)
+                .frame(width: 42, height: 42)
+                .offset(x: -22, y: -24)
             Image(systemName: index == 2 ? "water.waves" : "photo")
-                .font(.system(size: 30, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.82))
+                .font(.system(size: 25, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.78))
                 .rotationEffect(.degrees(index == 2 ? -18 : 0))
             ForEach(0..<5) { bubble in
                 Circle()
-                    .fill(.white.opacity(0.18))
+                    .fill(.white.opacity(0.16))
                     .frame(width: CGFloat(3 + bubble), height: CGFloat(3 + bubble))
-                    .offset(x: CGFloat(18 - bubble * 8), y: CGFloat(-22 + bubble * 9))
+                    .offset(x: CGFloat(15 - bubble * 7), y: CGFloat(-18 + bubble * 8))
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1)
+        )
     }
 }

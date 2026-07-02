@@ -31,6 +31,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
     let maxDepthMeters: Double
     let avgDepthMeters: Double
     let avgWaterTemperatureCelsius: Double?
+    let minWaterTemperatureCelsius: Double?
+    let maxWaterTemperatureCelsius: Double?
     let ttv: Double
     let entryGPS: GPSPoint?
     let exitGPS: GPSPoint?
@@ -63,7 +65,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case id, startDate, endDate, durationSeconds, maxDepthMeters, avgDepthMeters
-        case avgWaterTemperatureCelsius, ttv, entryGPS, exitGPS
+        case avgWaterTemperatureCelsius, minWaterTemperatureCelsius, maxWaterTemperatureCelsius, ttv, entryGPS, exitGPS
         case entryGPSFixSource, exitGPSFixSource, samples
         case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo, exceededSupportedDepthRange
         case isManual, hasDepthProfile, equipmentUsed, entryPressureText, exitPressureText, entryPressureBar, exitPressureBar, decompressionNotes, ccrLogbookMetadata, fullComputerLogbookMetadata, depthSensorSourceTag
@@ -77,6 +79,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         maxDepthMeters: Double,
         avgDepthMeters: Double,
         avgWaterTemperatureCelsius: Double?,
+        minWaterTemperatureCelsius: Double? = nil,
+        maxWaterTemperatureCelsius: Double? = nil,
         ttv: Double,
         entryGPS: GPSPoint?,
         exitGPS: GPSPoint?,
@@ -109,6 +113,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.maxDepthMeters = maxDepthMeters
         self.avgDepthMeters = avgDepthMeters
         self.avgWaterTemperatureCelsius = avgWaterTemperatureCelsius
+        self.minWaterTemperatureCelsius = minWaterTemperatureCelsius
+        self.maxWaterTemperatureCelsius = maxWaterTemperatureCelsius
         self.ttv = ttv
         self.entryGPS = entryGPS
         self.exitGPS = exitGPS
@@ -145,6 +151,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         maxDepthMeters = try container.decode(Double.self, forKey: .maxDepthMeters)
         avgDepthMeters = try container.decode(Double.self, forKey: .avgDepthMeters)
         avgWaterTemperatureCelsius = try container.decodeIfPresent(Double.self, forKey: .avgWaterTemperatureCelsius)
+        minWaterTemperatureCelsius = try container.decodeIfPresent(Double.self, forKey: .minWaterTemperatureCelsius)
+        maxWaterTemperatureCelsius = try container.decodeIfPresent(Double.self, forKey: .maxWaterTemperatureCelsius)
         ttv = try container.decode(Double.self, forKey: .ttv)
         entryGPS = try container.decodeIfPresent(GPSPoint.self, forKey: .entryGPS)
         exitGPS = try container.decodeIfPresent(GPSPoint.self, forKey: .exitGPS)
@@ -185,6 +193,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(maxDepthMeters, forKey: .maxDepthMeters)
         try container.encode(avgDepthMeters, forKey: .avgDepthMeters)
         try container.encodeIfPresent(avgWaterTemperatureCelsius, forKey: .avgWaterTemperatureCelsius)
+        try container.encodeIfPresent(minWaterTemperatureCelsius, forKey: .minWaterTemperatureCelsius)
+        try container.encodeIfPresent(maxWaterTemperatureCelsius, forKey: .maxWaterTemperatureCelsius)
         try container.encode(ttv, forKey: .ttv)
         try container.encodeIfPresent(entryGPS, forKey: .entryGPS)
         try container.encodeIfPresent(exitGPS, forKey: .exitGPS)

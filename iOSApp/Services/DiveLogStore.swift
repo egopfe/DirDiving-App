@@ -411,16 +411,20 @@ final class DiveLogStore: ObservableObject {
                     temperatureCelsius: 24 - Double(idx)
                 )
             }
-            let avg = samples.map(\.depthMeters).reduce(0, +) / Double(samples.count)
+            let summary = DiveProfileMath.summary(
+                samples: samples,
+                startDate: start,
+                endDate: start.addingTimeInterval(duration)
+            )
             return DiveSession(
                 id: demoID,
                 startDate: start,
                 endDate: start.addingTimeInterval(duration),
                 durationSeconds: duration,
                 maxDepthMeters: samples.map(\.depthMeters).max() ?? maxDepth,
-                avgDepthMeters: avg,
+                avgDepthMeters: summary.averageDepthMeters,
                 avgWaterTemperatureCelsius: 24 - Double(idx),
-                ttv: DiveProfileMath.ttvIndex(averageDepthMeters: avg, durationSeconds: duration),
+                ttv: summary.ttv,
                 entryGPS: GPSPoint(latitude: 38.1157 + Double(idx) * 0.001, longitude: 13.3615, horizontalAccuracy: 15, timestamp: start),
                 exitGPS: GPSPoint(latitude: 38.1162 + Double(idx) * 0.001, longitude: 13.3620, horizontalAccuracy: 18, timestamp: start.addingTimeInterval(duration)),
                 samples: samples,
