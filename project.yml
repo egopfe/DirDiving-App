@@ -442,6 +442,7 @@ targets:
       - iOSApp/Services/IOSExportCancellation.swift
       - iOSApp/Services/EquipmentStore.swift
       - iOSApp/Utils/ChecklistItemSupport.swift
+      - iOSApp/Utils/EquipmentItemPresentationPolicy.swift
       - iOSApp/Utils/SyncNonceReplayCache.swift
       - iOSApp/Utils/CompanionPhotoManagementAuth.swift
       - iOSApp/Utils/DiveProfileMath.swift

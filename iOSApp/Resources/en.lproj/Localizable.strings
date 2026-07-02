@@ -1135,6 +1135,11 @@
 "equipment.my_equipment.button" = "My equipment";
 "equipment.my_equipment.title" = "My equipment";
 "equipment.checklist.gas_flag" = "GAS";
+"equipment.add.generic_item" = "Add equipment item";
+"equipment.add.gas_cylinder" = "Add gas / cylinder item";
+"equipment.item.gas_cylinder" = "Gas / cylinder item";
+"equipment.item.generic" = "Generic equipment item";
+"equipment.gas_separation_notice" = "Gas mixes and cylinders are managed separately from generic equipment.";
 "equipment.checklist.tank_size" = "Tank size";
 "equipment.template.rec" = "REC Equipment";
 "equipment.template.tec" = "TEC Equipment";
