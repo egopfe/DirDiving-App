@@ -65,6 +65,7 @@ struct SnorkelingWatchPresentationInput: Equatable {
     var offRouteWarningPaused: Bool
     var plannedReturnAlertActive: Bool
     var importedRoutePresentation: SnorkelingWatchImportedRoutePresentation
+    var microMapPresentation: SnorkelingWatchMicroMapPresentation
 }
 
 enum SnorkelingWatchSessionSaveState: String, Equatable {

@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` @ `38bc09e`
+**Branch consigliato:** `main` @ `38bc09e` (P2) — P3 commit pending index update
+
+---
+
+## Aggiornamento indice 2026-06-17 — Snorkeling Watch P3 Advanced Navigation + Analytics
+
+Watch micro-map route preview, iOS planned vs actual analytics, waypoint reached report, track quality analytics, photo marker thumbnails; 19 P3 tests.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`SNORKELING_WATCH_P3_ADVANCED_AUDIT_CURRENT.md`](SNORKELING_WATCH_P3_ADVANCED_AUDIT_CURRENT.md) |
+| **Report** | [`SNORKELING_WATCH_P3_IMPLEMENTATION_REPORT_CURRENT.md`](SNORKELING_WATCH_P3_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Completeness** | [`SNORKELING_WATCH_P3_COMPLETENESS_AUDIT_CURRENT.md`](SNORKELING_WATCH_P3_COMPLETENESS_AUDIT_CURRENT.md) |
+| **Verdict** | **SNORKELING_WATCH_P3_INTERNAL_READY** · **NO_ALGORITHM_REGRESSION** · **MANUAL_UI_QA_PENDING** |
 
 ---
 

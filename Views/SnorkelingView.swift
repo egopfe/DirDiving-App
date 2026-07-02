@@ -370,13 +370,20 @@ struct SnorkelingView: View {
     private var navigationPanel: some View {
         DivePanel(stroke: color(for: ui.navigationAccentToken)) {
             HStack(spacing: DiveUI.spaceM) {
-                DiveBearingRing(
-                    headingDegrees: ui.headingDegrees ?? 0,
-                    bearingDelta: ui.bearingDeltaDegrees ?? 0,
-                    accent: color(for: ui.navigationAccentToken),
-                    size: 100
-                )
-                .accessibilityLabel(ui.turnInstructionAccessibility)
+                VStack(spacing: 6) {
+                    DiveBearingRing(
+                        headingDegrees: ui.headingDegrees ?? 0,
+                        bearingDelta: ui.bearingDeltaDegrees ?? 0,
+                        accent: color(for: ui.navigationAccentToken),
+                        size: 88
+                    )
+                    .accessibilityLabel(ui.turnInstructionAccessibility)
+                    SnorkelingWatchMicroMapView(
+                        presentation: input.microMapPresentation,
+                        accent: color(for: ui.navigationAccentToken),
+                        size: 72
+                    )
+                }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(ui.waypointNameText)
@@ -412,12 +419,19 @@ struct SnorkelingView: View {
                             .foregroundStyle(DiveUI.orange)
                             .accessibilityLabel(String(localized: "snorkeling.nav.gps_unavailable"))
                     } else {
-                        DiveBearingRing(
-                            headingDegrees: ui.headingDegrees ?? 0,
-                            bearingDelta: ui.bearingDeltaDegrees ?? 0,
-                            accent: DiveUI.yellow,
-                            size: 88
-                        )
+                        VStack(spacing: 6) {
+                            DiveBearingRing(
+                                headingDegrees: ui.headingDegrees ?? 0,
+                                bearingDelta: ui.bearingDeltaDegrees ?? 0,
+                                accent: DiveUI.yellow,
+                                size: 76
+                            )
+                            SnorkelingWatchMicroMapView(
+                                presentation: input.microMapPresentation,
+                                accent: DiveUI.yellow,
+                                size: 64
+                            )
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 4) {

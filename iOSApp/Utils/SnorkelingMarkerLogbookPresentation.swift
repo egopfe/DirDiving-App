@@ -15,6 +15,8 @@ struct SnorkelingMarkerLogbookRowPresentation: Equatable, Identifiable {
     var gpsQualityText: String?
     var distanceFromEntryText: String?
     var note: String?
+    var photoAttachmentID: UUID?
+    var hasPhoto: Bool
 }
 
 enum SnorkelingMarkerLogbookPresentationPolicy {
@@ -29,22 +31,38 @@ enum SnorkelingMarkerLogbookPresentationPolicy {
         }
     }
 
-    static func makeRows(markers: [SnorkelingMarker]) -> [SnorkelingMarkerLogbookRowPresentation] {
+    static func makeRows(
+        markers: [SnorkelingMarker],
+        photoAttachmentIDsByMarkerID: [UUID: UUID] = [:]
+    ) -> [SnorkelingMarkerLogbookRowPresentation] {
         markers
             .sorted { $0.monotonicRelativeTimestampSeconds < $1.monotonicRelativeTimestampSeconds }
-            .map(makeRow(marker:))
+            .map { makeRow(marker: $0, photoAttachmentID: photoAttachmentIDsByMarkerID[$0.id]) }
     }
 
-    static func makeRow(marker: SnorkelingMarker) -> SnorkelingMarkerLogbookRowPresentation {
-        SnorkelingMarkerLogbookRowPresentation(
+    static func makeRow(marker: SnorkelingMarker, photoAttachmentID: UUID? = nil) -> SnorkelingMarkerLogbookRowPresentation {
+        let attachmentID = photoAttachmentID ?? marker.photoReferenceID
+        return SnorkelingMarkerLogbookRowPresentation(
             id: marker.id,
             categoryKey: marker.category.rawValue,
             categoryLabel: categoryLabel(for: marker),
             timestampText: timestampText(for: marker),
             gpsQualityText: gpsQualityText(for: marker),
             distanceFromEntryText: distanceFromEntryText(for: marker),
-            note: marker.note
+            note: marker.note,
+            photoAttachmentID: attachmentID,
+            hasPhoto: attachmentID != nil
         )
+    }
+
+    static func photoAttachmentIDs(for sessionID: UUID, attachments: [SnorkelingSessionPhotoAttachment]) -> [UUID: UUID] {
+        var map: [UUID: UUID] = [:]
+        for attachment in attachments where attachment.sessionID == sessionID {
+            if let markerID = attachment.markerID {
+                map[markerID] = attachment.id
+            }
+        }
+        return map
     }
 
     private static func categoryLabel(for marker: SnorkelingMarker) -> String {
