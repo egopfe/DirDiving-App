@@ -65,7 +65,8 @@ enum ChecklistItemSupport {
     ) -> [ChecklistItemKind: [Int]] {
         var grouped: [ChecklistItemKind: [Int]] = [:]
         for (index, item) in items.enumerated() {
-            grouped[item.kind, default: []].append(index)
+            let section = EquipmentItemPresentationPolicy.sectionKind(for: item)
+            grouped[section, default: []].append(index)
         }
         return grouped
     }

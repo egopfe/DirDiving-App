@@ -1133,6 +1133,11 @@
 "equipment.my_equipment.button" = "La mia attrezzatura";
 "equipment.my_equipment.title" = "La mia attrezzatura";
 "equipment.checklist.gas_flag" = "GAS";
+"equipment.add.generic_item" = "Aggiungi attrezzatura";
+"equipment.add.gas_cylinder" = "Aggiungi gas / bombola";
+"equipment.item.gas_cylinder" = "Elemento gas / bombola";
+"equipment.item.generic" = "Equipaggiamento generico";
+"equipment.gas_separation_notice" = "Le miscele e le bombole sono gestite separatamente dall'attrezzatura generica.";
 "equipment.checklist.tank_size" = "Dimensione bombola";
 "equipment.template.rec" = "Attrezzatura REC";
 "equipment.template.tec" = "Attrezzatura TEC";
