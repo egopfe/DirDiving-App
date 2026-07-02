@@ -7,6 +7,7 @@ struct EquipmentTemplateEditorView: View {
     let templateID: UUID
     @State private var name: String
     @State private var items: [EquipmentChecklistItem]
+    @State private var newItemTitle = ""
 
     init(template: EquipmentTemplate) {
         templateID = template.id
@@ -23,32 +24,8 @@ struct EquipmentTemplateEditorView: View {
                             TextField(DIRIOSLocalizer.string("equipment.template.name_placeholder"), text: $name)
                                 .foregroundStyle(.white)
                         }
-                        DIRCard(DIRIOSLocalizer.string("equipment.card.checklist"), icon: "checklist", accent: DIRTheme.green) {
-                            ForEach($items) { $item in
-                                VStack(alignment: .leading, spacing: 6) {
-                                    TextField(DIRIOSLocalizer.string("equipment.checklist.new_item"), text: $item.title)
-                                        .foregroundStyle(.white)
-                                    Toggle(DIRIOSLocalizer.string("equipment.checklist.gas_flag"), isOn: $item.usesGas).tint(DIRTheme.yellow)
-                                    EquipmentChecklistGasSection(item: $item)
-                                    Button(role: .destructive) {
-                                        items.removeAll { $0.id == item.id }
-                                    } label: {
-                                        Text(DIRIOSLocalizer.string("equipment.checklist.remove"))
-                                            .font(.caption.weight(.semibold))
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                                Divider().overlay(DIRTheme.hairline)
-                            }
-                            Button {
-                                items.append(EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.checklist.new_item")))
-                            } label: {
-                                Text(DIRIOSLocalizer.string("equipment.checklist.add"))
-                                    .font(.callout.weight(.semibold))
-                                    .foregroundStyle(DIRTheme.cyan)
-                            }
-                            .buttonStyle(.plain)
-                        }
+                        templateChecklistSections
+                        addTemplateItemCard
                     }
                     .padding(16)
                 }
@@ -68,6 +45,94 @@ struct EquipmentTemplateEditorView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var templateChecklistSections: some View {
+        let grouped = ChecklistItemSupport.groupedIndices(in: items)
+        return ForEach(ChecklistItemKind.sectionOrder, id: \.self) { kind in
+            if let indices = grouped[kind], !indices.isEmpty {
+                DIRCard(kind.localizedSectionTitle, icon: kind.sectionIcon, accent: sectionAccent(for: kind)) {
+                    ForEach(indices, id: \.self) { index in
+                        templateItemRow(binding: $items[index])
+                        if index != indices.last {
+                            Divider().overlay(DIRTheme.hairline)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var addTemplateItemCard: some View {
+        DIRCard(DIRIOSLocalizer.string("equipment.checklist.new_item"), icon: "plus.circle", accent: DIRTheme.cyan) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(DIRIOSLocalizer.string("equipment.gas_separation_notice"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                TextField(DIRIOSLocalizer.string("equipment.checklist.new_item"), text: $newItemTitle)
+                    .foregroundStyle(.white)
+
+                Button(DIRIOSLocalizer.string("equipment.add.generic_item")) {
+                    addTemplateItem(usesGas: false)
+                }
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.cyan)
+                .buttonStyle(.plain)
+
+                Button(DIRIOSLocalizer.string("equipment.add.gas_cylinder")) {
+                    addTemplateItem(usesGas: true)
+                }
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.yellow)
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func templateItemRow(binding: Binding<EquipmentChecklistItem>) -> some View {
+        let item = binding.wrappedValue
+        return VStack(alignment: .leading, spacing: 6) {
+            TextField(DIRIOSLocalizer.string("equipment.checklist.new_item"), text: binding.title)
+                .foregroundStyle(.white)
+            if EquipmentItemPresentationPolicy.shouldShowGasEditor(for: item) {
+                Text(DIRIOSLocalizer.string("equipment.item.gas_cylinder"))
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                EquipmentChecklistGasSection(item: binding)
+            }
+            Button(role: .destructive) {
+                items.removeAll { $0.id == item.id }
+            } label: {
+                Text(DIRIOSLocalizer.string("equipment.checklist.remove"))
+                    .font(.caption.weight(.semibold))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func sectionAccent(for kind: ChecklistItemKind) -> Color {
+        switch kind {
+        case .equipment, .task, .custom: return DIRTheme.cyan
+        case .gas: return DIRTheme.yellow
+        case .safety: return DIRTheme.green
+        case .document: return DIRTheme.muted
+        }
+    }
+
+    private func addTemplateItem(usesGas: Bool) {
+        let title = newItemTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
+        items.append(
+            EquipmentChecklistItem(
+                title: title,
+                isReady: false,
+                usesGas: usesGas,
+                kind: .equipment
+            )
+        )
+        newItemTitle = ""
     }
 
     private func save() {
