@@ -1,7 +1,18 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-07-01  
-**Branch consigliato:** `main` = `origin/main` @ `32234d1`
+**Aggiornato:** 2026-07-02  
+**Branch consigliato:** `main` = `origin/main` @ `741aa37`
+
+---
+
+## Aggiornamento indice 2026-07-02 — CCR planner safety acknowledgement fix
+
+Independent CCR safety ack toggle; generic planner ack no longer unlocks CCR; Italian typo fixed.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`DIRDIVING_CCR_PLANNER_SAFETY_ACK_FIX_CURRENT.md`](DIRDIVING_CCR_PLANNER_SAFETY_ACK_FIX_CURRENT.md) |
+| **Verdict** | **CCR_PLANNER_SAFETY_ACK_FIX_READY** · **NO_ALGORITHM_REGRESSION** · **MANUAL_UI_QA_PENDING** |
 
 ---
 
